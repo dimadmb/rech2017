@@ -1,0 +1,44 @@
+{% extends 'baseadmin.html.twig' %}
+
+{% block body %}
+    <h1>Фотографии кают редактирование</h1>
+
+    {{ form_start(edit_form) }}
+        {{ form_widget(edit_form) }}
+		<div id="dropZone" class="clearfix">
+			<div id="text">Для загрузки, перетащите файлы сюда.</div>
+			<div class="sortable">{% include 'image/upload.html.twig' with {'images':cabin.images} %}</div>
+		</div>
+        <input class="btn btn-primary" type="submit" value="Сохранить изменения и перейти на страницу" />
+    {{ form_end(edit_form) }}
+
+    <ul>
+        <li>
+            <a href="{{ path('shipcabinimage_ship',{'ship_code':ship.code}) }}">Back to the list</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}
+
+
+{% block javascripts %}
+
+<script src="{{ asset('admin/js/imageUpload.js') }}"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+	$(document).ready(function() {
+		$('.sortable').sortable().bind('sortupdate', function(e, ui) {
+			$('.sortable input.sort').each(function(i){
+				$(this).val(i);
+			});
+		});
+		
+	});
+</script>	
+
+{% endblock %}

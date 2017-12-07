@@ -24,6 +24,8 @@ class PageController extends Controller
      */
     public function pageAction($url)
     {
+		
+		
 		$repository = $this->getDoctrine()->getRepository('BaseBundle:Page');
 		$page = $repository->findOneByFullUrl($url);
 		if ($page == null) {

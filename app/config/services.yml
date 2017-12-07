@@ -7,3 +7,14 @@ services:
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+
+    cruise_search:
+        class: CruiseBundle\Service\CruiseSearch
+        arguments: ['@doctrine']
+
+    cruise:
+        class: CruiseBundle\Service\Cruise
+        arguments: ['@doctrine']
+
+    num2str:
+        class: CruiseBundle\Service\NumToString

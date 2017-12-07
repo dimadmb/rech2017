@@ -1,3 +1,10 @@
+
+
+manager:
+    resource: "@ManagerBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
 load:
     resource: "@LoadBundle/Controller/"
     type:     annotation

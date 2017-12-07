@@ -33,7 +33,9 @@ class AppKernel extends Kernel
 			new Dimadmb\SimpleHtmlDomBundle\DimadmbSimpleHtmlDomBundle(),
 			
 			new Symfony\Bundle\AsseticBundle\AsseticBundle(),
+            new ManagerBundle\ManagerBundle(),
 			
+			new Liuggio\ExcelBundle\LiuggioExcelBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {

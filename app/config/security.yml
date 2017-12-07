@@ -9,7 +9,7 @@ security:
         
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
-        ROLE_SUPER_ADMIN: ROLE_ADMIN
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_MANAGER]
 
     providers:
         fos_userbundle:
@@ -32,4 +32,6 @@ security:
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
+        - { path: ^/manager/, role: ROLE_MANAGER }
+        - { path: ^/order, role: IS_AUTHENTICATED_FULLY }
 

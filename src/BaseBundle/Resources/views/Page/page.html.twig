@@ -16,7 +16,7 @@
 {% for image in page.file %}
 	<div class="col-sm-3 admin-thumb" id="image-{{image.id}}">
 		<a class="photo" title="{{ image.title }}" href="{{ (upload_path~image.filename) | imagine_filter('show') }}" rel="group" >
-			<img class="img-responsive" alt="{{ image.title }}" title="{{ image.title }}" src="{{ (upload_path~image.filename) | imagine_filter('my_thumb') }}" />
+			<img class="img-responsive" style="margin:0 auto 10px;" alt="{{ image.title }}" title="{{ image.title }}" src="{{ (upload_path~image.filename) | imagine_filter('my_thumb') }}" />
 		</a>
 	</div>
 {% endfor %}
@@ -33,6 +33,7 @@
 			<div class="navbar-form pull-right">
               <button class="btn btn-primary" edit="false" id="edit-inline">Быстрая правка</button>
               <a  href="{{ path('page_edit',{id:page.id}) }}" class="btn btn-primary"  >Редактировать в админке</a>
+              <a  href="{{ path('admin_index') }}" class="btn btn-primary"  >Админка</a>
             </div>
         </div>
     </div>	

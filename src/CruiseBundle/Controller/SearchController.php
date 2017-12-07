@@ -23,7 +23,7 @@ class SearchController extends Controller
 		"astrahan" => ["inf" => "Астрахань", "gen" => "Астрахани"],
 		];
 
-	public function searchFormAction()
+	public function searchFormAction($action = null)
 	{
 		$request =  Request::createFromGlobals();
 		$repository = $this->getDoctrine()->getRepository('CruiseBundle:Cruise');
@@ -79,9 +79,10 @@ class SearchController extends Controller
 				}
 			}
 		}
-		
+		//dump($action);
         return $this->render('CruiseBundle:Search:searchForm.html.twig', array(
-            'form' => $form
+            'form' => $form,
+			'action' => $action
         ));		
 
 	}

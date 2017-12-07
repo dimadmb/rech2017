@@ -5,14 +5,243 @@
 {% block description %}Описание речного круиза {{cruise.name}}. Отправление на теплоходе {{cruise.ship.name}} {{cruise.startDate | date("d.m.Y")}}, прибытие {{cruise.endDate | date("d.m.Y")}}. Длительность круиза {{cruise.dayCount}} дней. {% endblock %}
 
 
-{% block body %}
 
+{% block javascriptsonload %}
+var rns={
+{% for  deckName, deck in cabins %}
+	{% for type in deck %}
+			{% for room in type.rooms %}
+			{{room.number}}:{
+			desc: '{{type.cabinName}}',
+			offers:[{% for rpName , place in type.rpPrices %}'{{type.cabin.id}}-{{rpName}}',{% endfor %}],
+			},
+			{% endfor %}			
+	{% endfor %}			
+{% endfor %}			
+};
+
+var offers={
+{% for  deckName, deck in cabins %}
+	{% for type in deck %}
+		{% for rpName, rp in type.rpPrices  %}	
+			'{{type.cabin.id}}-{{rpName}}': {
+			name:'{{type.cabinName}} ({{rpName}})',
+			rns:[{% for room in type.rooms %}{{room.number}},{% endfor %}]
+			},
+		{% endfor %}			
+	{% endfor %}			
+{% endfor %}	
+}
+
+
+window.selectOffer = function (offer_id, rn_id){	
+    $('.select-offer').remove();
+    var offerDIV=$('div[data-offer=\''+offer_id+'\']');
+    // надо перемотать к нему + развернуть + выделить чекбокс
+    $('html, body').animate({
+        scrollTop: offerDIV.offset().top
+    }, 500);
+
+    offerDIV.find('.expand-lnk').trigger('click');
+
+    offerDIV.find('input[data-rn='+rn_id+']').prop('checked',true).trigger('change');
+    offerDIV.find('span[data-rni='+rn_id+']').addClass('checked');
+};
+
+    $('.places-number').click(function(){
+	if($(this).hasClass('disabled')) return false;
+       var rn_id=$(this).html();
+       var offer=$(this).parents( ".cabin-row" );
+       if ($(this).hasClass('checked')){
+           $(this).removeClass('checked');
+		   offer.find('input[data-rn='+rn_id+']').prop('checked',false);
+           offer.find('span[data-rni='+rn_id+']').removeClass('checked');
+           $(svgDocument).find('#rn-'+rn_id).css('stroke','none');
+       }else{
+			$(this).addClass('checked');
+           offer.find('input[data-rn='+rn_id+']').prop('checked',true).trigger('change');
+           offer.find('span[data-rni='+rn_id+']').addClass('checked');
+           $(svgDocument).find('#rn-'+rn_id).css('stroke','#f00');
+       }
+    });
+	
+    $('input[data-rn]').change(function(e){
+        //console.log($(this).prop("checked"));
+		var offer=$(this).parents( ".cabin-row" );
+        if ($(this).prop("checked"))
+		{
+            $(svgDocument).find('#rn-'+$(this).data('rn')).css('stroke','#f00');
+			offer.find('.places-number[data-rni='+$(this).data('rn')+']').addClass('checked');
+			$('input[data-rn='+$(this).data('rn')+']').not(this).prop('checked',false)
+			.parents( ".cabin-row" ).find('.places-number[data-rni='+$(this).data('rn')+']').removeClass('checked');
+			
+		}
+        else
+		{
+            $(svgDocument).find('#rn-'+$(this).data('rn')).css('stroke','none');
+			offer.find('.places-number[data-rni='+$(this).data('rn')+']').removeClass('checked');			
+		}
+
+    });	
+	
+	
+	
+	var svgObject = document.getElementById("svg");
+	if (svgObject.contentDocument) {
+		var svgDocument = svgObject.contentDocument;
+	} else {
+		try {
+			var svgDocument = svgObject.getSVGDocument();
+		} catch(e) {alert(e);}
+	}	
+    $(svgDocument).find('[id^=rn]').css({cursor:'pointer',display:'none'}).
+
+    hover(
+        function(){
+            $(this).css({fill: "#f00"});
+            $('body').append('<div class="room-desc" style="background:#fff; padding:15px; border:3px solid #ccc; border-radius:5px; position:absolute; max-width:500px; left:'+($(this).offset().left + $('#svg').offset().left +20)+'px; top:'+($(this).offset().top + $('#svg').offset().top+20)+'px">'+$(this).attr('desc')+'</div>');
+        },
+        function(){
+            $(this).css({fill: "#000"});
+            $('.room-desc').remove();
+        }).
+
+	
+    click(function(){
+        //console.log($(this).attr('id').substr(3));
+		
+		if(!$(this).hasClass('disabled')) 
+		{
+			var id=$(this).attr('id').substr(3);
+			$('.select-offer').remove();
+			if ($(this).css('stroke') == 'none')
+			{
+				//$(this).css('stroke','#f00');
+				/*
+				Добавление выбора предложения из списка
+				*/
+				str='';
+				for(i in rns[id].offers){
+					
+					
+					//current_offers.push(offers[rns[id].offers[i]]);
+					var offer=offers[rns[id].offers[i]];
+					str+='<li  onclick="selectOffer(\''+rns[id].offers[i]+'\','+ id +')">'+offer.name+'</li>';
+				}
+				//console.log(str);
+				
+				$('body').append('<div data-id="'+id+'" class="select-offer" style="left:'+($(this).offset().left + $('#svg').offset().left +20)+'px; top:'+($(this).offset().top + $('#svg').offset().top-40)+'px"><div class="select-header">Выберите вариант размещения</div><ul>'+str+'</ul><i class="icon icon-cancel close-select-offer"></i></div>');
+
+			}
+			else
+			{
+
+				$(this).css('stroke','none');
+				$('input[data-rn='+id+']').prop('checked',false)
+				.parents( ".cabin-row" ).find('.places-number[data-rni='+id+']').removeClass('checked');
+			}			
+		}
+		else
+		{
+			$('body').append('<div class="select-offer" style="left:'+($(this).offset().left + $('#svg').offset().left +20)+'px; top:'+($(this).offset().top + $('#svg').offset().top-40)+'px"><div class="select-header">Каюту можно удалить из корзины</div><i class="icon icon-cancel close-select-offer"></i></div>');
+		}
+
+
+
+
+    })
+    ;	
+	
+	/// удаляем всплывающее окно select-offer при нажатии не на него 
+	
+	$('body').on('click','.close-select-offer',function(){		
+		id = $('.select-offer').attr('data-id');
+		$('.select-offer').remove();
+		//console.log(id);
+		$(svgDocument).find('#rn-'+id).css('stroke','none');
+		
+	})	
+
+{% for  deckName, deck in cabins %}
+	{% for type in deck %}
+			{% for room in type.rooms %}
+				if($(svgDocument).find("#rn-{{room.number}}") !== null)
+				{
+					descr  = "{{ type.cabinName }}" ;
+					$(svgDocument).find('#rn-{{room.number}}').css("display", "block")      .attr('desc',descr);  
+				}
+				else 
+				{	
+					console.log('{{room.number}}')
+				}	
+			{% endfor %}			
+	{% endfor %}			
+{% endfor %}	
+
+	
+{% endblock %}
+
+
+{% block body %}
+<style>
+.select-offer {
+	background:#fff;
+	padding:15px;
+	border:3px solid #ccc;
+	border-radius:5px;
+	position:absolute;
+	max-width:500px;
+}
+.select-offer .select-header {
+	font-size: 15px;
+	font-weight: 600;
+	color: #4688f1;
+	margin-bottom: 10px;
+}
+.select-offer ul li {
+	cursor: pointer;
+}
+.select-offer ul li:hover {
+	color: #4688f1;
+}
+
+.cabin-row .cabin-places span.places-number.checked{
+	background: #4688f1;
+}
+
+.cabin-row .cabin-places span.places-number {
+	cursor:pointer;
+}
+.cabin-row .cabin-places span.places-number.disabled {
+	cursor: not-allowed;
+}
+
+.close-select-offer {
+	position:absolute;
+	top:0;
+	right:0;
+	cursor:pointer;
+}
+.places-number {
+	display:none;
+	border-radius: 10px;
+	padding: 3px;
+	position:relative;
+}
+.places-number.checked {
+	background:#00ff68 !important;
+	border:1px solid #ccc ;
+	display:inline-block;
+}
+
+
+</style>
 {#{dump()}#}
 
 <h1>Описание речного круиза  «{{cruise.name}}»</h1>
-
-
-
+{#{dump(request)}} 
+{{dump(rooms)}} 
+{{dump(cabins)}#}
 <p>
 Дата отправления:{{cruise.startDate | date("d.m.Y")}}<br>
 Дата прибытия:{{cruise.endDate | date("d.m.Y")}}<br>
@@ -122,83 +351,92 @@
 {% if (cabins != null) %}
 
 
-<table class="table table-striped  ">
-<thead>
-	<tr>
-		<th>Палуба</th>
-		<th>Тип каюты</th>
-		<th>Размещение</th>
-		<th>
-		<table style="width:100%;">
-			<tr>
-				{% for tariff,one in tariff_arr %}	
-					<td style="width:{{ (100/(tariff_arr|length))|round }}%; text-align:center;">
-						{{tariff}}
-					</td>
-				{% endfor %} 
-			</tr>
-		</table>
-		
-		</th>
-	</tr>
-</thead>
+<object id="svg" type="image/svg+xml" data="{{'/files/ship/'~cruise.ship.code~'/'~cruise.ship.code~'-decks.svg'}}" style="width: 100%;" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">Your browser does not support SVGs</object>
 
+{{dump(cabins)}}
 
+<form action="{{path('basket')}}" method="post">
 {% for  deckName, deck in cabins %}
+<h2>{{deckName}} палуба</h2>
 	{% for type in deck %}
 		{% for rpName, rp in type.rpPrices  %}
-			<tr>
-				<td>{{deckName}}</td>
-				<td>{{type.cabinName}}<br>
-					{#% if (type.rooms|length > 0) %}
-					№№ 
-					{% endif %}
-					{% for room in type.rooms %}
-						<span style="/*color:red;*/ font-weight:700;" >{{room}} </span>
-						
-					{% endfor %#}</td>
-				<td>{{rpName}}</td>
-				<td>
-				<table style="width:100%; ">
-					<tr>
-					
-						{% for tariff,one in tariff_arr %}
+			<div data-offer="{{type.cabin.id}}-{{rpName}}" class="descr-block cabin-row" style="padding:5px;; margin-bottom:5px; display:table; width: 100%; background:#fff;">
+				<div style="display:table-row;">
+					<p>{{type.cabinName}} ({{rpName}})</p>				
+				</div>
+				<div style="display:table-row; border-bottom">
+				<div class="cabin-places" style="display:table-cell; padding-right:50px; ">
 
-						
-						<td style="width:{{ (100/(tariff_arr|length))|round }}%; text-align:center;">
-						
-						{% if (rp.prices[tariff]) is defined %}	
-						
+					<p>
+					{% for room in type.rooms if (room.discount == false) %}
+						<span class="places-number" data-rni="{{room.number}}" style="{% if room.discount %}color:red;{% endif %} font-weight:700;" >{{room.number}}</span>
+					{% endfor %}
+					</p>
+					<p>
+					{% for room in type.rooms if (room.discount == false) %}
+						<label style="border: 1px solid #ccc;    padding: 3px;    border-radius: 5px;{% if room.discount %}color:red;{% endif %} font-weight:700;" for="">{{room.number}}<input type="checkbox" name="rooms[{{room.id}}]"  data-rn={{room.number}} value="{{rp.place}}"></label>
+					{% endfor %}
+					</p>
+				
+				</div>
 
+				{% for prices in rp.prices %}
+					<div style="display:table-cell; width:150px;">
+					{% for mealName,meal in prices %}
+								<p>{{meal.tariff.name}}</p>
+								<p style=""><span >{{mealName}}</span> <b>{{meal.price|number_format(0, '.', ' ')}}  руб.</b></p>
+					{% endfor %}
+					</div>
+				{% endfor %}
+				
+				</div> <!-- end row -->
+				
+				<div style="display:table-row;">
+				<div class="cabin-places" style="display:table-cell; padding-right:50px; ">
+					<p>
+					{% for room in type.rooms if room.discount %}
+						<span class="places-number" data-rni="{{room.number}}" style="{% if room.discount %}color:red;{% endif %} font-weight:700;" >{{room.number}}</span>
+					{% endfor %}
+					</p>
+					<p>
+					{% for room in type.rooms if room.discount %}
+						<label style="border: 1px solid #ccc;    padding: 3px;    border-radius: 5px;{% if room.discount %}color:red;{% endif %} font-weight:700;" for="">{{room.number}}<input type="checkbox" name="rooms[{{room.id}}]"  data-rn={{room.number}} value="{{rp.place}}"></label>
+					{% endfor %}
+					</p>
+				
+				</div>
+				{% for prices in rp.prices %}
+					<div style="display:table-cell; width:150px;">
+					{% for mealName,meal in prices %}
 								
-								
-								
-								{% for mealName,meal in rp.prices[tariff] %}
-
-									
-								{% if (type.rooms|length > 0) %}
-									<p style="room"><span >{{mealName}}</span> <b>{{meal.price|number_format(0, '.', ' ')}}  руб.</b></p>
-								{% else %}	
-									<p style=""><span >{{mealName}}</span> <b>{{meal.price|number_format(0, '.', ' ')}}  руб.</b></p>
+								{% if (type.discountInCabin) %}
+								<p>{{meal.tariff.name}}</p>
+									<p style="text-decoration:line-through;"><span >{{mealName}}</span></p>
+									<p style="color:red;" > <b>{{(meal.price *( 1 - (cruise.typeDiscount.value/100))) |number_format(0, '.', ' ')}}  руб.</b></p>
 								{% endif %}
-									
-									
-									
-								{% endfor %}
-		
-						{% endif %}
-						</td>						
-						
-						{% endfor %}					
 
-					</tr>
-				</table>
-				</td>
-			</tr>
+					{% endfor %}
+					</div>
+				{% endfor %}
+				
+				</div> <!-- end row -->
+				<div style="display:table-row;">
+					{% for image in type.cabin.images %}
+						<a class="photo" title="{{ image.title }}" href="{{ (upload_path~image.filename) | imagine_filter('show') }}" rel="group" >
+							<img class="img-responsive" style="float:left; margin-right:5px;" alt="{{ image.title }}" title="{{ image.title }}" src="{{ (upload_path~image.filename) | imagine_filter('thumb_70') }}" />
+						</a>
+					{% endfor %}						
+				</div>
+			</div>
 		{% endfor %}
 	{% endfor %}
 {% endfor %}
-</table>
+
+<input type="hidden" name="cruise" value="{{cruise.id}}">
+<input type="submit" value="Заказать">
+
+</form>
+
 
 
 <p>* Цены действительны на момент публикации и могут незначительно измениться до полной оплаты рейса.</p>
@@ -206,11 +444,10 @@
 <p>Нет доступных круизов</p>
 {% endif %}
 
-
 {% endblock %}
 
 
-{% block javascriptsonload %}
+{#% block javascriptsonload %}
 
 	$('#orderModalForm').submit(function(){
 		// ajax отправка 
@@ -244,6 +481,6 @@
 	});
 
 {{ parent() }}
-{% endblock %}
+{% endblock %#}
 
 

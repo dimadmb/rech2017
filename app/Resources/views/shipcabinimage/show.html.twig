@@ -1,0 +1,48 @@
+{% extends 'baseadmin.html.twig' %}
+
+{% block body %}
+    <h1>Motorshiproomimage</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ motorshipRoomImage.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ motorshipRoomImage.name }}</td>
+            </tr>
+            <tr>
+                <th>Sort</th>
+                <td>{{ motorshipRoomImage.sort }}</td>
+            </tr>
+            <tr>
+                <th>Motorship</th>
+                <td>{{ motorshipRoomImage.motorship }}</td>
+            </tr>
+            <tr>
+                <th>Deck</th>
+                <td>{{ motorshipRoomImage.deck }}</td>
+            </tr>
+            <tr>
+                <th>Roomtype</th>
+                <td>{{ motorshipRoomImage.roomType }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('motorshiproomimage_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('motorshiproomimage_edit', { 'id': motorshipRoomImage.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+		
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+		<link rel="stylesheet" href="{{ asset('admin/css/style.css') }}">
+		
+		
+		<link rel="stylesheet" href="{{ asset('css/fancybox/jquery.fancybox.css') }}">
+		
+
+		
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+		
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>	
+
+		<script src="{{ asset('js/jquery.fancybox.js') }}"></script>
+
+
+	
+    </head>
+    <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-inverse navbar-static-top" role="navigation">
+        <div class="container header-volna" style="padding-top:30px; position:relative;">
+            <a  href="{{path('homepage')}}"><img style=" margin-top:-25px; max-width:100%" src="{{asset('images/template/logo.png')}}" alt="Речное агентство"></a>
+
+			</div>
+			
+
+			
+			
+        </div>
+        <!-- /.container -->
+        <div class="container ">
+
+	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		<ul class="nav navbar-nav navbar-right">
+
+
+
+			<li class="dropdown">
+				<a href="{{path('manager_invoices')}}">Заявки</a>
+			</li>
+			<li class="dropdown">
+				<a href="{{path('manager_turs')}}">Туры</a>
+			</li>
+
+
+
+		</ul>
+	</div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>	
+	
+	<div class="container">
+	{% block body %}{% endblock %}
+	</div>
+        
+        {% block javascripts %}{% endblock %}
+		
+		<script>
+			$(document).ready(function() {
+				$('.photo').fancybox();
+				{% block javascriptsready %}{% endblock %}
+			})
+		</script>
+
+    </body>
+</html>

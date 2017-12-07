@@ -1,0 +1,15 @@
+{% extends 'baseadmin.html.twig' %}
+
+{% block body %}
+
+{% for ship in ships %}
+
+
+	<a href="{{path('shipcabinimage_ship',{'ship_code':ship.code})}}">{{ship.name}}</a>
+	<br>
+	
+
+{% endfor %}
+
+
+{% endblock %}

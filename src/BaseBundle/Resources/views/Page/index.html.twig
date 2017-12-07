@@ -31,3 +31,50 @@
 {% endif %}
 
 {% endblock %}
+
+{% block javascripts %}
+{% if is_granted("ROLE_ADMIN") %}
+<script async type="text/javascript" src="/web/bundles/ivoryckeditor/ckeditor.js"></script>
+{% endif %}
+{% endblock %}
+
+{% block javascriptsonload %}
+{% if is_granted("ROLE_ADMIN") %}
+	$('#edit-inline').click(function(){
+		if($(this).attr("edit") == 'false')
+		{
+			$(this).attr("edit",'true');
+			$(this).text("Сохранить");
+			
+			$('#page_html').css({display:"none"});
+			$('.edit-inline').attr('contenteditable','true').css({backgroundColor:"#cfc", display : "block"});
+			//$('.edit-inline').animate({ backgroundColor: "red" },500)
+			CKEDITOR.disableAutoInline = true
+			CKEDITOR.inline("page_body", {"contentsCss":["\/web\/css\/bootstrap.min.css","\/web\/css\/bootstrap-theme.min.css","\/web\/css\/style.css"],"allowedContent":true,"language":"ru","filebrowserBrowseUrl":"\/web\/app_dev.php\/elfinder"});
+		}
+		else 
+		{
+			console.log("сохраняем");
+			//console.log($('#page_title').text());
+			//console.log(CKEDITOR.instances['page_body'].getData());
+			//var data = 'page_title=' + $('#page_title').text() + '&page_body=' + CKEDITOR.instances['page_body'].getData();
+			var data = {'page_h1':$('#page_h1').text() , 'page_body' : CKEDITOR.instances['page_body'].getData() }
+			$.ajax({
+				type: "POST",
+				url: '{{ path('page_ajax_edit',{id:page.id}) }}',
+				data: data,
+				success: function(data, textStatus, jqXHR){
+					//console.log(data);
+					//$('#answer .modal-body').html(data);
+					$('#answer').modal();
+					location.reload();
+
+				},
+				error: function(jqXHR, textStatus){
+					alert(textStatus);
+				}
+			})
+		}
+	});
+{% endif %}	
+{% endblock %}

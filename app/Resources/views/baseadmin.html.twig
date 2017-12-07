@@ -16,6 +16,8 @@
 		
 		<link rel="stylesheet" href="{{ asset('css/fancybox/jquery.fancybox.css') }}">
 		
+		{% block styles %}{% endblock %}
+		
 
 		
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
@@ -30,6 +32,42 @@
 	
     </head>
     <body>
+	
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-inverse navbar-static-top" role="navigation">
+        <div class="container header-volna" style="padding-top:30px; position:relative;">
+            <a  href="{{path('homepage')}}"><img style=" margin-top:-25px; max-width:100%" src="{{asset('images/template/logo.png')}}" alt="Речное агентство"></a>
+
+			</div>
+			
+
+			
+			
+        </div>
+        <!-- /.container -->
+        <div class="container ">
+
+	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		<ul class="nav navbar-nav navbar-right">
+
+
+
+			<li class="dropdown">
+				<a href="{{path('page_index')}}">Страницы</a>
+			</li>
+			<li class="dropdown">
+				<a href="{{path('shipcabinimage_ships')}}">Картинки к каютам теплохода</a>
+			</li>
+
+
+
+		</ul>
+	</div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>		
+	
 	<div class="container">
 	{% block body %}{% endblock %}
 	</div>

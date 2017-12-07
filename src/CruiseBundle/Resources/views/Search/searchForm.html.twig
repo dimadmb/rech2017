@@ -1,5 +1,5 @@
 
-<form action="{{path('search')}}" method="get">
+<form {% if action == null %}action="{{path('search')}}" {% else %} action="{{path(action)}}{% endif %}" method="get">
 
 <div class="row">
 	<div class="col-sm-3">

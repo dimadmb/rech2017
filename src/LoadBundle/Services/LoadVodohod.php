@@ -53,7 +53,7 @@ class LoadVodohod  extends Controller
 	public function load($ship_id, $update = false)
 	{
 		$dump = [];
-		$base_url = "http://www.vodohod.spb.ru/api/";
+		$base_url = "https://vodohod.spb.ru/api/";
 		$em = $this->doctrine->getManager();
 
 		$cruiseRepos = $this->doctrine->getRepository('CruiseBundle:Cruise');		
@@ -67,10 +67,20 @@ class LoadVodohod  extends Controller
 		$categoryRepos = $this->doctrine->getRepository('CruiseBundle:Category');
 		
 		$turOperator = $this->doctrine->getRepository('CruiseBundle:TurOperator')->findOneById(1);
-		$ship = $shipRepos->findOneById($ship_id);
+		//$ship = $shipRepos->findOneById($ship_id);
 		
+		$qb = $em->createQueryBuilder()
+				->select('s,cab,rooms')
+				->from('CruiseBundle:Ship', 's')
+				->leftJoin('s.cabin','cab')
+				->leftJoin('cab.rooms','rooms')
+				->where('s.id = '.$ship_id)
 
+		;
 		
+		$ship = $qb->getQuery()->getOneOrNullResult();
+
+		dump($ship);
 
 		/// Загружается с питерского сайта
 		$this->getSPB();		
@@ -139,12 +149,20 @@ class LoadVodohod  extends Controller
 			
 			$dump = $motorship = $this->getMotorship($ship_id);
 			$this->ShipPageCreate($ship_id);
+		
+			/*
 			
 			if ($ship != null) {
 				$em->remove($ship);
 				$em->flush();
 			}
 			$ship = new Ship();
+			*/
+			
+			if($ship == null)
+			{
+				$ship = new Ship();
+			}
 			
 			
 			$ship
@@ -174,31 +192,62 @@ class LoadVodohod  extends Controller
 			$cabin_url = $base_url."rooms_motorship.php?motorship_id=".$ship_id;
 			$cabin_json = $this->curl_get_file_contents($cabin_url);
 			$cabins_v = json_decode($cabin_json,true);
+			
+			//dump($ship);
+			
 			foreach($cabins_v as $cabin_v)
 			{
-				$cabin = new ShipCabin();
+				//$cabin = new ShipCabin();
 				
 				$cabinType = $cabinTypeRepos->findOneByRtId($cabin_v['rt_id']);  //  используется id водохода
 				$deck = $decksRepos->findOneByDeckId((int)$cabin_v['deck_id']);
 				
-				$cabin
-					->setDeck($deck)
-					->setType($cabinType)
-					->setShip($ship)
-				;
-				$ship->addCabin($cabin);
+				$cabin = null;
+				foreach($ship->getCabin() as $cabinTemp)
+				{
+					if(($cabinTemp->getType() == $cabinType ) && ($cabinTemp->getDeck() == $deck) )
+					{
+						$cabin = $cabinTemp;
+					}
+				}
+				if(null == $cabin)
+				{
+					$cabin = new ShipCabin();
+					$cabin
+						->setDeck($deck)
+						->setType($cabinType)
+						->setShip($ship)
+					;
+					$ship->addCabin($cabin);					
+				}
+
 				
 				foreach($rooms[$cabin_v['deck_id']][$cabin_v['rt_id']] as $roomItem)
 				{
+					$room = null;
 
-				
-					$room = new ShipRoom();
-					$room
-						->setNumber($roomItem['room_number'])
-						->setCabin($cabin)
-					;
-					$cabin->addRoom($room);
-					$em->persist($room);
+					foreach($ship->getCabin() as $cabinTemp)
+					{
+						foreach($cabinTemp->getRooms() as $roomTemp )
+						{
+							if($roomTemp->getNumber() == $roomItem['room_number'] )
+							{
+								$room = $roomTemp;
+							}
+						}
+					}					
+					
+					if(null == $room)
+					{
+						$room = new ShipRoom();
+						$room
+							->setNumber($roomItem['room_number'])
+							->setCabin($cabin)
+						;
+						$cabin->addRoom($room);
+						$em->persist($room);						
+					}
+
 				}
 
 				$em->persist($cabin);
@@ -238,23 +287,25 @@ class LoadVodohod  extends Controller
 			}
 		}
 		
-		// удаляем все круизы данного теплохода 
-		// нужно оптимизировать в один запрос
-		$cruises_remove = $cruiseRepos->findBy(['ship' => $ship]);
-		foreach ($cruises_remove as $cr) {
-			$em->remove($cr);
-		}
-		$em->flush();
-		
-		
-		
-		// и добавляем заново
+		$cruisesArray = [];
+		$cruises_ship = $cruiseRepos->findBy(['ship' => $ship]);
+		foreach ($cruises_ship as $cr) {
+			$cruisesArray[$cr->getId()] = $cr;
+ 		}
+
+
 		foreach($cruises_v as $id => $cruise_v)
 		{
-			$cruise = new Cruise();
+			if(isset($cruisesArray[$id]))
+			{
+				$cruise = $cruisesArray[$id];
+			}
+			else
+			{
+				$cruise = new Cruise();
+			}
 
 			$cruise->setId($id);
-			$cruise->setCode($id);
 			$cruise->setShip($ship);
 			$cruise->setName($cruise_v["name"]);
 			$cruise->setStartDate(new \DateTime($cruise_v["date_start"]));
@@ -262,7 +313,19 @@ class LoadVodohod  extends Controller
 			$cruise->setDayCount($cruise_v["days"]);
 			$cruise->setTurOperator($turOperator);
 			
+			// удаляем связи с категориями
+			$cruise->removeAllCategory();
+			// и программы круиза
+			$cruise->removeAllProgram();
+			$programm_del = $em->getRepository("CruiseBundle:ProgramItem")->findByCruise($cruise);
+			foreach($programm_del as $p_del)
+			{
+				$em->remove($p_del);
+			}
+			
 			$em->persist($cruise);
+			$em->flush();
+			
 			
 			foreach($cruise_v["directions"] as $direct)
 			{
@@ -344,9 +407,7 @@ class LoadVodohod  extends Controller
 					if($price_value <= 0) continue;
 
 					// запишем это всё в price
-					
-					
-					$price = new Price();
+
 					 
 						if(isset($cabins[$rt_name->getRtId()][$deck->getDeckId()]))
 						{
@@ -356,6 +417,18 @@ class LoadVodohod  extends Controller
 						{
 							continue;
 						}	
+					
+					$price = $em->getRepository("CruiseBundle:Price")->findOneBy([
+										'place' => $rp_id,
+										'cabin' => $cabin,
+										'meals' => $mealss[""],
+										'tariff' => $cruiseTariff,
+										'cruise' => $cruise,
+									]);
+					if(null == $price)
+					{
+						$price = new Price();						
+					}
 					
 
 					
@@ -413,7 +486,7 @@ class LoadVodohod  extends Controller
 	/// Данную функцию можно вызвать лишь раз для инициализации или при изменениях у Водохода
 	public function getSPB()
 	{
-		$base_url = "http://www.vodohod.spb.ru/api/";	
+		$base_url = "https://vodohod.spb.ru/api/";	
 		$em = $this->doctrine->getManager();
 		
 		// палубы 
@@ -513,6 +586,8 @@ class LoadVodohod  extends Controller
 	
 	public function ShipPageCreate($ship_id)
 	{
+		
+		
 		$motorship = $this->getMotorship($ship_id);
 			
 			
@@ -557,6 +632,7 @@ class LoadVodohod  extends Controller
 				'ship_description' => $shipBody,
 				'img_deck' => self::PATH_IMG.$shipCode.'/'.$shipCode.'-decks.gif',
 				"ship_id" => $ship_id,
+				"ship_name" => $shipName,
 				));
 		
 		$em = $this->doctrine->getManager();
@@ -596,11 +672,10 @@ class LoadVodohod  extends Controller
 				unlink($dir.'/'.$image->getFilename());
 				$em->remove($image);
 			}
-			$em->remove($page);
+			//$em->remove($page);
 			$em->flush();
 		}
-		
-		$page = new Page();
+		if($page == null) 	$page = new Page();
 		
 		$page 
 				->setParent($pageParent)
@@ -629,6 +704,9 @@ class LoadVodohod  extends Controller
 			$htmlFoto = $this->curl_get_file_contents("https://vodohod.com/cruises/vodohod/".$shipCode."/photo.htm");
 				$parser->load($htmlFoto);				
 			}
+			
+			$page->removeAllFile();
+			$em->flush();
 			
 			$sort = 1;
 			foreach($parser->find('.item a') as $element) 

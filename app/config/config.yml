@@ -6,6 +6,7 @@ imports:
     - { resource: "@AdminBundle/Resources/config/services.yml" }
     - { resource: "@CruiseBundle/Resources/config/services.yml" }
     - { resource: "@LoadBundle/Resources/config/services.yml" }
+    - { resource: "@ManagerBundle/Resources/config/services.yml" }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -30,7 +31,7 @@ framework:
         engines: ['twig']
     default_locale:  "%locale%"
     trusted_hosts:   ~
-    trusted_proxies: ~
+#    trusted_proxies: ~
     session:
         # http://symfony.com/doc/current/reference/configuration/framework.html#handler-id
         handler_id:  session.handler.native_file
@@ -53,6 +54,7 @@ assetic:
     use_controller: false
     bundles:        [ ]
     #java: /usr/bin/java
+    java: "/home/q/q12naswz/.local/bin/java"
     filters:
         cssrewrite: ~
 
@@ -121,6 +123,7 @@ swiftmailer:
     port:       "%mailer_port%"
     encryption: "%mailer_encryption%"
     spool:     { type: memory }
+    auth_mode:  login
 
 liip_imagine :
     resolvers :
@@ -131,6 +134,13 @@ liip_imagine :
 
     filter_sets :
         cache : ~
+
+        thumb_70 :
+            filters :
+                thumbnail  : { size : [70, 70] }
+                #relative_resize: { heighten: 200 }
+            post_processors:
+                jpegoptim: { strip_all: true, max: 70, progressive: true }
 
         my_thumb :
             filters :
@@ -196,6 +206,23 @@ fos_user:
     db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
     user_class: BaseBundle\Entity\User
+    from_email:
+        address: "%mailer_user%"
+        sender_name: "Ваше «Речное Агентство»"
+    registration:
+        confirmation:
+#            from_email: # Use this node only if you don't want the global email address for the confirmation email
+#                address:        "%mailer_user%"
+#                sender_name:    "%mailer_user%"
+            enabled:    true # change to true for required email confirmation
+            template:   '@FOSUser/Registration/email.txt.twig'
+
+        form:
+            type: BaseBundle\Form\RegistrationType
+    profile:
+        form:
+            type: BaseBundle\Form\ProfileType
+
 
 lsw_memcache:
     session:

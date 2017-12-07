@@ -1,0 +1,110 @@
+{% extends 'basemanager.html.twig' %}
+
+{% block body %}
+
+{#{dump(cruises)}#}
+		
+<div class="row" style="background:#00ceff;">
+	<div class="col-sm-12">					
+	{{ render(controller('CruiseBundle:Search:searchForm',{'action':'manager_turs'})) }}
+	</div>			
+</div>
+			
+<h1>Скидки на туры</h1>
+
+{% for cruise in cruises %}
+<div class="row">
+	<div class="col-sm-1">
+	{{cruise.id}}
+	</div>	
+	<div class="col-sm-1">
+	{{cruise.ship.name}}
+	</div>	
+	<div class="col-sm-1">
+	{{cruise.startDate | date('d.m.y')}}
+	</div>	
+	<div class="col-sm-1">
+	{{cruise.endDate | date('d.m.y')}}
+	</div>	
+	<div class="col-sm-1">
+	{{cruise.dayCount}}
+	</div>	
+	<div class="col-sm-4">
+	{{cruise.name}}
+	</div>	
+	<div class="col-sm-3">
+		<div class="divGroup ">
+        <label class=""><input data-cruise-id="{{cruise.id}}" class="doDiscount" name="type_request{{cruise.id}}" type="radio" {% if cruise.typeDiscount is null %}checked{% endif %} value="0">НЕТ</label>
+		{% for typeDiscount in typeDiscounts  %}
+			<label class=""><input data-cruise-id="{{cruise.id}}" class="doDiscount"  name="type_request{{cruise.id}}" type="radio" {% if cruise.typeDiscount == typeDiscount %}checked{% endif %} value="{{typeDiscount.id}}">{{typeDiscount.value | number_format(0, '.', ',')}}%</label>
+		{% endfor %}
+        </div>	
+	</div>	
+</div>
+<hr>
+{% endfor %}
+
+<div class="modal rooms fade" id="modal-rooms" style="display:none;">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button"></button>
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<p class="cruise"></p>
+
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-danger" data-dismiss="modal" type="button">Закрыть окно</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('js/bootstrap-slider.js') }}"></script>
+{% endblock %}
+{% block javascriptsready %}
+		$('.doDiscount').click(function(){
+			console.log($(this));
+			$('#modal-rooms').modal('show');
+			cruise_id = $(this).attr('data-cruise-id');
+			value = $(this).val();
+			$.ajax({
+				data : {'typeDiscount':value},
+				url: "{{path('manager_get_ajax_rooms')}}/"+cruise_id,			  
+				success: function(html){
+					$('#modal-rooms .modal-body').html(html);
+				}
+			});
+		});
+		
+		$('body').on('click','.itemKauta',function(){
+			cruise_id = $(this).siblings('.cruise_id').val();
+			room_id = $(this).attr('data-room-id');
+			span = $(this);
+			$.ajax({
+				url: "{{path('manager_set_ajax_room_root')}}"+cruise_id+"/"+room_id,
+				success: function(discount){
+					
+					if(discount == 'set')
+					{
+						span.addClass('selectKauta');
+					}
+					else if(discount == 'del')
+					{
+						span.removeClass('selectKauta');
+					}
+
+				}				
+			});
+
+		})
+		
+		$("#days").slider({});
+{% endblock %}
+
+{% block stylesheets %}<link rel="stylesheet" href="{{ asset('css/bootstrap-slider.css') }}">{% endblock %}

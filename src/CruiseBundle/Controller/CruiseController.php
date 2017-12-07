@@ -7,14 +7,25 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\ORM\Query\ResultSetMapping;
+use Symfony\Component\HttpFoundation\Session\Session;
+
 
 
 
 class CruiseController extends Controller
 {
 
+	public function curl_get_file_contents($URL)
+	{
+		$c = curl_init();
+		curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($c, CURLOPT_URL, $URL);
+		$contents = curl_exec($c);
+		curl_close($c);
 
+		if ($contents) return $contents;
+			else return FALSE;
+	}
 
 
     /**
@@ -70,15 +81,37 @@ class CruiseController extends Controller
      */
 	public function cruiseDetailAction($id)
 	{
+				
 		$cruiseRepository = $this->getDoctrine()->getRepository("CruiseBundle:Cruise");
 		
+		$em = $this->getDoctrine()->getManager();
+		
+		$cruise = $em->createQueryBuilder()
+			->select('c,td')
+			->from("CruiseBundle:Cruise",'c')
+			->leftJoin('c.typeDiscount','td')
+			->where('c.id ='.$id)
+			->getQuery()
+			->getOneOrNullResult()
+		;
+		
 
-		$cruise = $cruiseProgram = $cruiseRepository->getProgramCruise($id);
+		//$cruise = $cruiseProgram = $cruiseRepository->getProgramCruise($id);
 		if($cruise == null)
 		{
 			throw $this->createNotFoundException("Страница не найдена.");
 		}			
 		$cruiseShipPrice = $cruiseRepository->getPrices($id);
+		
+		//dump($cruiseShipPrice);
+		
+		$session = new Session();
+		$basket = $session->get('basket');	
+		if(null === $basket)
+		{
+			$session->set('basket',[]);	
+		}
+		
 
 
 		$tariff_arr = array();
@@ -87,18 +120,59 @@ class CruiseController extends Controller
 		if($cruiseShipPrice != null)
 		{
 			
+			$roomDiscounts = $this->getDoctrine()->getRepository("CruiseBundle:RoomDiscount")->findByCruise($cruise);
+			
+			$discount = $cruise->getTypeDiscount();
+			$active_rooms = [];
+			if(null !== $discount)
+			{
+				foreach($roomDiscounts as  $roomDiscount)
+				{
+					$active_rooms[] = $roomDiscount->getRoom()->getId();
+				}				
+			}
+			$available_rooms = [];
+			$url = "http://cruises.vodohod.com/agency/json-prices.htm?pauth=jnrehASKDLJcdakljdx&cruise=".$cruise->getId();
+			$rooms_json = $this->curl_get_file_contents($url);
+			$rooms_v = json_decode($rooms_json,true);
+			foreach($rooms_v['room_availability'] as $room_group_v)
+			{
+				foreach($room_group_v as $room_v)
+				{
+					$available_rooms[] = $room_v;
+				}
+			}
 			
 			$cabinsAll = $cruiseShipPrice->getShip()->getCabin();
+			
 			foreach($cabinsAll as $cabinsItem)
 			{
 				
+				
+				$discountInCabin = false;
 				$rooms_in_cabin = array();
 				foreach($cabinsItem->getRooms() as $room)
 				{
-					/*if(in_array($room->getNumber(),$active_rooms))
-					{*/
-						$rooms_in_cabin[] = $room->getNumber();
-					/*}*/
+					if(in_array($room->getId(),$active_rooms))
+					{
+						$room->discount = true;
+						$discountInCabin = true;
+					}
+					else
+					{
+						$room->discount = false;
+					}
+					
+					if(in_array($room->getNumber(),$available_rooms))
+					{
+						$rooms_in_cabin[] = $room;
+					}
+					elseif(in_array($room->getId(),$active_rooms))
+					{
+						$rooms_in_cabin[] = $room;
+					}
+
+					
 				}
 
 				foreach($cabinsItem->getPrices() as $prices)
@@ -107,6 +181,7 @@ class CruiseController extends Controller
 					$tariff_arr[$prices->getTariff()->getname()]=1;
 					
 					$price[$prices->getPlace()->getRpName()]['prices'][$prices->getTariff()->getname()][$prices->getMeals()->getName()] = $prices;
+					$price[$prices->getPlace()->getRpName()]['place'] = $prices->getPlace()->getRpId();
 					//$price[$prices->getRpId()->getRpName()]['rooms'] = $rooms_in_cabin;//список кают
 					// сюда добавить свободные каюты
 					//$rooms => 
@@ -116,7 +191,8 @@ class CruiseController extends Controller
 					'cabinName' =>$cabinsItem->getType()->getComment(),
 					'cabin' => $cabinsItem,
 					'rpPrices' => $price,
-					'rooms' => $rooms_in_cabin
+					'rooms' => $rooms_in_cabin,
+					'discountInCabin' => $discountInCabin
 					// тут можно посчитать количество rowspan
 					)
 					;
@@ -127,16 +203,24 @@ class CruiseController extends Controller
 		{
 			return ['cruise' => $cruise, 'cabins' => null,'tariff_arr'=>null ];
 		}		
+
 		
-		
-		return [ 'cruise' => $cruise, 'cabins' => $cabins,'tariff_arr'=>$tariff_arr ];
+		return [ 	
+					'cruise' => $cruise, 
+					'cabins' => $cabins,
+					'tariff_arr'=>$tariff_arr ,
+					'discount'=>$discount,
+					'request' => Request::createFromGlobals(),
+					'rooms' => $available_rooms,
+					];
 	}
 
 
 
 	public function searchCruise($parameters = array())
 	{
-		
+		return $this->get('cruise_search')->searchCruise($parameters);
+		/*
 		$em = $this->getDoctrine()->getManager();
 		$rsm = new ResultSetMapping;
 		$rsm->addEntityResult('CruiseBundle:Cruise', 'c');
@@ -156,12 +240,8 @@ class CruiseController extends Controller
 		$rsm->addFieldResult('p', 'p_id', 'id');
 		$rsm->addFieldResult('p', 'p_price', 'price');
 
-
-
-
 		$where = "";
 		$join = "";
-		
 		
 		// даты unix окончание - последняя дата начала // для моиска по месяцам
 		if(isset($parameters['startdate']))
@@ -192,26 +272,26 @@ class CruiseController extends Controller
 			AND s.shipId = ".$parameters['ship'];
 		}
 		
-		/*
-		if(isset($parameters['specialoffer']) && isset($parameters['burningCruise']))
-		{
-			$where .= "
-			AND ((code.specialOffer = 1) OR (code.burningCruise = 1)) ";	
-		}
-		else
-		{
-			if(isset($parameters['specialoffer']))
-			{
-				$where .= "
-				AND code.specialOffer = 1";			
-			}
-			if(isset($parameters['burningCruise']))
-			{
-				$where .= "
-				AND code.burningCruise = 1";			
-			}		
-		}
-		*/
+		
+		//if(isset($parameters['specialoffer']) && isset($parameters['burningCruise']))
+		//{
+		//	$where .= "
+		//	AND ((code.specialOffer = 1) OR (code.burningCruise = 1)) ";	
+		//}
+		//else
+		//{
+		//	if(isset($parameters['specialoffer']))
+		//	{
+		//		$where .= "
+		//		AND code.specialOffer = 1";			
+		//	}
+		//	if(isset($parameters['burningCruise']))
+		//	{
+		//		$where .= "
+		//		AND code.burningCruise = 1";			
+		//	}		
+		//}
+		
 		if(isset($parameters['places']))
 		{
 			$join .= "
@@ -222,8 +302,6 @@ class CruiseController extends Controller
 			AND cp.place_id IN (".implode(',',$parameters['places']).")";	
 			
 		}
-
-		
 		
 		if(isset($parameters['days']))
 		{
@@ -260,9 +338,7 @@ class CruiseController extends Controller
 				WHERE tariff.name LIKE '%взрослый%'
 				GROUP BY p2.cruise_id
 			) p ON c.id = p.cruise_id
-		
-		
-		
+
 		WHERE 1
 		"
 		.$where.
@@ -276,7 +352,10 @@ class CruiseController extends Controller
 		//$query->setParameter(1, 'romanb');
 		
 		$result = $query->getResult();
+		
+		
 		return $result;
+		*/
 	}
 
 

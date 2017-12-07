@@ -51,7 +51,7 @@ class ImageController extends Controller
 		
 		if($image != null)
 		{
-			unlink($this->getParameter('upload_directory').'/'.$image->getFilename());
+			@unlink($this->getParameter('upload_directory').'/'.$image->getFilename());
 			
 			$em->remove($image);
 			$em->flush();

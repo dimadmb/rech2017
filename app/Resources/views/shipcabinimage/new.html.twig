@@ -1,0 +1,25 @@
+{% extends 'baseadmin.html.twig' %}
+
+{% block body %}
+    <h1>Фотографии к каюте</h1>
+{#{dump()}#}
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+		<div id="dropZone" class="clearfix">
+			<div id="text">Для загрузки, перетащите файлы сюда.</div>
+			
+		</div>
+        <input type="submit" value="Create" />
+    {{ form_end(form) }}
+
+    <ul>
+        <li>
+            <a href="{#{ path('motorshiproomimage_ship') }#}">Вернуться к теплоходу</a>
+        </li>
+    </ul>
+{% endblock %}
+
+
+{% block javascripts %}
+	<script src="{{ asset('admin/js/imageUpload.js') }}"></script>
+{% endblock %}

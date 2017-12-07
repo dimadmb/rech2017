@@ -1,0 +1,37 @@
+{% extends 'baseadmin.html.twig' %}
+
+{% block body %}
+
+	{#{dump()}#}
+	
+	<h1>{{ship.name}}</h1>
+	
+	{% for cabin in cabins %}
+	<div class="row" style="border:1px solid #ccc; border-radius:5px;">
+
+		
+		{% if( cabin.images | length > 0) %}
+
+			
+			<p>
+				<a href="{{path('shipcabinimage_edit',{'id':cabin.id})}}"> Редактировать  {{cabin.deck.name}} {{cabin.type.name}}  </a>
+			</p>
+			
+			{% for image in cabin.images %}
+			<a class="photo" title="{{ image.title }}" href="{{ (upload_path~image.filename) | imagine_filter('show') }}" rel="group" >
+				<img class="img-responsive" style="float:left; margin-right:5px;" alt="{{ image.title }}" title="{{ image.title }}" src="{{ (upload_path~image.filename) | imagine_filter('thumb_70') }}" />
+			</a>
+			
+			{% endfor %}
+			
+		{% else %}	
+
+			
+			<a href="{{path('shipcabinimage_new',{'cabin_id':cabin.id})}}"> Создать тип каюты {{cabin.deck.name}} {{cabin.type.name}}</a><br>
+			
+		{% endif %}
+	</div>
+	{% endfor %}
+	
+
+{% endblock %}

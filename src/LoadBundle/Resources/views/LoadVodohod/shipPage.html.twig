@@ -14,5 +14,11 @@
 	</div>
 </div><!--.row-->
 <br>
-{{"{{ render(controller('CruiseBundle:Cruise:ship',{'ship':"~ship_id~"})) }}"}}
 
+<h2>Расписание круизов теплохода «{{ship_name}}»</h2>
+<hr>
+{{"{{ render(controller('CruiseBundle:Cruise:ship',{'ship':"~ship_id~"})) }}"}}
+<br>
+
+<h2>Фотоальбом теплохода «{{ship_name}}»</h2>
+<hr>

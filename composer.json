@@ -12,7 +12,7 @@
     },
     "require": {
         "php": ">=5.5.9",
-        "symfony/symfony": "3.1.*",
+        "symfony/symfony": "3.3.*",
         "doctrine/orm": "^2.5",
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/doctrine-cache-bundle": "^1.2",
@@ -30,7 +30,8 @@
         "twig/extensions": "^1.4",
         "dimadmb/simple-html-dom-bundle": "dev-master",
         "leaseweb/memcache-bundle": "^2.1",
-        "symfony/assetic-bundle": "^2.8"
+        "symfony/assetic-bundle": "^2.8",
+        "liuggio/excelbundle": "^2.1"
     },
     "repositories":[
         {

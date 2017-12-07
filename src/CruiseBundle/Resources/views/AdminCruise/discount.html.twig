@@ -1,0 +1,37 @@
+{% extends 'baseadmin.html.twig' %}
+
+{% block body %}
+
+		<div class="container" style="background:#00ceff;">
+			<div class="row">
+				<div class="col-sm-12">					
+				{{ render(controller('CruiseBundle:Search:searchForm',{'action':'admin_cruise_discount'})) }}
+				</div>			
+			</div>
+		</div>	
+<h1>Скидки на туры</h1>
+
+	{{dump(cruises)}}
+{% for cruise in cruises %}	
+<div class="row">
+<div class="col-sm-1"></div>
+<div class="col-sm-1"></div>
+<div class="col-sm-1"></div>
+<div class="col-sm-1"></div>
+</div>
+{% endfor %}	
+	
+{% endblock %}	
+
+
+{% block javascripts %}
+<script src="{{ asset('js/bootstrap-slider.js') }}"></script>
+		<script>
+			window.onload = function() {
+				$("#days").slider({});
+			}
+
+		</script>	
+{% endblock %}
+
+{% block styles %}<link rel="stylesheet" href="{{ asset('css/bootstrap-slider.css') }}">{% endblock %}

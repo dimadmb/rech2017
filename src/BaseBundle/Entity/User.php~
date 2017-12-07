@@ -30,7 +30,28 @@ class User extends BaseUser
      *
      * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
      */
-    private $lastName;	
+    private $lastName;		
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="father_name", type="string", length=255, nullable=true)
+     */
+    private $fatherName;	
+	
+	
+	/**
+	 * @ORM\OneToMany(targetEntity="CruiseBundle\Entity\Ordering", mappedBy="user")
+	 */
+	private $orders;
+	
+	
+	/**
+	 * @ORM\ManyToOne(targetEntity="CruiseBundle\Entity\Agency", inversedBy="users")
+	 */
+	private $agency;
+	
+	
 
     public function __construct()
     {
@@ -39,6 +60,8 @@ class User extends BaseUser
 		
 		$this->salt = "";
     }
+	
+
 
     /**
      * Set firstName
@@ -86,5 +109,63 @@ class User extends BaseUser
     public function getLastName()
     {
         return $this->lastName;
+    }
+
+    /**
+     * Set fatherName
+     *
+     * @param string $fatherName
+     *
+     * @return User
+     */
+    public function setFatherName($fatherName)
+    {
+        $this->fatherName = $fatherName;
+
+        return $this;
+    }
+
+    /**
+     * Get fatherName
+     *
+     * @return string
+     */
+    public function getFatherName()
+    {
+        return $this->fatherName;
+    }
+
+    /**
+     * Add order
+     *
+     * @param \CruiseBundle\Entity\Ordering $order
+     *
+     * @return User
+     */
+    public function addOrder(\CruiseBundle\Entity\Ordering $order)
+    {
+        $this->orders[] = $order;
+
+        return $this;
+    }
+
+    /**
+     * Remove order
+     *
+     * @param \CruiseBundle\Entity\Ordering $order
+     */
+    public function removeOrder(\CruiseBundle\Entity\Ordering $order)
+    {
+        $this->orders->removeElement($order);
+    }
+
+    /**
+     * Get orders
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getOrders()
+    {
+        return $this->orders;
     }
 }
