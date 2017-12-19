@@ -7,6 +7,7 @@ class Convert
 	public static function translit($str) {
 		$str = trim($str);
 		$expl = explode(" ", $str);
+		/*
 		$res = "";
 		foreach ($expl as $i=>$part) {
 			$part = trim($part);
@@ -15,6 +16,7 @@ class Convert
 				$res += " ";
 			}
 		}
+		*/
 		$str = self::string_translit($str);
 		$translit=array(" "=>"-", "."=>"_","/"=>"_" , );
 		$str = strtr($str, $translit);

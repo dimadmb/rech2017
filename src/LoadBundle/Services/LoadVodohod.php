@@ -80,7 +80,7 @@ class LoadVodohod  extends Controller
 		
 		$ship = $qb->getQuery()->getOneOrNullResult();
 
-		dump($ship);
+		//dump($ship);
 
 		/// Загружается с питерского сайта
 		$this->getSPB();		

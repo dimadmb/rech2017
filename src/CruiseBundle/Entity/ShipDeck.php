@@ -31,7 +31,7 @@ class ShipDeck
     /**
      * @var int
      *
-     * @ORM\Column(name="deck_id", type="integer")
+     * @ORM\Column(name="deck_id", type="integer", nullable=true)
      */
     private $deckId;
 	

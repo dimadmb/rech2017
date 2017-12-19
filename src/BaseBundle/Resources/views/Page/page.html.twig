@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{page.title}}{% endblock %}
+{% block description %}{% if (page.description != null) and (page.description != "")  %}{{page.description}}{% else %}{{ parent() }}{% endif %}{% endblock %}
+{% block keywords %}{% if (page.keywords != null) and (page.keywords != "")  %}{{page.keywords}}{% else %}{{ parent() }}{% endif %}{% endblock %}
+{% block title %}{% if (page.title != null) and (page.title != "") %}{{page.title}}{% else %}{{ parent() }}{% endif %}{% endblock %}
 
 {% block body %}
 

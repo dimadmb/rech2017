@@ -18,12 +18,14 @@ class OrderItemType extends AbstractType
     {
 
 
+		//dump($options);
+		
 		$builder
 
 			->add('orderItemPlaces',CollectionType::class,				
 				[
 					'entry_type' => OrderItemPlaceType::class,
-					'entry_options' => array('label' => false),
+					'entry_options' => ['label' => false , 'is_manager'=>$options['is_manager']],
 				])
 		;
     }
@@ -34,7 +36,8 @@ class OrderItemType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'CruiseBundle\Entity\OrderItem'
+            'data_class' => 'CruiseBundle\Entity\OrderItem',
+			'is_manager' => false,
         ));
     }
 

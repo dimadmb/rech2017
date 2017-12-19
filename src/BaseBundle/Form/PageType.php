@@ -19,6 +19,8 @@ class PageType extends AbstractType
             ->add('name')
             ->add('localUrl')
             ->add('title')
+            ->add('keywords')
+            ->add('description')
             ->add('h1')
             ->add('body', CKEditorType::class)
             ->add('sort')

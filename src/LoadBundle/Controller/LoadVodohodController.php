@@ -57,7 +57,7 @@ class LoadVodohodController extends Controller
 	public function loadShipAction($ship_id = null)
 	{
 		$load = $this->get('load.loadvodohod');
-		$res = $load->load($ship_id, true);
+		$res = $load->load($ship_id, false);
 		return  $res;
 		//return $load->load($ship_id);
 	}	

@@ -10,7 +10,7 @@
 		
 		
 		
-		<div class="col-sm-1"><a href="{{path('invoice',{'order':order.id})}}">№{{order.id}}</a></div>
+		<div class="col-sm-1"><a href="{{path('invoice',{'hash':order.idHash})}}">№{{order.id}}</a></div>
 		<div class="col-sm-1">{{order.created | date("d.m.Y")}}</div>
 		<div class="col-sm-2">{{order.cruise.ship.name}}</div>
 		
@@ -28,14 +28,14 @@
 		
 		<div class="col-sm-1">{{order.summ}}</div>
 		<div class="col-sm-1">
-			 
+			 создал:<br>
 			{% if (order.user.firstName != null) and (order.user.firstName != "") %}
 				{{order.user.lastName}} {{order.user.firstName}} {{order.user.fatherName}}
 			{% else %}
 				{{order.user.username}}	
 			{% endif %}			
 		</div>
-		<div class="col-sm-3">покупатель: 
+		<div class="col-sm-3">покупатель: <br>
 			{% if order.agency != null %}
 				{{order.agency.name}}
 			{% elseif order.buyer != null %}
@@ -43,7 +43,7 @@
 			{% endif %}
 		
 		</div>
-		
+
 	</div>
 {% endfor %}
 

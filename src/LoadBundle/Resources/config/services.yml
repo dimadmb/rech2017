@@ -8,3 +8,6 @@ services:
     load.loadinfoflot:
         class: LoadBundle\Services\LoadInfoflot
         arguments: ["@doctrine","@templating","@simple_html_dom"]
+    load.loadgama:
+        class: LoadBundle\Services\LoadGama
+        arguments: ["@doctrine","@templating","@simple_html_dom"]

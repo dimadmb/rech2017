@@ -131,17 +131,9 @@ class CruiseController extends Controller
 					$active_rooms[] = $roomDiscount->getRoom()->getId();
 				}				
 			}
-			$available_rooms = [];
-			$url = "http://cruises.vodohod.com/agency/json-prices.htm?pauth=jnrehASKDLJcdakljdx&cruise=".$cruise->getId();
-			$rooms_json = $this->curl_get_file_contents($url);
-			$rooms_v = json_decode($rooms_json,true);
-			foreach($rooms_v['room_availability'] as $room_group_v)
-			{
-				foreach($room_group_v as $room_v)
-				{
-					$available_rooms[] = $room_v;
-				}
-			}
+			$available_rooms = $this->get('cruise')->getAvailibleRooms($cruise);
+			
+
 			
 			$cabinsAll = $cruiseShipPrice->getShip()->getCabin();
 			
@@ -163,7 +155,7 @@ class CruiseController extends Controller
 						$room->discount = false;
 					}
 					
-					if(in_array($room->getNumber(),$available_rooms))
+					if(in_array($room->getNumber(),$available_rooms) /*|| true*/)
 					{
 						$rooms_in_cabin[] = $room;
 					}

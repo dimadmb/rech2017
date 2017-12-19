@@ -2,7 +2,7 @@
 
 
 {% block body %}
-
+<br>
 {% for ship in ships %}
 <div class="col-sm-6 clearfix" style="margin-bottom:10px;">
 	<p style="font-size:16px; text-align:center;">
@@ -11,7 +11,7 @@
 	
 	<div style="float:left; padding-right:10px;     width: 100%; ">
 		<a href="{{path('page',{'url':'ships/'~ship.code})}}">
-			<img src="{{ ('/files/ship/'~ship.code~'/'~ship.code~'-main.jpg') | imagine_filter('ship') }}" alt="">
+			<img class="img-responsive" src="{{ ('/files/ship/'~ship.code~'/'~ship.code~'-main.jpg') | imagine_filter('ship') }}" alt="" style="margin:0 auto 15px;" >
 		</a>
 	</div>
 

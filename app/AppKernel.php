@@ -36,6 +36,7 @@ class AppKernel extends Kernel
             new ManagerBundle\ManagerBundle(),
 			
 			new Liuggio\ExcelBundle\LiuggioExcelBundle(),
+			new GGGGino\WordBundle\GGGGinoWordBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {

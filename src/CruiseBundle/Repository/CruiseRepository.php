@@ -71,4 +71,46 @@ class CruiseRepository extends \Doctrine\ORM\EntityRepository
             ->createQuery('SELECT c FROM CruiseBundle:Cruise c ORDER BY c.dayCount DESC ')->setMaxResults(1)
             ->getOneOrNullResult();		
 	}		
+	
+	public function findApiAll()
+	{
+		$str = "SELECT c, s
+			FROM CruiseBundle\Entity\Cruise c 
+			JOIN c.ship s
+			ORDER BY c.startDate
+			";
+   		$q = $this->_em->createQuery($str);
+   		return $q->getResult();
+	}
+
+	public function findOneApiByCode($code)
+	{
+		$str = "SELECT c, s,  cab, pr, rp, room, tariff, rt, deck
+			FROM CruiseBundle\Entity\Cruise c 
+			LEFT JOIN c.ship s
+
+			
+			LEFT JOIN c.prices pr
+			
+			LEFT JOIN pr.cabin cab
+			LEFT JOIN cab.rooms room
+			
+			LEFT JOIN pr.place rp
+			
+			LEFT JOIN pr.tariff tariff
+			
+			LEFT JOIN cab.type rt
+			LEFT JOIN cab.deck deck			
+
+			WHERE c.id = ?1
+			AND pr.cruise = c
+			
+			ORDER BY deck.deckId , room.number*1 , tariff.id , pr.price
+			
+			";
+   		$q = $this->_em->createQuery($str);
+		$q->setParameter(1, $code);
+   		return $q->getOneOrNullResult();
+	}	
+	
 }

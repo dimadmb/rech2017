@@ -1,0 +1,59 @@
+{% extends '::basemanager.html.twig' %}
+
+{% block body %}
+
+
+
+{% for order in orders %}
+	<div class="row" style="background:#fff; margin-bottom:10px;"> 
+		
+		
+		
+		<div class="col-sm-1"><a href="{{path('invoice',{'hash':order.idHash})}}">№{{order.id}}</a>
+		<br>
+		{{order.region}}
+		</div>
+		<div class="col-sm-1">{{order.created | date("d.m.Y")}}</div>
+		<div class="col-sm-2">{{order.cruise.ship.name}}</div>
+		
+		<div class="col-sm-2">
+		{{order.cruise.startDate | date('d.m.y')}} - {{order.cruise.endDate | date('d.m.y')}}
+		</div>	
+	
+		
+		<div class="col-sm-1">			
+			{% for orderItem in order.orderItems %}
+				Каюта {{orderItem.room.number}} <br>
+			{% endfor %}
+		</div>
+		
+		
+		<div class="col-sm-1">{{order.summ}}</div>
+		<div class="col-sm-1">
+			 создал:<br>
+			{% if (order.user.firstName != null) and (order.user.firstName != "") %}
+				{{order.user.lastName}} {{order.user.firstName}} {{order.user.fatherName}}
+			{% else %}
+				{{order.user.username}}	
+			{% endif %}			
+		</div>
+		<div class="col-sm-1">покупатель: <br>
+			{% if order.agency != null %}
+				{{order.agency.name}}
+			{% elseif order.buyer != null %}
+				{{order.buyer.lastName}} {{order.buyer.name}} {{order.buyer.fatherName}}
+			{% endif %}
+		
+		</div>
+		<div class="col-sm-2">
+			<a class="btn btn-success" data-id="{{order.id}}" href="#">Добавить оплату</a>
+			
+			{% for pay in order.pays %}
+				{{dump(pay)}}
+			{% endfor %}
+			
+		</div>
+	</div>
+{% endfor %}
+
+{% endblock %}

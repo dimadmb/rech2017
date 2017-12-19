@@ -16,6 +16,9 @@ parameters:
     #liip_imagine.jpegoptim.binary: /home/d/dkocheuj/.local/bin/jpegoptim
     liip_imagine.jpegoptim.binary: "%kernel.root_dir%/../../../.local/bin/jpegoptim"
 
+    schet_salt: "5bxhjV7R4vBQJKk8NFqPCQCCnrUKvDVu"
+    place_salt: "c56CC5enUbrGKWn8x3FhXkZbHaMk6Ms7Mm3KdTHY"
+
 framework:
     #esi:             ~
     translator:      { fallbacks: [en] }

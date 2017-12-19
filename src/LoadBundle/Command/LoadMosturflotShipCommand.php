@@ -38,7 +38,7 @@ class LoadMosturflotShipCommand extends ContainerAwareCommand
 
 		$load = $this->getContainer()->get('load.loadmosturflot');
 
-        $output->writeln($load->load($id,true));
+        $output->writeln($load->load($id,false));
     }
 	
 }

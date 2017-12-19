@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+use CruiseBundle\Entity\Buyer;
 use CruiseBundle\Entity\Ordering;
 use CruiseBundle\Entity\OrderItem;
 use CruiseBundle\Entity\OrderItemPlace;
@@ -19,6 +20,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use CruiseBundle\Form\BuyerType;
 use CruiseBundle\Form\OrderItemType;
 use CruiseBundle\Form\OrderingType;
+
+use Hashids\Hashids;
 
 class OrderController extends Controller
 {
@@ -40,10 +43,13 @@ class OrderController extends Controller
 
     /**
 	 * @Template("dump.html.twig")	
-     * @Route("/pay/{id}", name="pay")
+     * @Route("/pay/{hash}", name="pay")
      */
-    public function payAction($id)
+    public function payAction($hash)
 	{
+		
+		$id = $this->get('cruise')->hashOrderDecode($hash);
+		
 		$em = $this->getDoctrine()->getManager();
 		
 		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($id);
@@ -55,7 +61,7 @@ class OrderController extends Controller
 			$this->getDoctrine()->getManager()->flush();
 		}
 		
-		return [$this->get('cruise')->getOrderPrice($order), $this->get('cruise')->getSesonDiscount($order),$order->getSumm() ];
+		return ['dump'=>$this->get('cruise')->getOrderPrice($order), $this->get('cruise')->getSesonDiscount($order),$order->getSumm() ];
 	}
 
 
@@ -64,13 +70,15 @@ class OrderController extends Controller
 	
     /**
 	 * @Template()	
-     * @Route("/order/{order}", name="invoice")
+     * @Route("/order/{hash}", name="invoice")
      */
-    public function invoiceAction(Request $request,Ordering $order)
+    public function invoiceAction(Request $request,$hash)
     {
 		$session = new Session();
 		
-		$session->get('basket');		
+		$session->get('basket');	
+
+
 
 
 		$em = $this->getDoctrine()->getManager();
@@ -83,21 +91,38 @@ class OrderController extends Controller
 			->leftJoin('oi.room' , 'room')
 			->leftjoin('room.cabin','cabin')
 			->leftJoin('cabin.prices','price')
-			->where('o.id = '.$order->getId())
+			->where('o.id = '.$this->get('cruise')->hashOrderDecode($hash))
 			->andWhere('price.place = oi.place')
 			->andWhere('price.cruise = o.cruise')
 			->getQuery()
 			->getOneOrNullResult()
-		;	
+		;
+	
  
 			// проверить водоход ли это и выставить скидку
 			if(($order->getCruise()->getShip()->getTurOperator()->getCode() == 'vodohod') && ($order->getSesonDiscount() === null))
 			{
-				
-				
+
 				$order->setSesonDiscount($this->get('cruise')->getSesonDiscount($order));
 				//$this->getDoctrine()->getManager()->flush();
+			} 
+			// если агентство - ставим комиссию
+			if(($order->getAgency() !== null) && ($order->getFee() === null))
+			{
+				$order->setFee($order->getAgency()->getFee());
+				//dump($order->getAgency()->getFee());
+				$this->getDoctrine()->getManager()->flush();
 			}
+			
+			
+			if(($order->getBuyer() === null) && ($order->getAgency() === null))
+			{
+				$buyer = new Buyer();
+				$em->persist($buyer);
+				
+				$order->setBuyer($buyer);
+			}
+				
 
 			
 			
@@ -132,6 +157,7 @@ class OrderController extends Controller
 				or 	$orderItemPlace->getPassNum() === null
 				or 	$orderItemPlace->getPassDate() === null
 				or 	$orderItemPlace->getPassWho() === null
+
 				)
 				{
 
@@ -147,18 +173,22 @@ class OrderController extends Controller
 		
 		if($order->getPermanentRequest())
 		{
-			if(($order->getPermanentDiscount() == null) or ($order->getPermanentDiscount() == 0) ) // возможно убрать второй аргумент
+			if(($order->getPermanentDiscount() == null) /*or ($order->getPermanentDiscount() == 0)*/ ) // возможно убрать второй аргумент
 			{
 
 				$allow_pay = false;
 			}
 		}
+		
+		
+		$orderPrice = $this->get('cruise')->getOrderPrice($order);
 	
 		return [
 					'order'=>$order,
 					'form'=>$editForm->createView(),
 					'rooms'=>$this->get('cruise')->getRooms($order->getCruise()->getId()),
 					'allow_pay' => $allow_pay,
+					'orderPrice'=>$orderPrice
 				];
 	}
 	
@@ -196,10 +226,14 @@ class OrderController extends Controller
 			{
 				$buyer = new \CruiseBundle\Entity\Buyer();
 				
-				$buyer->setName($user->getFirstName());
-				$buyer->setLastName($user->getLastName());
-				$buyer->setFatherName($user->getFatherName());
-				$buyer->setEmail($user->getEmail());
+				if( !$this->get('security.authorization_checker')->isGranted('ROLE_MANAGER') )
+				{
+					$buyer->setName($user->getFirstName());
+					$buyer->setLastName($user->getLastName());
+					$buyer->setFatherName($user->getFatherName());
+					$buyer->setEmail($user->getEmail());					
+				}
+
 				
 				$em->persist($buyer);
 				$order->setBuyer($buyer);			
@@ -248,7 +282,7 @@ class OrderController extends Controller
 			
 			$session->remove('basket');
 			
-			return $this->redirectToRoute('invoice',['order'=>$order->getId()]);
+			return $this->redirectToRoute('invoice',['hash'=>$this->get('cruise')->hashOrderEncode($order->getId())]);
 			
 		}
 		/*
@@ -286,10 +320,17 @@ class OrderController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		
 		$qb = $em->createQueryBuilder()
-			->select('o,oi,oip')
+			->select('o,oi,oip,room,cruise,buyer,agency,user')
 			->from('CruiseBundle:Ordering','o')	
+			->leftJoin('o.cruise','cruise')
+			->leftJoin('o.buyer','buyer')
+			->leftJoin('o.agency','agency')
+			->leftJoin('o.user','user')
 			->leftJoin('o.orderItems','oi')
-			->leftJoin('oi.orderItemPlaces','oip')	
+			->leftJoin('oi.room', 'room')
+			->leftJoin('oi.orderItemPlaces','oip')
+			
+			->orderBy('o.id','ASC')
 		;
 		if($this->getUser()->getAgency() !== null)
 		{
@@ -315,7 +356,12 @@ class OrderController extends Controller
 			->getQuery()
 			->getResult()			
 		;	
-		
+		/*
+		foreach($orders as $order)
+		{
+			$order->idHash = $this->get('cruise')->hashOrderEncode($order->getId());
+		}
+		*/
 		
 		return ['orders'=>$orders];
 	}

@@ -36,8 +36,12 @@ class ManagerController extends Controller
      */
     public function invoicesAction(Request $request)
     {
-		$cruises = $this->getDoctrine()->getManager()->getRepository("CruiseBundle:Cruise")->findAll();
-		return ['cruises'=>$cruises];
+		$orders = $this->getDoctrine()->getManager()->getRepository("CruiseBundle:Ordering")->findAll();
+		/*foreach($orders as $order)
+		{
+			$order->idHash = $this->get('cruise')->hashOrderEncode($order->getId());
+		}*/
+		return ['orders'=>$orders];
 	}	
 	
     /**

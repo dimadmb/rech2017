@@ -34,6 +34,14 @@ class TypeDiscount
      * @ORM\Column(name="value", type="decimal", precision=10, scale=2)
      */
     private $value;
+	
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="code", type="string", length=255)
+     */
+    private $code;	
 
 
     /**
@@ -92,5 +100,29 @@ class TypeDiscount
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * Set code
+     *
+     * @param string $code
+     *
+     * @return TypeDiscount
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    /**
+     * Get code
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
     }
 }

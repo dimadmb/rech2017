@@ -137,6 +137,15 @@ class Agency
 	 * @ORM\OneToMany(targetEntity="Ordering", mappedBy="agency")
 	 */
 	private $orders;
+	
+	
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="auth", type="string", length=255, nullable=true)
+     */
+    private $auth;
 
 
 	
@@ -588,5 +597,29 @@ class Agency
     public function getOrders()
     {
         return $this->orders;
+    }
+
+    /**
+     * Set auth
+     *
+     * @param string $auth
+     *
+     * @return Agency
+     */
+    public function setAuth($auth)
+    {
+        $this->auth = $auth;
+
+        return $this;
+    }
+
+    /**
+     * Get auth
+     *
+     * @return string
+     */
+    public function getAuth()
+    {
+        return $this->auth;
     }
 }

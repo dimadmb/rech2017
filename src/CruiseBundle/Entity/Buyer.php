@@ -109,6 +109,15 @@ class Buyer
 	 * @ORM\OneToMany(targetEntity="Ordering", mappedBy="buyer")
 	 */
 	private $orders;
+	
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="address", type="string", length=255, nullable=true)
+     */
+    private $address;	
+	
 
 
     /**
@@ -448,5 +457,29 @@ class Buyer
     public function getOrders()
     {
         return $this->orders;
+    }
+
+    /**
+     * Set address
+     *
+     * @param string $address
+     *
+     * @return Buyer
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get address
+     *
+     * @return string
+     */
+    public function getAddress()
+    {
+        return $this->address;
     }
 }

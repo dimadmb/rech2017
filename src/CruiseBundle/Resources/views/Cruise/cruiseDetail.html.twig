@@ -287,65 +287,6 @@ window.selectOffer = function (offer_id, rn_id){
 <hr>
 <h3>Стоимость тура на 1 человека * </h3>
 
-<a href="#orderModal" class="btn  btn-danger btn-lg pull-right" data-toggle="modal">Заказать</a>
-
-<form id="orderModalForm" action="">
-<!-- HTML-код модального окна -->
-<div id="orderModal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <!-- Заголовок модального окна -->
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">Заявка на круиз «{{cruise.name}}» </h4>
-      </div>
-      <!-- Основное содержимое модального окна -->
-      <div class="modal-body">
-		
-		<input type="hidden" id="orderCruiseId" value="{{cruise.id}}">
-	  
-		<label for="orderName">Представьтесь</label>
-        <input type="text" id="orderName" class="form-control" name="name" placeholder="Как Вас зовут">
-		<br>
-		<label for="orderPhone">Номер телефона</label>
-        <input type="text" id="orderPhone" required="true" class="form-control" name="phone" placeholder="Номер телефона"> 
-		<br>
-		<label for="orderEmail">Электронная почта</label>
-        <input type="text" id="orderEmail" class="form-control" name="email" placeholder="E-mail">
-		<br>
-		
-		<label for="orderAdult">Количество взрослых</label>
-		<select name="orderAdult" id="orderAdult" class="form-control" >
-			<option value="1">1</option>
-			<option value="2">2</option>
-			<option value="3">3</option>
-			<option value="4">4</option>
-		</select>
-		<br>		
-		<label for="orderChild">Количество детей</label>
-		<select name="orderChild" id="orderChild" class="form-control" >
-			<option value="0">0</option>
-			<option value="1">1</option>
-			<option value="2">2</option>
-			<option value="3">3</option>
-			<option value="4">4</option>
-		</select>
-		<br>
-		
-		<label for="orderMessage">Комментарий к заказу</label>
-		<textarea name="orderMessage" class="form-control" id="orderMessage"  placeholder="Комментарий к заказу" ></textarea>
-      </div>
-      <!-- Футер модального окна -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-        <button type="submit" id="orderModalSend" class="btn btn-primary">Отправить</button>
-      </div>
-    </div>
-  </div>
-</div>
-</form> 
-
-<br>
 <br>
 
 {% if (cabins != null) %}
@@ -384,7 +325,7 @@ window.selectOffer = function (offer_id, rn_id){
 					<div style="display:table-cell; width:150px;">
 					{% for mealName,meal in prices %}
 								<p>{{meal.tariff.name}}</p>
-								<p style=""><span >{{mealName}}</span> <b>{{meal.price|number_format(0, '.', ' ')}}  руб.</b></p>
+								<p style=""><span >{{mealName}}</span>&nbsp;<b>{{meal.price|number_format(0, '.', ' ')}}  руб.</b></p>
 					{% endfor %}
 					</div>
 				{% endfor %}
@@ -411,7 +352,8 @@ window.selectOffer = function (offer_id, rn_id){
 								
 								{% if (type.discountInCabin) %}
 								<p>{{meal.tariff.name}}</p>
-									<p style="text-decoration:line-through;"><span >{{mealName}}</span></p>
+									<p style=""><span >{{mealName}}</span></p>
+									<p style="text-decoration:line-through;"><span >{{meal.price|number_format(0, '.', ' ')}}  руб.</span></p>
 									<p style="color:red;" > <b>{{(meal.price *( 1 - (cruise.typeDiscount.value/100))) |number_format(0, '.', ' ')}}  руб.</b></p>
 								{% endif %}
 

@@ -111,6 +111,23 @@ class OrderItemPlace
 	 * @ORM\ManyToOne(targetEntity="Price")
 	 */
 	private $price;
+	
+		
+	/**
+	 * @ORM\ManyToOne(targetEntity="TypeDoc")
+	 */
+	private $typeDoc;
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="surcharge", type="decimal", precision=10, scale=2, nullable=true)
+     */	
+	private $surcharge;
+	
+	
+	private $idHash;
+	
 
 
     /**
@@ -453,4 +470,37 @@ class OrderItemPlace
     {
         return $this->price;
     }
+
+    /**
+     * Set typeDoc
+     *
+     * @param \CruiseBundle\Entity\TypeDoc $typeDoc
+     *
+     * @return OrderItemPlace
+     */
+    public function setTypeDoc(\CruiseBundle\Entity\TypeDoc $typeDoc = null)
+    {
+        $this->typeDoc = $typeDoc;
+
+        return $this;
+    }
+
+    /**
+     * Get typeDoc
+     *
+     * @return \CruiseBundle\Entity\TypeDoc
+     */
+    public function getTypeDoc()
+    {
+        return $this->typeDoc;
+    }
+	
+	
+	public function getIdHash()
+	{
+		$place_salt = 'c56CC5enUbrGKWn8x3FhXkZbHaMk6Ms7Mm3KdTHY';
+		$hashids_place = new \Hashids\Hashids($place_salt,32);
+		return $hashids_place->encode($this->id);		
+	}	
+	
 }

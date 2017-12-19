@@ -34,9 +34,16 @@
                 {% endif %}
             </li>
         {% endfor %}
+		
+		
+	{% if (is_granted('IS_AUTHENTICATED_FULLY') and rootPages ) %}
+			<li>
+				<a href="{{path('orders')}}">Заказы</a>
+            </li>	
+	{% endif %}	
+	
     </ul>
 {% endmacro %}
  
- <div>
+
 	{{ tree.pages(pages, true) }}
- </div>

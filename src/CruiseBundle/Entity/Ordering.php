@@ -120,6 +120,14 @@ class Ordering
 	 */
 	private $pays;
 	
+	/**
+	 * @ORM\ManyToOne(targetEntity="Region", inversedBy="orders") 
+	 */
+	private $region;
+	
+	
+	private $idHash;
+	
 	
 	private $summ;
 
@@ -581,4 +589,36 @@ class Ordering
     {
         return $this->pays;
     }
+
+    /**
+     * Set region
+     *
+     * @param \CruiseBundle\Entity\Region $region
+     *
+     * @return Ordering
+     */
+    public function setRegion(\CruiseBundle\Entity\Region $region = null)
+    {
+        $this->region = $region;
+
+        return $this;
+    }
+
+    /**
+     * Get region
+     *
+     * @return \CruiseBundle\Entity\Region
+     */
+    public function getRegion()
+    {
+        return $this->region;
+    }
+	
+	
+	public function getIdHash()
+	{
+		$schet_salt = '5bxhjV7R4vBQJKk8NFqPCQCCnrUKvDVu';
+		$hashids_schet = new \Hashids\Hashids($schet_salt,32);
+		return $hashids_schet->encode($this->id);
+	}
 }

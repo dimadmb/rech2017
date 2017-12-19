@@ -7,11 +7,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <meta name="description" content="{% block description %}Речные круизы из Москвы. Круизы по Волге. «Речное агентство».{% endblock %}">
-    {#<meta name="keywords" content="{% block keywords %}речные круизы, Москва, туры на теплоходе, круизы выходного дня, круизы по Волге, круизы по рекам, отдых на теплоходах{% endblock %}">#}
+    <meta name="keywords" content="{% block keywords %}речные круизы, Москва, туры на теплоходе, круизы выходного дня, круизы по Волге, круизы по рекам, отдых на теплоходах{% endblock %}">
 
 	<meta content="width=device-width,initial-scale=1" name=viewport>
 	
-    <title>{% block title %}Дефолтный тайтл{% endblock %}</title>
+    <title>{% block title %}Речные круизы из Москвы. Круизы по Волге. «Речное агентство».{% endblock %}</title>
 
 
 {% stylesheets 
@@ -27,7 +27,7 @@ output="css/styles.css"
 {% endstylesheets %}
 
 </head>
-
+{% spaceless %}
 <body>
 {% block admin %}{% endblock %}
 {% if is_granted("ROLE_MANAGER") %}
@@ -52,16 +52,51 @@ output="css/styles.css"
 			<a class="navbar-brand navbar-right hidden-xs" style="font-size: 24px;" href="{{path('page',{'url':'contacts'})}}">Контакты:</a>
 			</div>
 			
-			<div style="position:absolute; right:150px; top:3px; /*margin-left:-100px;*/" class="hidden-xs" >
+			<div style="position:absolute; right:205px; top:3px; line-height:20px;" class="hidden-xs" >
+			
+					
+			<span style="color:#fff;">
+				Москва<br>
+				<span style="float:right;text-align:right;">
+				Тел: <a style="color:#fff; font-size:12px;"  href="tel:84956498371">8 (495) <span style="font-size:150%">649-83-71</span></a>
+				<br>
+				<a style="color:#fff; font-size:12px;" href="tel:84956982967">8 (495) <span style="font-size:150%">698-29-67</span></a>			
+				</span>
+				<br>
+
+				Санкт-Петербург<br>
+				<span style="float:right;text-align:right;">
+				Тел: <a style="color:#fff; font-size:12px;"  href="tel:84956498371">8 (812) <span style="font-size:150%">67-03-700</span></a>
+		
+				</span>
+			</span>
+			
+			<!--
 			<a class="navbar-brand" href="tel:84956498371">8 (495) <span style="font-size:150%">649-83-71</span></a>
 			<br>
 			<a class="navbar-brand" href="tel:84956982967">8 (495) <span style="font-size:150%">698-29-67</span></a>
+			-->
 			</div>
 			
 			<div class="hidden-xs" style="position:absolute; right:30px; top:15px; "  >
-			<a target="_blank" href="https://vk.com/club139724356"><img style="width:32px; margin-right:10px;" src="{{asset('images/template/VK.png')}}"  alt="Вконтакте"></a>
+			<a target="_blank" href="https://vk.com/club139724356"><img style="width:33px; margin-right:10px;" src="{{asset('images/template/VK.png')}}"  alt="Вконтакте"></a>
 			
-			<a target="_blank" href="http://instagram.com/rechagent"><img style="width:32px; margin-right:0px;" src="{{asset('images/template/inst.png')}}"  alt="instagram"></a>
+			<a target="_blank" href="https://www.ok.ru/group/53065077883088"><img style="width:33px; margin-right:10px;" src="{{asset('images/template/OK.png')}}"  alt="instagram"></a>			
+			<a target="_blank" href="http://instagram.com/rechagent"><img style="width:33px; margin-right:0px;" src="{{asset('images/template/inst.png')}}"  alt="instagram"></a>
+			
+			</div>
+			
+			<div class="hidden-xs" style="position:absolute; right:45px; top:60px; "  >
+
+            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                
+				<a href="{{path('fos_user_profile_show')}}">{{app.user.username}}</a><br>
+                <a class="" href="{{ path('fos_user_security_logout') }}">
+                    {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
+                </a>
+            {% else %}
+               <a style="color:#fff; font-weight:400;" href="{{ path('fos_user_security_login') }}">ВОЙТИ</a>
+            {% endif %}					
 			
 			</div>
 			
@@ -91,7 +126,7 @@ output="css/styles.css"
             <!-- Collect the nav links, forms, and other content for toggling -->
 			
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-{{ render(controller('BaseBundle:Menu:getMenu')) }}
+				{{ render(controller('BaseBundle:Menu:getMenu')) }}
             </div>
             <!-- /.navbar-collapse -->
         </div>
@@ -257,6 +292,6 @@ output="js/js.js"
 {% endblock %}
 <script async type="text/javascript" src="/web/bundles/ivoryckeditor/ckeditor.js"></script>	
 
-</body>
+</body>{% endspaceless %}
 
 </html>

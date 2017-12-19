@@ -2,11 +2,15 @@
 
 {% block body %}
 
-{{dump(order)}}
+{{dump()}}
 
 {#% for room in rooms %}
 	<span style="padding:10px; margin:5px;">{{room.number}}</span>
 {% endfor %#}
+
+
+<h3>Заявка №{{order.id}}</h3>
+
 
 <h3>Теплоход «{{order.cruise.ship.name}}»  с {{order.cruise.startDate | date("d.m.Y")}} по {{order.cruise.endDate | date("d.m.Y")}}  <br>«{{order.cruise.name}}»</h3>
 
@@ -43,36 +47,42 @@
 {% if form.buyer is defined %}
 		<h3>Покупатель</h3>
 		<div class="row">
-			<div class="col-sm-2"><p style="text-align:right;">ФИО</p></div>
-			<div class="col-sm-3">{{ form_widget(form.buyer.lastName, { 'attr':{'placeholder':'Фамилия'}}) }}</div>			
-			<div class="col-sm-3">{{ form_widget(form.buyer.name, { 'attr':{'placeholder':'Имя'}}) }}</div>
+			<div class="col-sm-1"><p style="text-align:right;">ФИО</p></div>
+			<div class="col-sm-4">{{ form_widget(form.buyer.lastName, { 'attr':{'placeholder':'Фамилия'}}) }}</div>			
+			<div class="col-sm-4">{{ form_widget(form.buyer.name, { 'attr':{'placeholder':'Имя'}}) }}</div>
 			<div class="col-sm-3">{{ form_widget(form.buyer.fatherName, { 'attr':{'placeholder':'Отчество'}}) }}</div>
-			<div class="col-sm-1"></div>
+
 		</div>
 		<div class="row" style="margin-top:10px">
-			<div class="col-sm-2"><p style="text-align:right;">Дата рождения<p></div>
-			<div class="col-sm-2">{{ form_widget(form.buyer.birthday, { 'attr':{'placeholder':'Дата рождения'}}) }}</div>	
+			<div class="col-sm-1"><p style="text-align:right;">Адрес прописки</p></div>
+			<div class="col-sm-11">{{ form_widget(form.buyer.address, { 'attr':{'placeholder':'Адрес прописки'}}) }}</div>			
+
+		</div>
+		<div class="row" style="margin-top:10px">
+			<div class="col-sm-1"><p style="text-align:right;">Дата рождения<p></div>
+			<div class="col-sm-3">{{ form_widget(form.buyer.birthday, { 'attr':{'placeholder':'Дата рождения'}}) }}</div>	
 			<div class="col-sm-1">Паспорт</div>			
 			<div class="col-sm-2">{{ form_widget(form.buyer.passSeria, { 'attr':{'placeholder':'Серия'}}) }}</div>
 			<div class="col-sm-2">{{ form_widget(form.buyer.passNum, { 'attr':{'placeholder':'Номер'}}) }}</div>
-			<div class="col-sm-2">{{ form_widget(form.buyer.passDate, { 'attr':{'placeholder':'Дата'}}) }}</div>
-			<div class="col-sm-1"></div>
+			<div class="col-sm-3">{{ form_widget(form.buyer.passDate, { 'attr':{'placeholder':'Дата'}}) }}</div>
+			
 			
 		</div>
 		<div class="row" style="margin-top:10px">
-			<div class="col-sm-2"><p style="text-align:right;">Кем выдан</p></div>
-			<div class="col-sm-9">{{ form_widget(form.buyer.passWho, { 'attr':{'placeholder':'Кем выдан'}}) }}</div>	
+			<div class="col-sm-1"><p style="text-align:right;">Кем выдан</p></div>
+			<div class="col-sm-11">{{ form_widget(form.buyer.passWho, { 'attr':{'placeholder':'Кем выдан'}}) }}</div>	
 
-			<div class="col-sm-1"></div>
+			
 			
 		</div>
 		<div class="row" style="margin-top:10px">
-			<div class="col-sm-2"><p style="text-align:right;">Телефон<p></div>
+			<div class="col-sm-1"><p style="text-align:right;">Телефон<p></div>
 			<div class="col-sm-3">{{ form_widget(form.buyer.phone, { 'attr':{'placeholder':'Телефон'}}) }}</div>	
-			<div class="col-sm-2"><p style="text-align:right;">Email</p></div>			
+			<div class="col-sm-1"><p style="text-align:right;">Email</p></div>			
 			<div class="col-sm-3">{{ form_widget(form.buyer.email, { 'attr':{'placeholder':'email'}}) }}</div>
 
-			<div class="col-sm-2"><a href="{{path('invoice_user',{'id':order.id})}}" class="btn btn-success">Счёт покупателя</a></div>
+			<div class="col-sm-2"><a href="{{path('invoice_user',{'hash':order.idHash})}}" class="btn btn-success">Счёт покупателя</a></div>
+			<div class="col-sm-1"><a href="{{path('contract_user',{'hash':order.idHash})}}" class="btn btn-success">Договор</a></div>
 			
 		</div>		
 		
@@ -83,28 +93,69 @@
 {% if form.agency is defined %}
 {{form_row(form.agency, {'label':'Агентство'}) }}
 {% endif %}
+
+{% if order.agency != null %}
+<a href="{{path('invoice_agency',{'hash':order.idHash})}}" class="btn btn-success">Счёт агентства</a>
+{% endif %}
+
   </div>
 </div>
 
-
-{% if form.sesonDiscount is defined %}
-{{ form_row(form.sesonDiscount, {'label':'Сезонная скидка'}) }}
+{% if order.sesonDiscount != null %}
+<div class="row" style="margin-top:10px">
+	<div class="col-sm-12">
+		Скидка раннего бронирования <b>{{order.sesonDiscount}} %</b>
+	</div>
+</div>
 {% endif %}
 
-{% if form.permanentRequest is defined %}
-{{ form_row(form.permanentRequest, {'label':'Запрос на скидку постоянного клиента'}) }}
-<p style="color:red;"><i>Оплата онлайн будет возможна после подтверждения скидки менеджером.</i></p>
-{% else %}
-{% if form.vars.data.permanentRequest %} <p><b>Есть запрос на скидку постоянного клиента</b></p> {% endif %}
+{% if is_granted('ROLE_MANAGER') %}
+
+<div class="row" style="margin-top:10px">
+	<div class="col-sm-3">
+	{% if form.sesonDiscount is defined %}
+	{{ form_row(form.sesonDiscount, {'label':'Сезонная скидка'}) }}
+	{% endif %}
+	</div>
+	<div class="col-sm-3">
+	{% if form.permanentRequest is defined %}
+	{{ form_row(form.permanentRequest, {'label':'Запрос на скидку постоянного клиента'}) }}
+	<p style="color:red;"><i>Оплата онлайн будет возможна после подтверждения скидки менеджером.</i></p>
+	{% else %}
+	{% if form.vars.data.permanentRequest %} <p style="color:red;"><b>Есть запрос на скидку постоянного клиента</b></p> {% endif %}
+	{% endif %}
+
+	{% if form.permanentDiscount is defined %}
+	{{ form_row(form.permanentDiscount, {'label':'Скидка постоянного клиента'}) }}
+	{% endif %}
+	</div>
+	<div class="col-sm-3">
+	{% if form.fee is defined %}
+	{{ form_row(form.fee, {'label':'Коммиссия агентства'}) }}
+	{% endif %}
+	</div>
+	<div class="col-sm-3">
+	{% if form.region is defined %}
+	{{ form_row(form.region, {'label':'Регион'}) }}
+	{% endif %}
+	</div>
+</div>	
 {% endif %}
 
-{% if form.permanentDiscount is defined %}
-{{ form_row(form.permanentDiscount, {'label':'Скидка постоянного клиента'}) }}
-{% endif %}
 
-{% if form.fee is defined %}
-{{ form_row(form.fee, {'label':'Коммиссия'}) }}
-{% endif %}
+
+<div class="row" style="margin-top:10px">
+
+	<div class="col-sm-12">
+	{% if form.permanentRequest is defined %}
+	{{ form_row(form.permanentRequest, {'label':'Запрос на скидку постоянного клиента'}) }}
+	<p style="color:red;"><i>Оплата онлайн будет возможна после подтверждения скидки менеджером.</i></p>
+	{% endif %}
+
+	</div>
+
+</div>	
+
 
 <h3>Каюты:</h3>
 
@@ -118,36 +169,39 @@
 	
 	{% for i, orderItemPlace in orderItem.orderItemPlaces %}
 		<div style="border:1px solid #aaa;">
-		<div class="col-xs-12">
+		<div class="col-xs-6">
 			<p><b>Место {{i+1}}</b></p>
 		</div>
+		<div class="col-xs-6">
+			<p> <a href="{{path('boarding_card',{'hash':orderItemPlace.vars.data.idHash})}}" class="btn btn-success">Посадочный талон</a> </p>
+		</div>
 		<div class="row">
-			<div class="col-sm-2"><p style="text-align:right;">ФИО</p></div>
-			<div class="col-sm-3">{{ form_widget(orderItemPlace.lastName, { 'attr':{'placeholder':'Фамилия'}}) }}</div>			
-			<div class="col-sm-3">{{ form_widget(orderItemPlace.name, { 'attr':{'placeholder':'Имя'}}) }}</div>
+			<div class="col-sm-1"><p style="text-align:right;">ФИО</p></div>
+			<div class="col-sm-4">{{ form_widget(orderItemPlace.lastName, { 'attr':{'placeholder':'Фамилия'}}) }}</div>			
+			<div class="col-sm-4">{{ form_widget(orderItemPlace.name, { 'attr':{'placeholder':'Имя'}}) }}</div>
 			<div class="col-sm-3">{{ form_widget(orderItemPlace.fatherName, { 'attr':{'placeholder':'Отчество'}}) }}</div>
-			<div class="col-sm-1"></div>
+
 		</div>
 		<div class="row" style="margin-top:10px">
-			<div class="col-sm-2"><p style="text-align:right;">Дата рождения<p></div>
-			<div class="col-sm-2">{{ form_widget(orderItemPlace.birthday, { 'attr':{'placeholder':'Дата рождения'}}) }}</div>	
-			<div class="col-sm-1">Паспорт</div>			
-			<div class="col-sm-2">{{ form_widget(orderItemPlace.passSeria, { 'attr':{'placeholder':'Серия'}}) }}</div>
+			<div class="col-sm-1"><p style="text-align:right;">Дата рождения<p></div>
+			<div class="col-sm-3">{{ form_widget(orderItemPlace.birthday, { 'attr':{'placeholder':'Дата рождения'}}) }}</div>	
+			<div class="col-sm-2">{{ form_widget(orderItemPlace.typeDoc, { 'attr':{'placeholder':'Тип документа'}}) }}</div>			
+			<div class="col-sm-1">{{ form_widget(orderItemPlace.passSeria, { 'attr':{'placeholder':'Серия'}}) }}</div>
 			<div class="col-sm-2">{{ form_widget(orderItemPlace.passNum, { 'attr':{'placeholder':'Номер'}}) }}</div>
-			<div class="col-sm-2">{{ form_widget(orderItemPlace.passDate, { 'attr':{'placeholder':'Дата'}}) }}</div>
-			<div class="col-sm-1"></div>
+			<div class="col-sm-3">{{ form_widget(orderItemPlace.passDate, { 'attr':{'placeholder':'Дата'}}) }}</div>
+			
 			
 		</div>
 		<div class="row" style="margin-top:10px">
-			<div class="col-sm-2"><p style="text-align:right;">Кем выдан</p></div>
-			<div class="col-sm-9">{{ form_widget(orderItemPlace.passWho, { 'attr':{'placeholder':'Кем выдан'}}) }}</div>	
+			<div class="col-sm-1"><p style="text-align:right;">Кем выдан</p></div>
+			<div class="col-sm-11">{{ form_widget(orderItemPlace.passWho, { 'attr':{'placeholder':'Кем выдан'}}) }}</div>	
 
-			<div class="col-sm-1"></div>
+			
 			
 		</div>
 		<div class="row" style="margin-top:10px; margin-bottom:10px;">
 
-			<div class="col-sm-2">
+			<div class="col-sm-1">
 				<p style="text-align:right;">Тариф</p>
 				
 			</div>
@@ -163,15 +217,23 @@
 				
 				
 				{{ form_widget(orderItemPlace.price, {'attr':{'data-discount':discountValue, 'class':'tariff-price' }}) }}
-				
 
-				
 			</div>
 			
 			<div class="col-sm-4">
 				{% if orderItemPlace.vars.data.orderItem.typeDiscount != null %}
 					<span style="color:red;">Цена со скидкой <span class="tariff-price-value"></span></span>
 				{% endif %}			
+			</div>
+			
+			<div class="col-sm-1">
+				Доплата
+			</div>
+			
+			<div class="col-sm-2">
+				{% if orderItemPlace.surcharge is defined %}
+				{{ form_widget(orderItemPlace.surcharge) }}
+				{% endif %}
 			</div>
 			
 		</div>
@@ -194,13 +256,31 @@
 {% endif %}
 
 
+
+
+<div class="row">
+	<div class="col-sm-2">Сумма<br> {{orderPrice.itogo.price | number_format(0, ' ', ' ')}}</div>
+	<div class="col-sm-2">Скидка<br> {{orderPrice.itogo.discount | number_format(0, ' ', ' ')}}</div>
+	<div class="col-sm-2">Сумма со скидкой<br> {{orderPrice.itogo.priceDiscount | number_format(0, ' ', ' ')}}</div>
+	<div class="col-sm-2">Оплачено<br> {{orderPrice.itogo.pay | number_format(0, ' ', ' ')}}</div>
+{% if (order.user.agency != null) or is_granted('ROLE_MANAGER') %}
+	{% if (order.agency != null) %}
+		<div class="col-sm-2">Агентское вознаграждение<br> {{orderPrice.itogo.fee_summ | number_format(0, ' ', ' ')}}</div>
+		<div class=" col-sm-2">За вычетом агентского вознаграждения <br>{{ ( orderPrice.itogo.priceDiscount - orderPrice.itogo.fee_summ ) | number_format(0, ' ', ' ')}}</div>
+	{% endif %}	
+{% endif %}	
+</div>	
+
+
+
+
 {{ form_row(form.submit, {'label':'Сохранить'}) }}
 
 {{ form_end(form) }}
 
 
 {% if (order.user.agency == null) and (allow_pay) %}
-	<a href="{{path('pay',{'id':order.id})}}" class="btn-success btn">Оплатить</a>
+	<a href="{{path('pay',{'hash':order.idHash})}}" class="btn-success btn">Оплатить</a>
 {% endif %}
 
 {% endblock %}

@@ -28,16 +28,17 @@ class BuyerType extends AbstractType
 		;
 		*/
         $builder
-			->add('name',null,['required'=>true])
-			->add('lastName',null,['required'=>true])
-			->add('fatherName',null,['required'=>true])
-			->add('birthday',null,['widget' => 'single_text','required'=>true])
-			->add('passSeria',null,['required'=>true])
-			->add('passNum',null,['required'=>true])
-			->add('passDate',null,['widget' => 'single_text','required'=>true])
-			->add('passWho',null,['required'=>true])
-			->add('phone',null,['required'=>true])
-			->add('email',null,['required'=>true])
+			->add('name',null,[/*'required'=>true*/])
+			->add('lastName',null,[/*'required'=>true*/])
+			->add('fatherName',null,[/*'required'=>true*/])
+			->add('birthday',null,[/*'required'=>true,*/'years'=> range((date("Y") - 80), (date("Y")-10))])
+			->add('passSeria',null,[/*'required'=>true*/])
+			->add('passNum',null,[/*'required'=>true*/])
+			->add('passDate',null,[/*'required'=>true,*/ 'years' => range((date("Y") - 50), date("Y"))])
+			->add('passWho',null,[/*'required'=>true*/])
+			->add('phone',null,[/*'required'=>true*/])
+			->add('email',null,[/*'required'=>true*/])
+			->add('address',null,[/*'required'=>true*/])
 		;
     }
     

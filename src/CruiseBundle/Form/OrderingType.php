@@ -24,14 +24,7 @@ class OrderingType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-       
-
-
-	
-			
-			
-	  
-	   
+       	   
 	   if($builder->getData()->getBuyer() !== null)
 		{
 			$builder->add('buyer', BuyerType::class, ['label'=>'Покупатель'] );
@@ -45,8 +38,7 @@ class OrderingType extends AbstractType
 			->add('orderItems',CollectionType::class,
 				[
 					'entry_type' => OrderItemType::class,
-					'entry_options' => array('label' => false),
-
+					'entry_options' => ['label' => false , 'is_manager'=>$options['is_manager']],
 				]
 			)
 			->add('submit',SubmitType::class)
@@ -63,6 +55,7 @@ class OrderingType extends AbstractType
 					->add('permanentDiscount')
 					->add('sesonDiscount')
 					->add('agency')
+					->add('region')
 			;			
 		}
 		

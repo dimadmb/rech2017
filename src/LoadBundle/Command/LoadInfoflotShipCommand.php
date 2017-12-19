@@ -28,6 +28,7 @@ class LoadInfoflotShipCommand extends ContainerAwareCommand
             ->setName('loadinfoflot:ship')
 			->setDescription('Загрузка теплохода, его описания и круизы с сайта Инфофлота')
 			->addArgument('id')	
+			->addOption('update', null, InputOption::VALUE_NONE, 'Принудительное обновление')
         ;
     }
 
@@ -38,7 +39,10 @@ class LoadInfoflotShipCommand extends ContainerAwareCommand
 
 		$load = $this->getContainer()->get('load.loadinfoflot');
 
-        $output->writeln($load->load($id,true));
+        $update = $input->getOption('update') == null ? false : true;
+		
+		
+		$output->writeln($load->load($id,$update));
     }
 	
 }

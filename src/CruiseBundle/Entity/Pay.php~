@@ -162,5 +162,28 @@ class Pay
     {
         return $this->isDelete;
     }
-}
 
+    /**
+     * Set order
+     *
+     * @param \CruiseBundle\Entity\Ordering $order
+     *
+     * @return Pay
+     */
+    public function setOrder(\CruiseBundle\Entity\Ordering $order = null)
+    {
+        $this->order = $order;
+
+        return $this;
+    }
+
+    /**
+     * Get order
+     *
+     * @return \CruiseBundle\Entity\Ordering
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+}

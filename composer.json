@@ -1,4 +1,6 @@
 {
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "name": "symfony/framework-standard-edition",
     "license": "MIT",
     "type": "project",
@@ -31,7 +33,9 @@
         "dimadmb/simple-html-dom-bundle": "dev-master",
         "leaseweb/memcache-bundle": "^2.1",
         "symfony/assetic-bundle": "^2.8",
-        "liuggio/excelbundle": "^2.1"
+        "liuggio/excelbundle": "^2.1",
+        "ggggino/wordbundle": "^1.0.6",
+        "hashids/hashids": "^2.0"
     },
     "repositories":[
         {
@@ -60,9 +64,6 @@
         ]
     },
     "config": {
-        "platform": {
-            "php": "5.5.9"
-        },
 		"component-dir": "web/assets"
     },
     "extra": {

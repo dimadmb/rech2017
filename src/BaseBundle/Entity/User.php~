@@ -168,4 +168,28 @@ class User extends BaseUser
     {
         return $this->orders;
     }
+
+    /**
+     * Set agency
+     *
+     * @param \CruiseBundle\Entity\Agency $agency
+     *
+     * @return User
+     */
+    public function setAgency(\CruiseBundle\Entity\Agency $agency = null)
+    {
+        $this->agency = $agency;
+
+        return $this;
+    }
+
+    /**
+     * Get agency
+     *
+     * @return \CruiseBundle\Entity\Agency
+     */
+    public function getAgency()
+    {
+        return $this->agency;
+    }
 }

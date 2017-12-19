@@ -1,0 +1,17 @@
+{% extends 'baseadmin.html.twig' %}
+
+
+{% block body %}
+
+{% if error is defined %}
+
+{{dump(error)}}
+
+{% else %}
+
+	
+{{dump()}}
+
+{% endif %}
+	
+{% endblock %}
