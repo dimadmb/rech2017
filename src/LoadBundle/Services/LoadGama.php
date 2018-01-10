@@ -70,7 +70,7 @@ class LoadGama  extends Controller
 		$em = $this->em;
 		
 		ini_set("memory_limit","2G");
-		ini_set("max_execution_time","600");
+		ini_set("max_execution_time","1200");
 		
 		
 
@@ -375,7 +375,9 @@ class LoadGama  extends Controller
 										->setPrice($priceValue)
 										;
 									$em->persist($price);
+									
 								}
+								$em->flush();
 								//dump($price);
 							}
 							// взрослый с обедом и ужином
@@ -405,6 +407,7 @@ class LoadGama  extends Controller
 										;
 									$em->persist($price);
 								}
+								$em->flush();
 								//dump($price);
 							}
 							// взрослый трёхразовое
@@ -434,6 +437,7 @@ class LoadGama  extends Controller
 										;
 									$em->persist($price);
 								}
+								$em->flush();
 								//dump($price);
 							}
 							
@@ -465,6 +469,7 @@ class LoadGama  extends Controller
 										;
 									$em->persist($price);
 								}
+								$em->flush();
 								//dump($price);
 							}
 							// детский с обедом и ужином
@@ -494,6 +499,7 @@ class LoadGama  extends Controller
 										;
 									$em->persist($price);
 								}
+								$em->flush();
 								//dump($price);
 							}
 							// детский трёхразовое
@@ -523,6 +529,7 @@ class LoadGama  extends Controller
 										;
 									$em->persist($price);
 								}
+								$em->flush();
 								//dump($price);
 							}
 							
@@ -706,7 +713,7 @@ class LoadGama  extends Controller
 		$page 
 				->setParent($pageParent)
 				->setName($shipName)
-				->setTitle($shipName)
+				->setTitle("Теплоход ".$shipName.": цены, маршруты, фото, отзывы, расписание на 2018 год")
 				->setH1($shipName)
 				->setSort(1)
 				->setActive(1)

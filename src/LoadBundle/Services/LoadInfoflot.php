@@ -340,7 +340,7 @@ class LoadInfoflot  extends Controller
 		$page 
 				->setParent($pageParent)
 				->setName($shipName)
-				->setTitle($shipName)
+				->setTitle("Теплоход ".$shipName.": цены, маршруты, фото, отзывы, расписание на 2018 год")
 				->setH1($shipName)
 				->setSort(1)
 				->setActive(1)

@@ -1,0 +1,40 @@
+{% extends 'basemanager.html.twig' %}
+
+{% block body %}
+    <h1>Users list</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Логин</th>
+                <th>Фамилия</th>
+                <th>Имя</th>
+                <th>Отчество</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td><a href="{{ path('manager_user_show', { 'id': user.id }) }}">{{ user.id }}</a></td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.lastName }}</td>
+				<td>{{ user.firstName }}</td>
+                <td>{{ user.fatherName }}</td>
+                <td>{% if user.enabled %}<span style="color:green">Активен</span>{% else %}<span style="color:red">Неактивен</span>{% endif %}</td>
+                <td>
+                    
+                   <a class="btn btn-success" href="{{ path('manager_user_edit', { 'id': user.id }) }}">Редактировать</a>
+      
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+            <a class="btn btn-success" href="{{ path('manager_user_new') }}">Создать нового пользователя</a>
+
+{% endblock %}

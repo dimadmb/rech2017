@@ -106,7 +106,7 @@ class Image
 		// we use the original file name here but you should
 		// sanitize it at least to avoid any security issues
 
-		$newName = md5($this->getFile()->getClientOriginalName().(date("now"))).'.'.$this->getFile()->getClientOriginalExtension();
+		$newName = md5($this->getFile()->getClientOriginalName().(date("YmdHis"))).'.'.$this->getFile()->getClientOriginalExtension();
 		
 		// move takes the target directory and target filename as params
 		$this->getFile()->move(

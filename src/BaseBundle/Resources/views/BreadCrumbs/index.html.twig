@@ -1,0 +1,7 @@
+
+{% for page in pages %}
+	
+	
+	<a href="{{path('page',{'url':page.fullUrl})}}">{{page.h1}}</a> {% if not loop.last %} / {% endif %} 
+
+{% endfor %}

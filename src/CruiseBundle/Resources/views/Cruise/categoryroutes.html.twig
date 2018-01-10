@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+
+{% block description %}	{% if (category.description is defined)  %}
+		{{category.description}}
+	{% else %}	
+		{{category.title}}
+	{% endif %}{% endblock %}
+
+
+
+
+{% block title %}
+	{% if (category.description is defined)  %}
+		{{category.description}}
+	{% else %}	
+		{{category.title}}
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+<h1>{{category.name}}</h1>
+
+{% include 'CruiseBundle:Cruise:cruises.html.twig'   %}
+	
+
+	
+{% endblock %}	

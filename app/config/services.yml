@@ -10,7 +10,7 @@ services:
 
     cruise_search:
         class: CruiseBundle\Service\CruiseSearch
-        arguments: ['@doctrine']
+        arguments: ['@doctrine','@memcache.default']
 
     cruise:
         class: CruiseBundle\Service\Cruise
@@ -18,3 +18,9 @@ services:
 
     num2str:
         class: CruiseBundle\Service\NumToString
+
+    app.twig_extension:
+        class: CruiseBundle\Twig\AppExtension
+        public: false
+        tags:
+            - { name: 'twig.extension' }

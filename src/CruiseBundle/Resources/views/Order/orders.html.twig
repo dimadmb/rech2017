@@ -2,7 +2,7 @@
 
 {% block body %}
 
-{{dump(orders)}}
+{#{dump(orders)}#}
 
 
 {% for order in orders %}
@@ -26,7 +26,7 @@
 		</div>
 		
 		
-		<div class="col-sm-1">{{order.summ}}</div>
+		<div class="col-sm-1">{{(order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ )| number_format(2, '.', ' ')}}</div>
 		<div class="col-sm-1">
 			 создал:<br>
 			{% if (order.user.firstName != null) and (order.user.firstName != "") %}
@@ -41,6 +41,8 @@
 			{% elseif order.buyer != null %}
 				{{order.buyer.lastName}} {{order.buyer.name}} {{order.buyer.fatherName}}
 			{% endif %}
+		<br>
+		<a class="btn btn-success del_order" href="{{path('invoice_del',{'hash':order.idHash})}}">Удалить</a>		
 		
 		</div>
 
@@ -48,3 +50,10 @@
 {% endfor %}
 
 {% endblock %}
+
+{% block javascriptsonload %}
+	$('body').on('click','.del_order',function(){
+		if (!confirm("Удалить?")) return false;
+		return true;
+	});
+{% endblock %}	

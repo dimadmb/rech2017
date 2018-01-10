@@ -24,84 +24,84 @@ class Agency
     /**
      * @var string
      *
-     * @ORM\Column(name="bank_name", type="string", length=255)
+     * @ORM\Column(name="bank_name", type="string", length=255, nullable=true)
      */
     private $bankName;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255)
+     * @ORM\Column(name="name", type="string", length=255, nullable=true)
      */
     private $name;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="rs", type="string", length=255)
+     * @ORM\Column(name="rs", type="string", length=255, nullable=true)
      */
     private $rs;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="ks", type="string", length=255)
+     * @ORM\Column(name="ks", type="string", length=255, nullable=true)
      */
     private $ks;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="bik", type="string", length=255)
+     * @ORM\Column(name="bik", type="string", length=255, nullable=true)
      */
     private $bik;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="inn", type="string", length=255)
+     * @ORM\Column(name="inn", type="string", length=255, nullable=true)
      */
     private $inn;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="kpp", type="string", length=255)
+     * @ORM\Column(name="kpp", type="string", length=255, nullable=true)
      */
     private $kpp;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="ur_address", type="string", length=255)
+     * @ORM\Column(name="ur_address", type="string", length=255, nullable=true)
      */
     private $urAddress;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="fakt_address", type="string", length=255)
+     * @ORM\Column(name="fakt_address", type="string", length=255, nullable=true)
      */
     private $faktAddress;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="phone", type="string", length=255)
+     * @ORM\Column(name="phone", type="string", length=255, nullable=true)
      */
     private $phone;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="fee", type="decimal", precision=10, scale=2)
+     * @ORM\Column(name="fee", type="decimal", precision=10, scale=2, nullable=true)
      */
     private $fee;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="num_dog", type="integer", nullable=true, unique=true)
+     * @ORM\Column(name="num_dog", type="integer", nullable=true)
      */
     private $numDog;
 
@@ -122,7 +122,7 @@ class Agency
     /**
      * @var string
      *
-     * @ORM\Column(name="short_name", type="string", length=255)
+     * @ORM\Column(name="short_name", type="string", length=255, nullable=true)
      */
     private $shortName;
 	
@@ -148,10 +148,19 @@ class Agency
     private $auth;
 
 
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="active", type="boolean")
+     */
+    private $active = true;
+	
+	
+	
 	
 	public function __toString()
 	{
-		return $this->name;
+		return (string)$this->id ." ". $this->name;
 	}
 	
     /**
@@ -621,5 +630,29 @@ class Agency
     public function getAuth()
     {
         return $this->auth;
+    }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     *
+     * @return Agency
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean
+     */
+    public function getActive()
+    {
+        return $this->active;
     }
 }

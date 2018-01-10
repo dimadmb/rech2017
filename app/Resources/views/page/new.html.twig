@@ -2,15 +2,13 @@
 
 {% block body %}
     <h1>Page creation</h1>
-{% if dump is defined %}
-	{{dump(dump)}}
-{% endif %}
+
 
     {{ form_start(form) }}
         {{ form_widget(form) }}
 		<div id="dropZone" class="clearfix">
 			<div id="text">Для загрузки, перетащите файлы сюда.</div>
-			
+			<div class="sortable"></div>
 		</div>
         <input type="submit" value="Create" />
     {{ form_end(form) }}
@@ -23,7 +21,21 @@
 {% endblock %}
 
 {% block javascripts %}
-	<script src="{{ asset('admin/js/imageUpload.js') }}"></script>
+
+<script src="{{ asset('admin/js/imageUpload.js') }}"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+	$(document).ready(function() {
+		$('.sortable').sortable().bind('sortupdate', function(e, ui) {
+			$('.sortable input.sort').each(function(i){
+				$(this).val(i);
+			});
+		});
+		
+	});
+</script>	
+
 {% endblock %}
 
 

@@ -125,6 +125,11 @@ class OrderItemPlace
      */	
 	private $surcharge;
 	
+	/**
+	 * @ORM\ManyToOne(targetEntity="Gender")
+	 */
+	private $gender;
+	
 	
 	private $idHash;
 	
@@ -526,5 +531,29 @@ class OrderItemPlace
     public function getSurcharge()
     {
         return $this->surcharge;
+    }
+
+    /**
+     * Set gender
+     *
+     * @param \CruiseBundle\Entity\Gender $gender
+     *
+     * @return OrderItemPlace
+     */
+    public function setGender(\CruiseBundle\Entity\Gender $gender = null)
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    /**
+     * Get gender
+     *
+     * @return \CruiseBundle\Entity\Gender
+     */
+    public function getGender()
+    {
+        return $this->gender;
     }
 }

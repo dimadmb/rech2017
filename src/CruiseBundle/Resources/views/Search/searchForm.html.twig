@@ -42,13 +42,14 @@
 		<div class="row">
 			
 			<div class="col-sm-4">
-				{#<div class="checkbox">
-					<label><input type="checkbox" id="burningCruise" name="burningCruise" > «Счастливый» круиз</label>
-				</div>					
-				<div class="checkbox">
-					<label><input type="checkbox" id="specialoffer" name="specialoffer"> Специальный тариф</label>
-				</div>	
-				<br>#}
+			
+						{% for offer in form.offers %}	
+							<div class="checkbox">
+								<label class=""><input type="checkbox" id="offer_{{offer.id}}" name="offers[]" value="{{offer.id}}" {% if offer.checked is defined %} checked {% endif %}> {{offer.name}}</label>
+							</div>
+						{% endfor %}			
+			
+				<br>
 			</div>		
 	
 			<div class="col-sm-4" style="padding:20px 15px 0 15px">
@@ -71,7 +72,7 @@
 							
 						{% for place in form.places %}	
 							<div class="checkbox">
-								<label class=""><input type="checkbox" id="places_{{place.id}}" name="places[]" value="{{place.placeId}}" {% if place.checked is defined %} checked {% endif %}> {{place.name}}</label>
+								<label class=""><input type="checkbox" id="places_{{place.id}}" name="places[]" value="{{place.Id}}" {% if place.checked is defined %} checked {% endif %}> {{place.name}}</label>
 							</div>
 						{% endfor %}	
 

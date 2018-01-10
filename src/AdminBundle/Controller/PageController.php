@@ -28,7 +28,7 @@ class PageController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $pages = $em->getRepository('BaseBundle:Page')->findAll();
+        $pages = $em->getRepository('BaseBundle:Page')->findBy([],['sort'=>'ASC']);
 		foreach($pages as $page)
 		{
 			$parent = $page->getParent();

@@ -22,7 +22,8 @@ output="css/styles.css"
 'css/style.css' 
 'css/fancybox/jquery.fancybox.css' 
 
- filter='yui_css' %}
+filter='yui_css'
+  %}
     <link rel="stylesheet" href="{{ asset_url }}" />
 {% endstylesheets %}
 
@@ -36,7 +37,8 @@ output="css/styles.css"
         <div class="container">
 			<div class="navbar-form pull-right">
               
-              <a  href="{{ path('manager_turs') }}" class="btn btn-primary"  >Менеджер</a>
+              <a  href="{{ path('manager_invoices') }}" class="btn btn-primary"  >Заявки</a>
+              <a  href="{{ path('manager_turs') }}" class="btn btn-primary"  >Туры</a>
             </div>
         </div>
     </div>	
@@ -82,7 +84,7 @@ output="css/styles.css"
 			<a target="_blank" href="https://vk.com/club139724356"><img style="width:33px; margin-right:10px;" src="{{asset('images/template/VK.png')}}"  alt="Вконтакте"></a>
 			
 			<a target="_blank" href="https://www.ok.ru/group/53065077883088"><img style="width:33px; margin-right:10px;" src="{{asset('images/template/OK.png')}}"  alt="instagram"></a>			
-			<a target="_blank" href="http://instagram.com/rechagent"><img style="width:33px; margin-right:0px;" src="{{asset('images/template/inst.png')}}"  alt="instagram"></a>
+			<a target="_blank" href="https://instagram.com/rechagent"><img style="width:33px; margin-right:0px;" src="{{asset('images/template/inst.png')}}"  alt="instagram"></a>
 			
 			</div>
 			
@@ -95,7 +97,7 @@ output="css/styles.css"
                     {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
                 </a>
             {% else %}
-               <a style="color:#fff; font-weight:400;" href="{{ path('fos_user_security_login') }}">ВОЙТИ</a>
+               <a style="color:#fff; font-weight:400;" href="{{ path('fos_user_security_login') }}">ВОЙТИ<br>(регистрация)</a>
             {% endif %}					
 			
 			</div>
@@ -125,7 +127,9 @@ output="css/styles.css"
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
 			
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			
+			
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">	
 				{{ render(controller('BaseBundle:Menu:getMenu')) }}
             </div>
             <!-- /.navbar-collapse -->
@@ -150,6 +154,9 @@ output="css/styles.css"
 		</div>	
 	</div>	
 </div>
+
+
+
 {#
 <div class="container">
 	<br>
@@ -165,6 +172,9 @@ output="css/styles.css"
 
 <div class="container">
 	<div class="row">
+	{% block breadcrumbs %}
+	<div class="breadcrumbs">{{render(controller('BaseBundle:BreadCrumbs:index'))}}</div>
+	{% endblock %}
 	
 		<div class="col-sm-12">					
 		{% block body %}
@@ -178,17 +188,19 @@ output="css/styles.css"
 <div class="footer">
           <div class="container ">
 			<div class="row">
-				<div class="col-sm-12" itemscope="" itemtype="http://schema.org/Organization" >
+				<div class="col-sm-12" itemscope="" itemtype="https://schema.org/Organization" >
 				1997-2017 <span itemprop="name">ВАШЕ РЕЧНОЕ АГЕНТСТВО</span><br>
 				
-				<span itemprop="address" itemscope="" itemtype="http://schema.org/PostalAddress">
+				<span itemprop="address" itemscope="" itemtype="https://schema.org/PostalAddress">
 				<span itemprop="addressLocality">Москва</span>,  <span itemprop="streetAddress">ул.Никольская, д 4/5, офис 403</span>.
-				</span>
+				
 
 				Телефон <span itemprop="telephone">+7 (495) 649-83-71</span>, <span itemprop="telephone">+7 (495) 698-29-67</span>  E-mail: <a itemprop="email" href="mailto:info@rech-agent.ru">info@rech-agent.ru</a> <br>
-				
-				Санкт-Петербург, Каменноостровский проспект, д. 40, офис 501  Телефон: (812) 67-03-700  E-mail: <a href="mailto:spb@rech-agent.ru">spb@rech-agent.ru</a>
-				<br>
+				</span>
+				<span itemprop="address" itemscope="" itemtype="https://schema.org/PostalAddress">
+				<span itemprop="addressLocality">Санкт-Петербург</span>, <span itemprop="streetAddress">Каменноостровский проспект, д. 40, офис 501</span> 
+				Телефон: <span itemprop="telephone">+7 (812) 67-03-700</span>  E-mail: <a itemprop="email" href="mailto:spb@rech-agent.ru">spb@rech-agent.ru</a>
+				<br></span>
 				Информация на сайте не является публичной офёртой и носит информационный характер. 
 				</div>
 			</div>

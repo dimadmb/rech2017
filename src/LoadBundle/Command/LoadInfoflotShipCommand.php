@@ -41,6 +41,7 @@ class LoadInfoflotShipCommand extends ContainerAwareCommand
 
         $update = $input->getOption('update') == null ? false : true;
 		
+		//$update = true;
 		
 		$output->writeln($load->load($id,$update));
     }

@@ -128,7 +128,7 @@ class Page
      *
      * @ORM\Column(name="sort", type="integer")
      */
-    private $sort;
+    private $sort = 500;
 
 
     /**
@@ -136,7 +136,7 @@ class Page
      *
      * @ORM\Column(name="active", type="boolean")
      */
-    private $active;
+    private $active = true;
 
     /**
      * @var bool

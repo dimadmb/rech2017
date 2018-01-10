@@ -1,0 +1,7 @@
+{% if pages | length > 0 %}
+
+	{% for page in pages %}
+	<div><a href="{{path('page',{'url':page.fullUrl})}}">{{page.name}}</a></div>
+	{% endfor %}
+
+{% endif %}

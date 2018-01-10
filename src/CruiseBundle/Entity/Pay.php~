@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="pay")
  * @ORM\Entity(repositoryClass="CruiseBundle\Repository\PayRepository")
+ * @ORM\HasLifecycleCallbacks  
  */
 class Pay
 {
@@ -24,7 +25,7 @@ class Pay
     /**
      * @var string
      *
-     * @ORM\Column(name="comment", type="string", length=255)
+     * @ORM\Column(name="comment", type="string", length=255, nullable=true)
      */
     private $comment;
 
@@ -34,6 +35,13 @@ class Pay
      * @ORM\Column(name="created", type="datetime")
      */
     private $created;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="date", type="datetime", nullable=true)
+     */
+    private $date;
 
     /**
      * @var string
@@ -47,8 +55,22 @@ class Pay
      *
      * @ORM\Column(name="is_delete", type="boolean")
      */
-    private $isDelete;
+    private $isDelete = false;
 	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="request_starrus", type="text", nullable=true)
+     */
+    private $requestStarrus;	
+	
+		
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="response_starrus", type="text", nullable=true)
+     */
+    private $responseStarrus;	
 	
 	
 	/**
@@ -97,10 +119,11 @@ class Pay
      * @param \DateTime $created
      *
      * @return Pay
+	 * @ORM\PrePersist()	
      */
-    public function setCreated($created)
+    public function setCreated()
     {
-        $this->created = $created;
+        $this->created = new \DateTime;
 
         return $this;
     }
@@ -185,5 +208,53 @@ class Pay
     public function getOrder()
     {
         return $this->order;
+    }
+
+    /**
+     * Set requestStarrus
+     *
+     * @param string $requestStarrus
+     *
+     * @return Pay
+     */
+    public function setRequestStarrus($requestStarrus)
+    {
+        $this->requestStarrus = $requestStarrus;
+
+        return $this;
+    }
+
+    /**
+     * Get requestStarrus
+     *
+     * @return string
+     */
+    public function getRequestStarrus()
+    {
+        return $this->requestStarrus;
+    }
+
+    /**
+     * Set responseStarrus
+     *
+     * @param string $responseStarrus
+     *
+     * @return Pay
+     */
+    public function setResponseStarrus($responseStarrus)
+    {
+        $this->responseStarrus = $responseStarrus;
+
+        return $this;
+    }
+
+    /**
+     * Get responseStarrus
+     *
+     * @return string
+     */
+    public function getResponseStarrus()
+    {
+        return $this->responseStarrus;
     }
 }

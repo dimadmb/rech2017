@@ -1,2 +1,12 @@
 User-agent: *
-Disallow: /
+Disallow: /admin
+Disallow: /cruise/search
+Disallow: /bundles
+Disallow: /web
+Allow: /web/bundles/base/files/_thumb/
+Disallow: /www
+Disallow: /search
+Disallow: /api/
+Disallow: /cruise/order/
+
+Host: https://www.rech-agent.ru

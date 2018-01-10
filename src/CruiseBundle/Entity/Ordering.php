@@ -128,7 +128,7 @@ class Ordering
 	
 	private $idHash;
 	
-	
+	/*
 	private $summ;
 
     public function getSumm()
@@ -155,7 +155,14 @@ class Ordering
 
         return $this;
     }	
-		
+	*/	
+	
+	
+	public function __toString()
+	{
+		return (string)$this->id;
+	}
+	
 	
     /**
      * Get id

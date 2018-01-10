@@ -8,6 +8,19 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
+use CruiseBundle\Entity\Ship;
+use CruiseBundle\Entity\Region;
+use CruiseBundle\Entity\Ordering;
+
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 /**
  * Manager controller.
@@ -28,6 +41,35 @@ class ManagerController extends Controller
 		$cruises = $this->getDoctrine()->getManager()->getRepository("CruiseBundle:Cruise")->findAll();
 		return ['cruises'=>$cruises];
 	}	
+
+
+    /**
+     * @Route("/invoice_del/{order}", name="manager_invoice_del")
+     */
+    public function invoiceDeleteAction(Ordering $order)
+    {
+		if($order)
+		{
+			$em = $this->getDoctrine()->getManager();
+			$order->setActive(false);
+			$em->flush();
+		}
+		return $this->redirectToRoute('manager_invoices');
+    }
+
+    /**
+     * @Route("/invoice_no_del/{order}", name="manager_invoice_no_del")
+     */
+    public function invoiceNoDeleteAction(Ordering $order)
+    {
+		if($order)
+		{
+			$em = $this->getDoctrine()->getManager();
+			$order->setActive(true);
+			$em->flush();
+		}
+		return $this->redirectToRoute('manager_invoices');
+    }
 	
 	
     /**
@@ -36,12 +78,149 @@ class ManagerController extends Controller
      */
     public function invoicesAction(Request $request)
     {
-		$orders = $this->getDoctrine()->getManager()->getRepository("CruiseBundle:Ordering")->findAll();
-		/*foreach($orders as $order)
+		$em = $this->getDoctrine()->getManager();
+		
+		
+		
+		
+		$form = $this->createFormBuilder()
+				->add('ship',EntityType::class,[
+								'required'=> false,
+								'class' => Ship::class,
+								'query_builder' => function (EntityRepository $er) {
+									return $er->createQueryBuilder('s')
+										->orderBy('s.name', 'ASC');
+										},
+										
+
+															])
+								
+				->add('oplata', ChoiceType::class,[
+								'required'=> false,
+									'choices'  => array(
+										'Неоплачен' => 1,
+										'Частично оплачен' => 2,
+										'Оплачен' => 3,
+										'Переплата' => 4,
+									),
+								])								
+				->add('del', CheckboxType::class,[
+								'required'=> false,
+								'label'  => "Показать удалённые",
+								])
+				->add('region',EntityType::class,[
+								'required'=> false,
+								'class' => Region::class,				
+								])
+				->add('buyer',TextType::class,['required'=> false])
+				->add('submit', SubmitType::class,array('label' => 'Фильтровать'))
+				->getForm()
+			;	
+		$form->handleRequest($request);		
+		
+		$search = [];
+		if ($form->isSubmitted() && $form->isValid()) 
 		{
-			$order->idHash = $this->get('cruise')->hashOrderEncode($order->getId());
-		}*/
-		return ['orders'=>$orders];
+			$search = $form->getData();
+		}		
+		
+		//dump($search);
+		
+		//$orders = $em->getRepository("CruiseBundle:Ordering")->findAll();
+		
+		$qb = $em->createQueryBuilder()
+						->select('o')
+						->from('CruiseBundle:Ordering','o')
+						;
+		if(isset($search['region']))
+		{
+			$qb
+			->andWhere('o.region = :region')
+			->setParameter('region',$search['region'])
+			;
+		}
+		if(isset($search['ship']))
+		{
+			$qb
+			->leftJoin('o.cruise','c')
+			->leftJoin('c.ship','s')
+			->andWhere('s = :ship')
+			->setParameter('ship',$search['ship'])
+			;
+		}
+		if(isset($search['buyer']))
+		{
+			$qb->leftJoin('o.buyer','b');			
+			$qb->andWhere($qb->expr()->orX(
+							$qb->expr()->like('b.name', ':buyer') , 
+							$qb->expr()->like('b.lastName', ':buyer') , 
+							$qb->expr()->like('b.fatherName', ':buyer') , 
+							$qb->expr()->like('b.email', ':buyer') , 
+							$qb->expr()->like('b.phone', ':buyer') 
+							));
+			$qb->setParameter('buyer', '%'.$search['buyer'].'%');				
+			
+		}
+		
+		if(isset($search['del']) && $search['del'] === true)
+		{
+			
+		}
+		else
+		{
+			$qb->andWhere('o.active = 1');
+		}
+
+		
+		$orders = $qb
+				->orderBy('o.id','DESC')
+				->getQuery()
+				->getResult()
+			;
+		
+		
+		foreach($orders as $key => &$order)
+		{
+			$order->orderPrice = $this->get('cruise')->getOrderPrice($order);
+		}
+		
+   // оплаты можно посчитать позже на PHP b удалить лишние
+		if(isset($search['oplata']))
+		{
+			foreach($orders as $key => &$order)
+			{
+				$orderPrice = $order->orderPrice;
+				
+				// не оплачен
+				if ( ($search['oplata'] == 1 ) && ($orderPrice['itogo']['pay'] > 0) ) 
+				{
+					unset($orders[$key]);
+				}
+				
+				//частично оплачен
+				if (($search['oplata'] == 2 ) && ( ($orderPrice['itogo']['pay'] == 0) ||  $orderPrice['itogo']['pay'] >= $orderPrice['itogo']['priceDiscount'])  )
+				{
+					unset($orders[$key]);
+				}
+				
+				// оплачен
+				if (($search['oplata'] == 3 ) && ( $orderPrice['itogo']['pay'] < $orderPrice['itogo']['priceDiscount'])  )
+				{
+					unset($orders[$key]);
+				}
+				
+				// переплата
+				if (($search['oplata'] == 4 ) && ( $orderPrice['itogo']['pay'] <= $orderPrice['itogo']['priceDiscount'])  )
+				{
+					unset($orders[$key]);
+				}
+				
+ 
+			}
+				
+		}
+	
+		return ['orders'=>$orders, 'form'=>$form->createView()];
 	}	
 	
     /**

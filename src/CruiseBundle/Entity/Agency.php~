@@ -101,7 +101,7 @@ class Agency
     /**
      * @var int
      *
-     * @ORM\Column(name="num_dog", type="integer", nullable=true, unique=true)
+     * @ORM\Column(name="num_dog", type="integer", nullable=true)
      */
     private $numDog;
 
@@ -122,7 +122,7 @@ class Agency
     /**
      * @var string
      *
-     * @ORM\Column(name="short_name", type="string", length=255)
+     * @ORM\Column(name="short_name", type="string", length=255, nullable=true)
      */
     private $shortName;
 	
@@ -148,6 +148,15 @@ class Agency
     private $auth;
 
 
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="active", type="boolean")
+     */
+    private $active = true;
+	
+	
+	
 	
 	public function __toString()
 	{

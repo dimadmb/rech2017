@@ -1,7 +1,53 @@
 RewriteEngine On
 
+
+# редиректы 
+# категории маршрутов (переехали на статичные страницы с вызовом контроллера)
+RewriteRule ^(.*)cruise/categoryroutes/(.*)\.html$ $1/cruise/$2 [R=301,L]
+# детальное описание круиза (упростили путь и отказались от теплохода в маршруте)
+RewriteRule ^(.*)cruise/cruisedetails/(.*)_(\d*)\.html$ $1/cruise/$3 [R=301,L]
+# теплоходы 
+RewriteRule ^(.*)cruise/ship/(.*)\.html$ $1/ships/$2 [R=301,L]
+# спецтарифы 
+RewriteRule ^(.*)specialoffer/burningcruise.html $1/specialoffers/happy [R=301,L]
+RewriteRule ^(.*)specialoffer/specialoffer.html $1/specialoffers/special [R=301,L]
+
+RewriteRule ^(.*)cruise/88(\d*)$ $1/cruise/100$2 [R=301,L]
+RewriteRule ^(.*)cruise/99(\d*)$ $1/cruise/2$2 [R=301,L]
+
+
+#месяца 
+Redirect 301 /cruise/month/1522530000.html  /cruise/month/2018-04
+Redirect 301 /cruise/month/1525122000.html  /cruise/month/2018-05
+Redirect 301 /cruise/month/1527800400.html  /cruise/month/2018-06
+Redirect 301 /cruise/month/1530392400.html  /cruise/month/2018-07
+Redirect 301 /cruise/month/1533070800.html  /cruise/month/2018-08
+Redirect 301 /cruise/month/1535749200.html  /cruise/month/2018-09
+Redirect 301 /cruise/month/1538341200.html  /cruise/month/2018-10
+Redirect 301 /cruise/month/1541019600.html  /cruise/month/2018-11
+
+Redirect 301 /cruise/alphabetlist  /ships
+
+#отправление из
+RewriteRule ^(.*)cruise/placestart/(.*)\.html$ $1/cruise-from/$2 [R=301,L]
+
+
+
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}/$1 [R=301,L] 
+
+RewriteCond %{HTTP_HOST} !^www\.(.*) [NC]
+RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1  [R=301,L]
+
+RewriteCond %{THE_REQUEST} /index.html
+RewriteRule (.*)$ / [R=301,L]
+
 RewriteCond %{REQUEST_URI} !^web/.*$
 RewriteRule ^(.*)$ web/$1 [QSA,L]
+
+
+
+
 
 php_value max_file_uploads 50
 
@@ -35,3 +81,4 @@ ExpiresByType img/jpg "access plus 1 months"
 ExpiresByType img/icon "access 1 months"
 ExpiresByType diagram/gif "now”
 </IfModule>
+

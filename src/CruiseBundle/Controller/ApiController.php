@@ -248,38 +248,17 @@ class ApiController extends Controller
 		$agency = $em->getRepository('CruiseBundle:Agency')->findOneBy(['id'=>$agency_code, 'auth'=>$auth]);
 		
 		
-		return $this->render("dump.html.twig",['dump'=>$agency]);
+		//return $this->render("dump.html.twig",['dump'=>$agency]);
 		
-
-		
-		
-		$em_booking = $this->getDoctrine()->getManager('booking');
-		$em = $this->getDoctrine()->getManager();
-		$connection = $em_booking->getConnection();	
-		///  проверка агентства
-		$sql="
-		SELECT `aa_agent`.*,jdr8t_users.name 
-		FROM `aa_agent`
-		LEFT JOIN jdr8t_users ON jdr8t_users.id = aa_agent.user_id
-		WHERE `aa_agent`.`user_id` = ".$agency_code."
-		AND jdr8t_users.auth = '".$auth."'
-		";
-		
-		//return ['json'=>json_encode(['error'=>$sql])];
-		
-		$statement = $connection->prepare($sql);
-		$statement->execute();
-		$agency = $statement->fetch();	
-		$count_agency = $statement->rowCount();
-		
-		if($count_agency != 1) 
+		if(null === $agency)
 		{
 			$error[] = "Такого агентства нет или неправильный код авторизации";
-			return ['json'=>json_encode(['error'=>$error])];
+			return ['json'=>json_encode(['error'=>$error])];			
 		}
-		
+	
 		$json = $request->request->get('json');
-		$arr  = json_decode($json, true );
+		$arr  = json_decode($json, true );		
+
 		
 		
 		
@@ -291,27 +270,25 @@ class ApiController extends Controller
 			return ['json'=>json_encode(['error'=>$error])];			
 		}
 		
-		$sql="
-		SELECT * FROM `aa_schet`
-		WHERE `aa_schet`.`id` = $schet_id
-		AND `aa_schet`.`user_id` = $agency_code
-		";	
-		$statement = $connection->prepare($sql);
-		$statement->execute();
-		$agency = $statement->fetch();	
-		$count_schet = $statement->rowCount();
-		if($count_schet != 1) 
-		{
-			$error[] = "Такого счёта нет или он создан другим пользователем";
-			return ['json'=>json_encode(['error'=>$error])];
-		}		
-		// Теперь нужно сменить статус у счёта 
-		$sql = "
-		UPDATE `aa_schet` SET `status`= 0  WHERE `id` = $schet_id
-		";
+		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($schet_id);
 		
-		$statement = $connection->prepare($sql);
-		$statement->execute();		
+		// найти счёт от этого агентства
+		
+		if(null === $order)
+		{
+			$error[] = "Такого счёта нет";
+			return ['json'=>json_encode(['error'=>$error])];			
+		}
+		
+		if($order->getAgency() !== $agency)
+		{
+			$error[] = "Счёт создан другим пользователем";
+			return ['json'=>json_encode(['error'=>$error])];				
+		}
+		
+		$order->setActive(false);
+		$em->flush();
+	
 		
 		return ['json'=>json_encode(['schet'=>$schet_id])];
 	}
@@ -339,7 +316,7 @@ class ApiController extends Controller
 		$json = $request->request->get('json');
 		
 		
-		$json = '{"cruise_id":1004163,"rooms":{"103":[{"tariff_id":10,"name":"\u0418\u0432\u0430\u043d","surname":"\u0418\u0432\u0430\u043d\u043e\u0432","patronymic":"\u0418\u0432\u0430\u043d\u043e\u0432\u0438\u0447","birthday":"1945-05-05","pass_seria":"1233","pass_num":"123456","pass_date":"2000-05-05","pass_who":"\u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"},{"tariff_id":11,"name":"\u0418\u0432\u0430\u043d","surname":"\u0418\u0432\u0430\u043d\u043e\u0432","patronymic":"\u0418\u0432\u0430\u043d\u043e\u0432\u0438\u0447","birthday":"1945-05-05","pass_seria":"1233","pass_num":"123456","pass_date":"2000-05-05","pass_who":"\u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"},{"tariff_id":10,"name":"\u041c\u0430\u0440\u0438\u044f","surname":"\u0418\u0432\u0430\u043d\u043e\u0432\u0430","patronymic":"\u0418\u0432\u0430\u043d\u043e\u0432\u043d\u0430","birthday":"1955-05-05","pass_seria":"1233","pass_num":"123456","pass_date":"2000-05-05","pass_who":"\u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"}]}}';
+		//$json = '{"cruise_id":1004163,"rooms":{"103":[{"tariff_id":10,"name":"\u0418\u0432\u0430\u043d","surname":"\u0418\u0432\u0430\u043d\u043e\u0432","patronymic":"\u0418\u0432\u0430\u043d\u043e\u0432\u0438\u0447","birthday":"1945-05-05","pass_seria":"1233","pass_num":"123456","pass_date":"2000-05-05","pass_who":"\u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"},{"tariff_id":11,"name":"\u0418\u0432\u0430\u043d","surname":"\u0418\u0432\u0430\u043d\u043e\u0432","patronymic":"\u0418\u0432\u0430\u043d\u043e\u0432\u0438\u0447","birthday":"1945-05-05","pass_seria":"1233","pass_num":"123456","pass_date":"2000-05-05","pass_who":"\u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"},{"tariff_id":10,"name":"\u041c\u0430\u0440\u0438\u044f","surname":"\u0418\u0432\u0430\u043d\u043e\u0432\u0430","patronymic":"\u0418\u0432\u0430\u043d\u043e\u0432\u043d\u0430","birthday":"1955-05-05","pass_seria":"1233","pass_num":"123456","pass_date":"2000-05-05","pass_who":"\u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"}]}}';
 		
 		
 		$arr  = json_decode($json, true );

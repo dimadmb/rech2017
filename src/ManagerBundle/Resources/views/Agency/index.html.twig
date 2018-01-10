@@ -1,0 +1,49 @@
+{% extends 'basemanager.html.twig' %}
+
+{% block body %}
+    <h1>Agencies list</h1>
+<style>
+.agency td {
+	padding:5px 5px ;
+	margin-bottom:10px;
+}
+
+</style>
+
+
+    <table class="agency">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Короткое название</th>				
+                <th>Название</th>
+                <th>Телефон</th>
+                <th>Комиссия</th>
+                <th>Номер договора</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for agency in agencies %}
+            <tr>
+                <td><a href="{{ path('manager_agency_show', { 'id': agency.id }) }}">{{ agency.id }}</a></td>
+                <td {% if not agency.active %} style="background:#ffd9d9;"{% endif %}>{{ agency.shortName }}</td>
+				<td>{{ agency.name }}</td>
+				
+				<td>{{ agency.phone }}</td>
+				<td>{{ agency.fee }}</td>
+                <td>{{ agency.numDog }}</td>
+                <td>
+                    <a class="btn btn-success" href="{{ path('manager_agency_edit', { 'id': agency.id }) }}">Редактировать</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('manager_agency_new') }}">Create a new agency</a>
+        </li>
+    </ul>
+{% endblock %}

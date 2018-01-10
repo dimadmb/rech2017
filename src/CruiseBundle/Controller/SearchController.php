@@ -73,12 +73,28 @@ class SearchController extends Controller
 		{
 			foreach($form["places"] as $place)
 			{
-				if(in_array($place->getPlaceId(),$places))
+				if(in_array($place->getId(),$places))
 				{
 					$place->checked = true;
 				}
 			}
 		}
+		
+		$form["offers"] = $this->getOffers();
+		if(null != $offers = $request->query->get('offers') )
+		{
+			foreach($form["offers"] as $offer)
+			{
+				if(in_array($offer->getId(),$offers))
+				{
+					$offer->checked = true;
+				}
+			}
+		}
+		
+		
+		
+		
 		//dump($action);
         return $this->render('CruiseBundle:Search:searchForm.html.twig', array(
             'form' => $form,
@@ -95,9 +111,17 @@ class SearchController extends Controller
 			FROM CruiseBundle:Place p 
 			WHERE EXISTS 
 				(SELECT pi FROM CruiseBundle:ProgramItem pi WHERE pi.place = p.id AND p.url <> '' )
+			ORDER BY p.name
 			"
 		);	
 		return $query->getResult();
+
+	}
+	public function getOffers()
+	{
+		$em = $this->getDoctrine()->getManager();
+
+		return $em->getRepository("CruiseBundle:TypeDiscount")->findAll();
 
 	}
 

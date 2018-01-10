@@ -1,11 +1,34 @@
 {% extends '::basemanager.html.twig' %}
 
 {% block body %}
+<div class="row" style="background:#fff; margin-bottom:10px;"> 
+{{ form_start(form) }}	
+<div class="col-sm-2">
+{{ form_row(form.ship) }}	
+</div>	
+<div class="col-sm-2">
+{{ form_row(form.oplata) }}	
+</div>	
+<div class="col-sm-2">
+{{ form_row(form.region) }}	
+</div>	
+<div class="col-sm-2">
+{{ form_row(form.buyer) }}	
+</div>	
+<div class="col-sm-2">
+{{ form_row(form.del) }}	
+</div>	
+<div class="col-sm-2">
+{{ form_row(form.submit) }}	
+</div>
+{{ form_end(form) }}
+</div>
 
+{#{dump(orders)}#}
 
 
 {% for order in orders %}
-	<div class="row" style="background:#fff; margin-bottom:10px;"> 
+	<div class="row" style="background:{% if order.active == true %}#fff{% else %}#fcc{% endif %}; margin-bottom:10px;"> 
 		
 		
 		
@@ -28,15 +51,36 @@
 		</div>
 		
 		
-		<div class="col-sm-1">{{order.summ}}</div>
-		<div class="col-sm-1">
+		<div class="col-sm-2">
+		{% if order.orderPrice.itogo.pay > order.orderPrice.itogo.priceDiscount  %}
+			<span style="color:#a34ae0;  font-weight:900;">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
+			<span style="">переплата {{ (order.orderPrice.itogo.pay - (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) )| number_format(2, '.', ' ') }} руб.</span>
+		{% endif %}
+		{% if order.orderPrice.itogo.pay == order.orderPrice.itogo.priceDiscount  %}
+			<span style="color:#f00;  font-weight:900;">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
+			
+		{% endif %}
+		{% if order.orderPrice.itogo.pay == 0 %}
+			<span style="color:#000; ">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
+			
+		{% endif %}
+		{% if (order.orderPrice.itogo.pay < order.orderPrice.itogo.priceDiscount) and (order.orderPrice.itogo.pay > 0)  %}
+			<span style="color:#b9b500; font-weight:900; ">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
+			<span style="">остаток {{ (-1*(order.orderPrice.itogo.pay - (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ)) )| number_format(2, '.', ' ') }} руб.</span>
+			
+		{% endif %}
+		
+		
+		
+		</div>
+		<!--<div class="col-sm-1">
 			 создал:<br>
 			{% if (order.user.firstName != null) and (order.user.firstName != "") %}
 				{{order.user.lastName}} {{order.user.firstName}} {{order.user.fatherName}}
 			{% else %}
 				{{order.user.username}}	
 			{% endif %}			
-		</div>
+		</div>-->
 		<div class="col-sm-1">покупатель: <br>
 			{% if order.agency != null %}
 				{{order.agency.name}}
@@ -46,14 +90,126 @@
 		
 		</div>
 		<div class="col-sm-2">
-			<a class="btn btn-success" data-id="{{order.id}}" href="#">Добавить оплату</a>
-			
+			<a class="btn btn-success addPay" data-id="{{order.id}}" href="#">Добавить оплату</a>
+			<span id="pays_{{order.id}}">
 			{% for pay in order.pays %}
-				{{dump(pay)}}
-			{% endfor %}
+				
+				<span data-id="{{pay.id}}"><br>{{pay.amount | number_format(2, '.', ' ')}} руб. {{ pay.date | date('d.m.Y')}}<span class="del_pay" >X</span></span>
+			{% endfor %}			
+			</span>
+			<br>
+			{% if order.active == true %}
+			<a class="btn btn-success del_order" href="{{path('manager_invoice_del',{'order':order.id})}}">Удалить</a>
+			{% else %}
+			<a class="btn btn-success " href="{{path('manager_invoice_no_del',{'order':order.id})}}">Восстановить</a>
+			{% endif %}
+
 			
 		</div>
+		
+		<div class="col-sm-12">
+			<b><i>{{order.commentManager}}</i></b>
+		</div>
+		
 	</div>
 {% endfor %}
+<style>
+.del_pay {
+	color:red;
+	cursor:pointer;
+	
+}
+</style>
+<div id="modalPay" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Заголовок модального окна -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Заголовок модального окна</h4>
+      </div>
+      <!-- Основное содержимое модального окна -->
+      <div class="modal-body">
+       
+      </div>
+      <!-- Футер модального окна -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- Скрипт, вызывающий модальное окно после загрузки страницы -->
 
 {% endblock %}
+
+{% block javascriptsready %}
+	
+	$('a.addPay').click(function(){
+		
+		id = $(this).attr('data-id');
+		$("#modalPay .modal-title").text("Оплата заявки №"+id);
+		
+		
+			$.ajax({
+				data : 'order_id='+id,
+				url: "{{path('manager_add_pay')}}",			  
+				success: function(html){
+					$('#modalPay .modal-body').html(html);
+				}
+			});
+		$("#modalPay").attr('data-id',id);
+		$("#modalPay").modal('show');
+	})
+
+	$('#modalPay').on('submit','form',function(){
+		modalPay = $(this).closest('#modalPay');
+		id = modalPay.attr('data-id');
+		form = $(this);//.closest('#modalPay').find('form');
+			
+		$.ajax({
+			method: 'post',
+			data : $(form).serialize(),
+			url: "{{path('manager_add_pay')}}",			  
+			success: function(html){
+				$('#pays_'+id).append(html);
+				
+			}
+		});
+		modalPay.modal('hide')		
+		return false;
+	})
+	
+	$('body').on('click','.del_pay',function(){
+		span = $(this).parent();
+		
+		if (!confirm("Удалить?")) return false;
+		
+		id = span.attr('data-id');
+		console.log(id)
+		$.ajax({
+			method: 'post',
+			data : 'id='+id,
+			url: "{{path('manager_del_pay')}}",			  
+			success: function(html){
+				console.log(html);
+				if(html = "OK") 
+				{
+					span.remove();
+				}
+				
+			}
+		});		
+	});	
+	$('body').on('click','.del_order',function(){
+		
+		
+		if (!confirm("Удалить?")) return false;
+		
+		return true;
+	});
+	
+
+
+{% endblock %}	

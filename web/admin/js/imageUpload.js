@@ -3,6 +3,7 @@ $(document).ready(function() {
 
     var dropZone = $('#dropZone'),
         dropZoneText = $('#dropZone > #text'),
+        dropZonePlace = $('#dropZone > .sortable'),
         maxFileSize = 64*1024*1024; // максимальный размер файла - 64 мб.
 
 	dropZone.on("click","a.delete_image",function(){
@@ -76,7 +77,7 @@ $(document).ready(function() {
 		if (event.target.readyState == 4) {
 			if (event.target.status == 200) {
 				dropZoneText.text("");
-				dropZone.append(event.target.responseText);
+				dropZonePlace.append(event.target.responseText);
 			} else {
 				dropZone.text('Произошла ошибка!');
 				dropZone.addClass('error');

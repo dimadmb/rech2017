@@ -16,9 +16,10 @@ class CruiseSearch
     private $doctrine;
 
 
-    public function __construct($doctrine)
+    public function __construct($doctrine,$memcache)
     {
         $this->doctrine = $doctrine;
+        $this->memcache = $memcache;
     }
 	
 	public function searchCruise($parameters = array())
@@ -43,6 +44,7 @@ class CruiseSearch
 		$rsm->addFieldResult('td', 'td_id', 'id');
 		$rsm->addFieldResult('td', 'td_name', 'name');
 		$rsm->addFieldResult('td', 'td_value', 'value');
+		$rsm->addFieldResult('td', 'td_code', 'code');
 		$rsm->addJoinedEntityResult('CruiseBundle:Ship', 's','c', 'ship');
 		$rsm->addFieldResult('s', 's_id', 'id');
 		$rsm->addFieldResult('s', 's_name', 'name');
@@ -55,6 +57,23 @@ class CruiseSearch
 		$where = "";
 		$join = "";
 		
+		
+		if(isset($parameters['category']))
+		{
+			$join .= "LEFT JOIN cruise_category ON cruise_category.cruise_id = c.id 
+			";
+			$join .= "LEFT JOIN category ON cruise_category.category_id = category.id ";
+			
+			$where .= "
+			AND category.code = '".$parameters['category']."'";
+		}		
+		
+		if(isset($parameters['specialOffer']))
+		{
+			$where .= "
+			AND td.code = '".$parameters['specialOffer']."'";
+		}
+
 		// даты unix окончание - последняя дата начала // для моиска по месяцам
 		if(isset($parameters['startdate']))
 		{
@@ -84,26 +103,14 @@ class CruiseSearch
 			AND s.shipId = ".$parameters['ship'];
 		}
 		
-		/*
-		if(isset($parameters['specialoffer']) && isset($parameters['burningCruise']))
+		
+		if(isset($parameters['offers']))
 		{
+
 			$where .= "
-			AND ((code.specialOffer = 1) OR (code.burningCruise = 1)) ";	
+			AND td.id IN (".implode(",",$parameters['offers']).")";	
 		}
-		else
-		{
-			if(isset($parameters['specialoffer']))
-			{
-				$where .= "
-				AND code.specialOffer = 1";			
-			}
-			if(isset($parameters['burningCruise']))
-			{
-				$where .= "
-				AND code.burningCruise = 1";			
-			}		
-		}
-		*/
+
 		if(isset($parameters['places']))
 		{
 			$join .= "
@@ -111,7 +118,7 @@ class CruiseSearch
 			LEFT JOIN place cp ON pi.place_id = cp.id
 			";
 			$where .= "
-			AND cp.place_id IN (".implode(',',$parameters['places']).")";	
+			AND cp.id IN (".implode(',',$parameters['places']).")";	
 			
 		}
 		
@@ -130,6 +137,12 @@ class CruiseSearch
 			AND c.name LIKE '".$parameters['placeStart']."%'";
 		}
 		
+		if(isset($parameters['month'])  )
+		{
+			$where .= "
+			AND c.startDate LIKE '".$parameters['month']."%'";
+		}
+		
 		$sql = "
 		SELECT 
 			c.id c_id , c.ship_id c_ship, c.startDate c_startdate, c.endDate c_enddate, c.dayCount c_daycount,  c.name c_name, c.tur_operator_id c_tur_operator
@@ -138,7 +151,7 @@ class CruiseSearch
 			,
 			t.id to_id, t.name to_name, t.inSale to_inSale
 			,
-			td.id td_id, td.name td_name, td.value td_value
+			td.id td_id, td.name td_name, td.value td_value, td.code td_code
 			,
 			p.id p_id, p.price p_price
 
@@ -173,8 +186,71 @@ class CruiseSearch
 		//$query->setParameter(1, 'romanb');
 		
 		$result = $query->getResult();
+		//$cruises = [];
+		foreach($result as &$cruise)
+		{
+			$cruise = $this->prepareCruise($cruise) ;
+		}
+		
 		return $result;
 	}	
+	
+	public function prepareCruise($cruise) 
+	{
+		$em = $this->doctrine->getManager();
+		$cruise->minprice = $cruise->getMinprice();
+		
+		if($cruise->getTypeDiscount() !== null)
+		{
+			if($cruiseMemory = $this->memcache->get('cruise'.$cruise->getId()) )
+			{
+				$cruise = $cruiseMemory ;
+				//dump($cruise);
+			}
+			else 
+			{
+				//$prices = $em->getRepository('CruiseBundle:Price')->findBy( $cruise_id, 1);
+				$prices = $em->createQueryBuilder()
+						->select('price, cab, room , rd')
+						->from('CruiseBundle:Price', 'price')
+						->leftJoin('price.cabin','cab')
+						->leftJoin('cab.rooms','room')
+						->leftJoin('room.roomDiscount','rd')
+						->where('price.cruise = '.$cruise->getId())
+						->andWhere('rd.cruise = '.$cruise->getId())
+						->andWhere('price.tariff = 1')
+						->getQuery()
+						->getResult()
+				
+				;
+				$minPriceDiscount = null;
+				foreach($prices as $price)
+				{
+					if(( $price->getPrice() < $minPriceDiscount ) or ($minPriceDiscount === null) )
+					{
+						$minPriceDiscount = $price->getPrice();
+					}
+				}
+				
+				//dump($minPriceDiscount);
+				$newPriceDiscount = $minPriceDiscount * (100 - $cruise->getTypeDiscount()->getValue()) / 100;
+				//dump($newPriceDiscount);
+				
+				if($newPriceDiscount*1 < $cruise->minprice*1)
+				{
+					//dump($cruise->minprice);
+					$cruise->newMinPrice = $newPriceDiscount;
+				}
+				
+				
+				$this->memcache->set('cruise'.$cruise->getId(),$cruise,0,60*60*1);
+				
+			}			
+		}
+		
+		return $cruise;
+	}
+	
 	
 	
 }

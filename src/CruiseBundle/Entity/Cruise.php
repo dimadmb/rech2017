@@ -22,7 +22,7 @@ class Cruise
     private $id;
 	
 	/**
-	 * @ORM\ManyToMany(targetEntity="Category" )
+	 * @ORM\ManyToMany(targetEntity="Category", inversedBy="cruises" )
 	 */
 	private $category;
 

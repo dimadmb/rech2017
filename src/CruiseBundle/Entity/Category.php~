@@ -41,6 +41,11 @@ class Category
      * @ORM\Column(name="code", type="string", length=255)
      */
     private $code;
+	
+	/**
+	 * @ORM\ManyToMany(targetEntity="Cruise", mappedBy="category")
+	 */
+	private $cruises;
 
 
     /**

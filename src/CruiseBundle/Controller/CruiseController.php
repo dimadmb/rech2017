@@ -47,6 +47,17 @@ class CruiseController extends Controller
 		$cruises = $this->searchCruise($request->query->all());
 		//return ["cruises"=>$cruises];
 		return ["months"=>$this->month($cruises)];
+    }
+	
+	
+    /**
+	 * @Template("CruiseBundle:Cruise:cruises.html.twig")	
+     */
+    public function searchInAction(Request $request, $parameters = [])
+    {
+		$cruises = $this->searchCruise($parameters);
+		//return ["cruises"=>$cruises];
+		return ["months"=>$this->month($cruises)];
     }	
 	
 
@@ -77,7 +88,10 @@ class CruiseController extends Controller
 
     /**
 	 * @Template()	
-     * @Route("/cruise/{id}", name="cruisedetail")
+     * @Route("/cruise/{id}", name="cruisedetail",     
+	 *     requirements={
+     *         "id": "\d+"
+     *     })
      */
 	public function cruiseDetailAction($id)
 	{
@@ -131,9 +145,10 @@ class CruiseController extends Controller
 					$active_rooms[] = $roomDiscount->getRoom()->getId();
 				}				
 			}
-			$available_rooms = $this->get('cruise')->getAvailibleRooms($cruise);
-			
+			//$available_rooms = $this->get('cruise')->getAvailibleRooms($cruise);
+			$available_rooms = $this->get('cruise')->getRooms($cruise->getId());
 
+			//dump($available_rooms);
 			
 			$cabinsAll = $cruiseShipPrice->getShip()->getCabin();
 			
@@ -145,25 +160,27 @@ class CruiseController extends Controller
 				$rooms_in_cabin = array();
 				foreach($cabinsItem->getRooms() as $room)
 				{
+					
 					if(in_array($room->getId(),$active_rooms))
 					{
-						$room->discount = true;
+						//$room->discount = true;
 						$discountInCabin = true;
 					}
 					else
 					{
-						$room->discount = false;
+						//$room->discount = false;
 					}
 					
 					if(in_array($room->getNumber(),$available_rooms) /*|| true*/)
 					{
 						$rooms_in_cabin[] = $room;
 					}
+					/*
 					elseif(in_array($room->getId(),$active_rooms))
 					{
 						$rooms_in_cabin[] = $room;
 					}
-
+					*/
 					
 				}
 
@@ -212,144 +229,38 @@ class CruiseController extends Controller
 	public function searchCruise($parameters = array())
 	{
 		return $this->get('cruise_search')->searchCruise($parameters);
-		/*
-		$em = $this->getDoctrine()->getManager();
-		$rsm = new ResultSetMapping;
-		$rsm->addEntityResult('CruiseBundle:Cruise', 'c');
-		$rsm->addFieldResult('c', 'c_id', 'id');
-		$rsm->addMetaResult('c', 'c_ship', 'ship');
-		$rsm->addFieldResult('c', 'c_startdate', 'startDate');
-		$rsm->addFieldResult('c', 'c_enddate', 'endDate');
-		$rsm->addFieldResult('c', 'c_daycount', 'dayCount');
-		$rsm->addFieldResult('c', 'c_name', 'name');
-		$rsm->addMetaResult('c', 'c_code', 'code');
-		$rsm->addJoinedEntityResult('CruiseBundle:Ship', 's','c', 'ship');
-		$rsm->addFieldResult('s', 's_id', 'id');
-		$rsm->addFieldResult('s', 's_name', 'name');
-		$rsm->addFieldResult('s', 's_code', 'code');
-		$rsm->addFieldResult('s', 's_m_id', 'shipId');
-		$rsm->addJoinedEntityResult('CruiseBundle:Price', 'p','c', 'prices');
-		$rsm->addFieldResult('p', 'p_id', 'id');
-		$rsm->addFieldResult('p', 'p_price', 'price');
-
-		$where = "";
-		$join = "";
-		
-		// даты unix окончание - последняя дата начала // для моиска по месяцам
-		if(isset($parameters['startdate']))
-		{
-			$where .= "
-			AND c.startdate >= ".$parameters['startdate'];
-		}		
-		if(isset($parameters['enddate']))
-		{
-			$where .= "
-			AND c.startdate <= ".$parameters['enddate'];
-		}	
-
-		// даты человеческие
-		if(isset($parameters['startDate']))
-		{
-			$where .= "
-			AND c.startDate >= '".($parameters['startDate'])."'";
-		}		
-		if(isset($parameters['endDate']))
-		{
-			$where .= "
-			AND c.endDate <= '".($parameters['endDate'])."'";
-		}
-		if(isset($parameters['ship']) && ($parameters['ship'] > 0) )
-		{
-			$where .= "
-			AND s.shipId = ".$parameters['ship'];
-		}
-		
-		
-		//if(isset($parameters['specialoffer']) && isset($parameters['burningCruise']))
-		//{
-		//	$where .= "
-		//	AND ((code.specialOffer = 1) OR (code.burningCruise = 1)) ";	
-		//}
-		//else
-		//{
-		//	if(isset($parameters['specialoffer']))
-		//	{
-		//		$where .= "
-		//		AND code.specialOffer = 1";			
-		//	}
-		//	if(isset($parameters['burningCruise']))
-		//	{
-		//		$where .= "
-		//		AND code.burningCruise = 1";			
-		//	}		
-		//}
-		
-		if(isset($parameters['places']))
-		{
-			$join .= "
-			LEFT JOIN program_item pi ON pi.cruise_id = c.id
-			LEFT JOIN place cp ON pi.place_id = cp.id
-			";
-			$where .= "
-			AND cp.place_id IN (".implode(',',$parameters['places']).")";	
-			
-		}
-		
-		if(isset($parameters['days']))
-		{
-			list($mindays,$maxdays) = explode(',',$parameters['days']);
-			$where .= "
-			AND c.daycount >=".$mindays;
-			$where .= "
-			AND c.daycount <=".$maxdays;			
-		}	
-
-		if(isset($parameters['placeStart']) && ($parameters['placeStart'] != "all" ) )
-		{
-			$where .= "
-			AND c.name LIKE '".$parameters['placeStart']."%'";
-		}
-		
-		$sql = "
-		SELECT 
-			c.id c_id , c.ship_id c_ship, c.startDate c_startdate, c.endDate c_enddate, c.dayCount c_daycount,  c.name c_name
-			,
-			s.id s_id, s.name s_name, s.code s_code, s.shipId s_m_id 
-			,
-			p.id p_id, p.price p_price
-
-		FROM cruise c
-		".$join."
-		LEFT JOIN ship s ON c.ship_id = s.id
-		LEFT JOIN 
-		
-			(
-				SELECT p2.id , MIN(p2.price) price, p2.cruise_id
-				FROM (SELECT * FROM price ORDER BY price) p2
-				LEFT JOIN tariff ON tariff.id = p2.tariff_id
-				WHERE tariff.name LIKE '%взрослый%'
-				GROUP BY p2.cruise_id
-			) p ON c.id = p.cruise_id
-
-		WHERE 1
-		"
-		.$where.
-		"
-		ORDER BY c.startDate
-		";
-		
-		$query = $em->createNativeQuery($sql, $rsm);
-		
-		
-		//$query->setParameter(1, 'romanb');
-		
-		$result = $query->getResult();
-		
-		
-		return $result;
-		*/
 	}
 
+	
+	
+	// вместо этого контроллера есть параметр в поиске
+	/**
+	 * @Template()
+     * @Route("/cruise/categoryroutes/{category}.html", name="categoryroutes")	 
+	*/
+	public function categoryroutesAction($category) 
+	{
+		$em = $this->getDoctrine()->getManager();
+
+		$category = $em->createQueryBuilder()
+						->select('cc,c')
+						->from('CruiseBundle:Category','cc')
+						->leftJoin('cc.cruises','c')
+						->where('c.endDate >= 	CURRENT_DATE()')
+						->andWhere("cc.code = '$category'")
+						->getQuery()
+						->getOneOrNullResult()
+					;
+		
+		if(null == $category )
+		{
+			throw $this->createNotFoundException("Страница не найдена.");
+		}
+		
+		$cruises_months= $this->month($category->getCruises());
+		
+		return array('months' => $cruises_months, 'category' => $category  );
+	}
 
 
 	

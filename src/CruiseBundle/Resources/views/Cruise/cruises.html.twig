@@ -2,7 +2,7 @@
 
 {% for monthName , month in months %}
 
-<h1>{{monthName | localizeddate('full', 'none', null, null, ' LLLL Y')}}</h1>
+<h2>{{monthName | localizeddate('full', 'none', null, null, ' LLLL Y')}}</h2>
 <table class="table table-cruises  table-striped">
 <colgroup>
 <col width="310">
@@ -28,9 +28,25 @@
 		<td> <a href="{{path('page',{'url':'ships/'~cruise.ship.code})}}">{{cruise.ship.name}}</a></td>
 		<td> {{cruise.startDate | date("d.m.Y")}}</td>
 		<td> <b>{{cruise.dayCount}}</b></td>
-		<td> {{cruise.minPrice | number_format(0, '.', ' ' ) }} руб.</td>
-		<td>
+		<td>  
+		{% if cruise.newMinPrice is defined %}
+		<span style=" text-decoration:line-through;">{{cruise.minPrice | number_format(0, '.', ' ' ) }} руб.</span>
+		<br>
+		<span style="color:red">{{cruise.newMinPrice | number_format(0, '.', ' ' ) }} руб.</span>
+		{% else %}
+		<span >{{cruise.minPrice | number_format(0, '.', ' ' ) }} руб.</span>
+		{% endif %}</td>
 
+        <td style="">
+		
+		{% if cruise.typeDiscount %}
+		
+			{% if (cruise.typeDiscount.id == 1) %}<span class="table-special-span color-gk">«Счастливый» круиз</span>{% endif %}
+
+			{% if (cruise.typeDiscount.id == 2) %} <span class="table-special-span color-st">Специальный тариф</span> {% endif %}
+		
+		{% endif %}
+		
 		</td>
 	</tr>
 {% endfor %}

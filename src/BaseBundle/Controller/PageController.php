@@ -5,6 +5,7 @@ namespace BaseBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class PageController extends Controller
@@ -60,6 +61,25 @@ class PageController extends Controller
 		return ['page' => $page ];
     }
 	
+	 /**
+	 * @Template()
+     */	
+	public function childsAction($page_id)
+	{
+		$em = $this->getDoctrine()->getManager();
+		$pages = $em->createQueryBuilder()
+				->select('p')
+				->from('BaseBundle:Page','p')
+				->where('p.parent = '.$page_id)
+				->andWhere('p.active = 1')
+				->getQuery()
+				->getResult()
+			;
+
+
+		
+		return ['pages'=>$pages];
+	}
 
 	
 }

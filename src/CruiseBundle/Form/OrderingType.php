@@ -15,6 +15,8 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use CruiseBundle\Form\BuyerType;
 
 use Symfony\Component\Form\FormEvents;
+use CruiseBundle\Entity\Agency;
+use Doctrine\ORM\EntityRepository;
 
 
 class OrderingType extends AbstractType
@@ -54,7 +56,15 @@ class OrderingType extends AbstractType
 					->add('fee')
 					->add('permanentDiscount')
 					->add('sesonDiscount')
-					->add('agency')
+					->add('agency',EntityType::class, [
+								'class' => Agency::class,
+								'query_builder' => function(EntityRepository $er)
+								{
+									return $er->createQueryBuilder('a')
+									->where('a.active = 1');
+								},
+								'required' => false
+								])
 					->add('region')
 			;			
 		}

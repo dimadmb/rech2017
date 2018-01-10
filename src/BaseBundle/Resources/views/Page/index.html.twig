@@ -1,5 +1,7 @@
 {% extends 'BaseBundle:Page:page.html.twig' %}
 
+{% block breadcrumbs %}{% endblock %}
+
 {% block slider %}
 <div class="slider">
 	<img src="/images/slide-1.png" style="display:block;" alt="">
@@ -18,27 +20,44 @@
 		#}
         <!-- Wrapper for slides -->
         <div class="carousel-inner">
+
+			
             <div class="item active">
-					<a href="/specialoffer/specialoffer.html">
+					
+						<img src="{{asset('images/slider/slide-7.jpg')}}" alt="">
+					
+                <div class="carousel-caption">
+                    
+                </div>
+            </div>	
+			
+            <div class="item ">
+					<a href="/specialoffers/special">
 						<img src="{{asset('images/slider/slide-6.png')}}" alt="">
 					</a>
                 <div class="carousel-caption">
+                    
                 </div>
             </div>			
+			
             <div class="item ">
 					<a href="/search?startDate=2018-04-01">
 						<img src="{{asset('images/slider/slide-4.png')}}" alt="">
 					</a>
                 <div class="carousel-caption">
+                    
                 </div>
             </div>				
+	
             <div class="item ">
-					<a href="/cruise/ship/kuchkin.html">
+					<a href="/ships/kuchkin">
 						<img src="{{asset('images/slider/slide-3.png')}}" alt="">
 					</a>
                 <div class="carousel-caption">
+                    
                 </div>
             </div>		
+
         </div>
         <!-- Controls -->
         <a class="left carousel-control" href="#myCarousel" data-slide="prev">
@@ -54,9 +73,9 @@
 
 
 <div class="row specpredlozeniya">
-	<div class="col-sm-6"><a href="{#{path('specialoffer',{'offer':'burningcruise'})}#}"><img src="{{asset('images/template/gk.png')}}" alt="«Горящие» круизы" class="img-responsive"></a><br></div>
+	<div class="col-sm-6"><a href="{{path('page',{'url':'specialoffers/happy'})}}"><img src="{{asset('images/template/gk.png')}}" alt="«Горящие» круизы" class="img-responsive"></a><br></div>
 
-	<div class="col-sm-6"><a href="{#{path('specialoffer',{'offer':'specialoffer'})}#}"><img src="{{asset('images/template/st.png')}}" alt="Специальные тарифы" class="img-responsive"></a><br></div>
+	<div class="col-sm-6"><a href="{{path('page',{'url':'specialoffers/special'})}}"><img src="{{asset('images/template/st.png')}}" alt="Специальные тарифы" class="img-responsive"></a><br></div>
 	
 	<!--<div class="col-sm-4"><a target="_blank" href="{#//booking.rech-agent.ru/#}"><img src="{{asset('images/template/online.png')}}" alt="Купить онлайн" class="img-responsive"></a><br></div>-->
 </div>

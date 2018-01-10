@@ -20,14 +20,15 @@
  </div>
 
  #}
- 
+
+
  
 {% import _self as tree %}
 {% macro pages(pages,  rootPages) %}
     <ul{% if rootPages %} class="nav navbar-nav navbar-right" {% else %} class="dropdown-menu" {% endif %} >
         {% for page in pages if (not page.parent or not rootPages or not page.parent.parent )%}
-            <li class="dropdown">
-				   <a {% if page.children|length and page.parent  %} class="dropdown-toggle" data-toggle="dropdown" {% endif %} href="{{ path('page', { 'url': page.fullUrl }) }}" >{{ page.name }}{% if page.children|length and page.parent  %}<b class="caret"></b>{% endif %}</a>
+            <li  {% if page.children|length and page.parent and rootPages %}class="dropdown"{% endif %}  {% if page.children|length and page.parent and not rootPages %}class="dropdown-submenu"{% endif %} >
+				   <a {% if page.children|length and page.parent  %} class="dropdown-toggle" data-toggle="dropdown" {% endif %} href="{{ path('page', { 'url': page.fullUrl }) }}" >{{ page.name }}{% if page.children|length and page.parent and rootPages %}<b class="caret"></b>{% endif %}</a>
 
                 {% if page.children|length and page.parent  %}
                     {{ _self.pages(page.children,  false) }}
@@ -47,3 +48,5 @@
  
 
 	{{ tree.pages(pages, true) }}
+ 
+

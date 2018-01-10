@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RESPONSE>
+	<RESULTCODE>0</RESULTCODE>
+	<RESULTMESSAGE>OK</RESULTMESSAGE>
+	<DATE>{{ "now" | date("YmdHis") }}</DATE>
+	<ADDINFO>
+		<AGENCY>
+			<NAME>Речное Агентство</NAME>
+			<BRANCH/>
+			<INN>9710008811</INN>
+		</AGENCY>
+		<FULLPRICE>{{orderPrice.itogo.priceDiscount | number_format  (2, '.', '')}}</FULLPRICE>
+		<CURRENCY>RUB</CURRENCY>
+		<AMOUNTTOPAY>{{ (orderPrice.itogo.priceDiscount - orderPrice.itogo.pay) | number_format  (2, '.', '')}}</AMOUNTTOPAY>
+		<EXCHANGERATE>1</EXCHANGERATE>
+		<AMOUNTTOPAYRUB>{{ (orderPrice.itogo.priceDiscount - orderPrice.itogo.pay) | number_format  (2, '.', '')}}</AMOUNTTOPAYRUB>
+		<AGENCYCOMISSION>0</AGENCYCOMISSION>
+		<STARTDATE>{{ cruise.startDate | date("Ymd000000") }}</STARTDATE>
+		<ENDDATE>{{ cruise.endDate | date("Ymd000000") }}</ENDDATE>
+		<TOURISTLIST>
+			<TOURIST>
+				<FIRSTNAME/>
+				<LASTNAME/>
+				<PATRONYMIC/>
+				<BIRTHDATE/>
+			</TOURIST>
+		</TOURISTLIST>
+		<PAYER>
+			<FIRSTNAME/>
+			<LASTNAME/>
+			<PATRONYMIC/>
+			<BIRTHDATE/>
+		</PAYER>
+		<SERVICELIST>
+		{% set nn = "Г" %}
+			<SERVICE>{{ cruise.name }}</SERVICE>
+			<SERVICE>Г</SERVICE>
+			<SERVICE>{{nn}}</SERVICE>
+		</SERVICELIST>
+	</ADDINFO>
+</RESPONSE>	

@@ -38,7 +38,7 @@ class LoadGamaShipCommand extends ContainerAwareCommand
 
 		$load = $this->getContainer()->get('load.loadgama');
 
-        $output->writeln($load->load($id,false));
+        $output->writeln($load->load($id,true));
     }
 	
 }

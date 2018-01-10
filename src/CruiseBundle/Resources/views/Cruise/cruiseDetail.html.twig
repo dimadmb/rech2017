@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 
-{% block title %}Описание речного круиза {{cruise.name}} {{cruise.startDate | date("d.m.Y")}} - {{cruise.endDate | date("d.m.Y")}}{% endblock %}
+{% block title %}Речной круиз {{cruise.name}} {{cruise.startDate | date("d.m.Y")}} - {{cruise.endDate | date("d.m.Y")}} теплоход {{cruise.ship.name}}{% endblock %}
 {% block description %}Описание речного круиза {{cruise.name}}. Отправление на теплоходе {{cruise.ship.name}} {{cruise.startDate | date("d.m.Y")}}, прибытие {{cruise.endDate | date("d.m.Y")}}. Длительность круиза {{cruise.dayCount}} дней. {% endblock %}
 
 
@@ -11,7 +11,7 @@ var rns={
 {% for  deckName, deck in cabins %}
 	{% for type in deck %}
 			{% for room in type.rooms %}
-			{{room.number}}:{
+			{{room.number | nospace}}:{
 			desc: '{{type.cabinName}}',
 			offers:[{% for rpName , place in type.rpPrices %}'{{type.cabin.id}}-{{rpName}}',{% endfor %}],
 			},
@@ -26,7 +26,7 @@ var offers={
 		{% for rpName, rp in type.rpPrices  %}	
 			'{{type.cabin.id}}-{{rpName}}': {
 			name:'{{type.cabinName}} ({{rpName}})',
-			rns:[{% for room in type.rooms %}{{room.number}},{% endfor %}]
+			rns:[{% for room in type.rooms %}'{{room.number | nospace}}',{% endfor %}]
 			},
 		{% endfor %}			
 	{% endfor %}			
@@ -66,21 +66,40 @@ window.selectOffer = function (offer_id, rn_id){
     });
 	
     $('input[data-rn]').change(function(e){
+	
+	
+	
         //console.log($(this).prop("checked"));
 		var offer=$(this).parents( ".cabin-row" );
         if ($(this).prop("checked"))
 		{
-            $(svgDocument).find('#rn-'+$(this).data('rn')).css('stroke','#f00');
-			offer.find('.places-number[data-rni='+$(this).data('rn')+']').addClass('checked');
+            $(this).parent().addClass('checked');
+			
+			
+			$(svgDocument).find('#rn-'+$(this).data('rn')).css('stroke','#f00');
+			/*offer.find('.places-number[data-rni='+$(this).data('rn')+']').addClass('checked');*/
 			$('input[data-rn='+$(this).data('rn')+']').not(this).prop('checked',false)
-			.parents( ".cabin-row" ).find('.places-number[data-rni='+$(this).data('rn')+']').removeClass('checked');
+			/*.parents( ".cabin-row" ).find('.places-number[data-rni='+$(this).data('rn')+']').removeClass('checked')*/;
 			
 		}
         else
 		{
             $(svgDocument).find('#rn-'+$(this).data('rn')).css('stroke','none');
-			offer.find('.places-number[data-rni='+$(this).data('rn')+']').removeClass('checked');			
+			
+			$(this).parent().removeClass('checked');
+			/*offer.find('.places-number[data-rni='+$(this).data('rn')+']').removeClass('checked');	*/		
 		}
+		
+		
+		if($('form label.checked').length > 0)
+		{
+			$('#allow_submit').css({'display':'block'})
+		}
+		else
+		{
+			$('#allow_submit').css({'display':'none'})
+		}
+		
 
     });	
 	
@@ -137,8 +156,8 @@ window.selectOffer = function (offer_id, rn_id){
 			{
 
 				$(this).css('stroke','none');
-				$('input[data-rn='+id+']').prop('checked',false)
-				.parents( ".cabin-row" ).find('.places-number[data-rni='+id+']').removeClass('checked');
+				$('input[data-rn='+id+']').prop('checked',false).parent().removeClass('checked')
+				.parents( ".cabin-row" )/*.find('.places-number[data-rni='+id+']').removeClass('checked')*/;
 			}			
 		}
 		else
@@ -165,14 +184,14 @@ window.selectOffer = function (offer_id, rn_id){
 {% for  deckName, deck in cabins %}
 	{% for type in deck %}
 			{% for room in type.rooms %}
-				if($(svgDocument).find("#rn-{{room.number}}") !== null)
+				if($(svgDocument).find("#rn-{{room.number | nospace}}") !== null)
 				{
 					descr  = "{{ type.cabinName }}" ;
-					$(svgDocument).find('#rn-{{room.number}}').css("display", "block")      .attr('desc',descr);  
+					$(svgDocument).find('#rn-{{room.number | nospace}}').css("display", "block")      .attr('desc',descr);  
 				}
 				else 
 				{	
-					console.log('{{room.number}}')
+					console.log('{{room.number | nospace}}')
 				}	
 			{% endfor %}			
 	{% endfor %}			
@@ -183,6 +202,7 @@ window.selectOffer = function (offer_id, rn_id){
 
 
 {% block body %}
+
 <style>
 .select-offer {
 	background:#fff;
@@ -229,6 +249,13 @@ window.selectOffer = function (offer_id, rn_id){
 	position:relative;
 }
 .places-number.checked {
+	background:#00ff68 !important;
+	border:1px solid #ccc ;
+	/*display:inline-block;*/
+	display:none;
+}
+
+label.checked {
 	background:#00ff68 !important;
 	border:1px solid #ccc ;
 	display:inline-block;
@@ -292,9 +319,8 @@ window.selectOffer = function (offer_id, rn_id){
 {% if (cabins != null) %}
 
 
-<object id="svg" type="image/svg+xml" data="{{'/files/ship/'~cruise.ship.code~'/'~cruise.ship.code~'-decks.svg'}}" style="width: 100%;" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">Your browser does not support SVGs</object>
+<object id="svg" type="image/svg+xml" data="{{'/files/ship/'~cruise.ship.code~'/'~cruise.ship.code~'-decks.svg'}}" style="width: 100%;" shape-rendering="geometricPrecision" text-rendering="geometricPrecision"></object>
 
-{{dump(cabins)}}
 
 <form action="{{path('basket')}}" method="post">
 {% for  deckName, deck in cabins %}
@@ -310,12 +336,12 @@ window.selectOffer = function (offer_id, rn_id){
 
 					<p>
 					{% for room in type.rooms if (room.discount == false) %}
-						<span class="places-number" data-rni="{{room.number}}" style="{% if room.discount %}color:red;{% endif %} font-weight:700;" >{{room.number}}</span>
+						<span class="places-number" data-rni="{{room.number | nospace}}" style="{% if room.discount %}color:red;{% endif %} font-weight:700;" >{{room.number }}</span>
 					{% endfor %}
 					</p>
 					<p>
 					{% for room in type.rooms if (room.discount == false) %}
-						<label style="border: 1px solid #ccc;    padding: 3px;    border-radius: 5px;{% if room.discount %}color:red;{% endif %} font-weight:700;" for="">{{room.number}}<input type="checkbox" name="rooms[{{room.id}}]"  data-rn={{room.number}} value="{{rp.place}}"></label>
+						<label style="border: 1px solid #ccc;    padding: 3px;    border-radius: 5px;{% if room.discount %}color:red;{% endif %} font-weight:700;" for="">{{room.number }}<input type="checkbox" name="rooms[{{room.id}}]"  data-rn={{room.number | nospace}} value="{{rp.place}}"></label>
 					{% endfor %}
 					</p>
 				
@@ -336,12 +362,12 @@ window.selectOffer = function (offer_id, rn_id){
 				<div class="cabin-places" style="display:table-cell; padding-right:50px; ">
 					<p>
 					{% for room in type.rooms if room.discount %}
-						<span class="places-number" data-rni="{{room.number}}" style="{% if room.discount %}color:red;{% endif %} font-weight:700;" >{{room.number}}</span>
+						<span class="places-number" data-rni="{{room.number | nospace}}" style="{% if room.discount %}color:red;{% endif %} font-weight:700;" >{{room.number }}</span>
 					{% endfor %}
 					</p>
 					<p>
 					{% for room in type.rooms if room.discount %}
-						<label style="border: 1px solid #ccc;    padding: 3px;    border-radius: 5px;{% if room.discount %}color:red;{% endif %} font-weight:700;" for="">{{room.number}}<input type="checkbox" name="rooms[{{room.id}}]"  data-rn={{room.number}} value="{{rp.place}}"></label>
+						<label style="border: 1px solid #ccc;    padding: 3px;    border-radius: 5px;{% if room.discount %}color:red;{% endif %} font-weight:700;" for="">{{room.number }}<input type="checkbox" name="rooms[{{room.id}}]"  data-rn={{room.number | nospace}} value="{{rp.place}}"></label>
 					{% endfor %}
 					</p>
 				
@@ -375,7 +401,13 @@ window.selectOffer = function (offer_id, rn_id){
 {% endfor %}
 
 <input type="hidden" name="cruise" value="{{cruise.id}}">
-<input type="submit" value="Заказать">
+
+<div class="container" style="position:fixed; padding:0 30px 0 0 ;  z-index: 999; bottom:0px;">
+	<div  id="allow_submit" class="col-sm-12" style="padding:10px; text-align:center; display:none; background:#eaa145;   " >
+	<input type="submit" class="btn btn-lg btn-success" value="Заказать" >
+	</div>
+</div>
+
 
 </form>
 

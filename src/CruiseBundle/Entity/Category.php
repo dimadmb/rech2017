@@ -41,6 +41,11 @@ class Category
      * @ORM\Column(name="code", type="string", length=255)
      */
     private $code;
+	
+	/**
+	 * @ORM\ManyToMany(targetEntity="Cruise", mappedBy="category")
+	 */
+	private $cruises;
 
 
     /**
@@ -123,5 +128,46 @@ class Category
     public function getCode()
     {
         return $this->code;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->cruises = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add cruise
+     *
+     * @param \CruiseBundle\Entity\Cruise $cruise
+     *
+     * @return Category
+     */
+    public function addCruise(\CruiseBundle\Entity\Cruise $cruise)
+    {
+        $this->cruises[] = $cruise;
+
+        return $this;
+    }
+
+    /**
+     * Remove cruise
+     *
+     * @param \CruiseBundle\Entity\Cruise $cruise
+     */
+    public function removeCruise(\CruiseBundle\Entity\Cruise $cruise)
+    {
+        $this->cruises->removeElement($cruise);
+    }
+
+    /**
+     * Get cruises
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getCruises()
+    {
+        return $this->cruises;
     }
 }

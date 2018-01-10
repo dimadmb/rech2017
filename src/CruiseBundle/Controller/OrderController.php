@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+use CruiseBundle\Entity\Pay;
 use CruiseBundle\Entity\Buyer;
 use CruiseBundle\Entity\Ordering;
 use CruiseBundle\Entity\OrderItem;
@@ -23,8 +24,14 @@ use CruiseBundle\Form\OrderingType;
 
 use Hashids\Hashids;
 
+use LoadBundle\Controller\Helper;
+
 class OrderController extends Controller
 {
+
+
+	
+	
 
     /**
 	 * @Template("dump.html.twig")	
@@ -43,7 +50,7 @@ class OrderController extends Controller
 
     /**
 	 * @Template("dump.html.twig")	
-     * @Route("/pay/{hash}", name="pay")
+     * @Route("/order/pay/{hash}", name="pay")
      */
     public function payAction($hash)
 	{
@@ -61,12 +68,15 @@ class OrderController extends Controller
 			$this->getDoctrine()->getManager()->flush();
 		}
 		
-		return ['dump'=>$this->get('cruise')->getOrderPrice($order), $this->get('cruise')->getSesonDiscount($order),$order->getSumm() ];
+		//return ['dump'=>$this->get('cruise')->getOrderPrice($order), $this->get('cruise')->getSesonDiscount($order) ];
+		
+		
+	$href = "https://b2c.appex.ru/payment/choice?orderSourceCode=$id&billingCode=Rechnoeagentstvo003";
+
+	return $this->redirect($href);
+		
 	}
 
-
-
-	
 	
     /**
 	 * @Template()	
@@ -157,6 +167,7 @@ class OrderController extends Controller
 				or 	$orderItemPlace->getPassNum() === null
 				or 	$orderItemPlace->getPassDate() === null
 				or 	$orderItemPlace->getPassWho() === null
+				or 	$orderItemPlace->getGender() === null
 
 				)
 				{
@@ -182,17 +193,64 @@ class OrderController extends Controller
 		
 		
 		$orderPrice = $this->get('cruise')->getOrderPrice($order);
+		
+		// для добавления дополнительных кают
+		$available_rooms = $this->get('cruise')->getRooms($order->getCruise()->getId());
+		$cruiseShipPrice = $em->getRepository("CruiseBundle:Cruise")->getPrices($order->getCruise()->getId());
+		$cabinsAll = $cruiseShipPrice->getShip()->getCabin();
+		$cabins = [];
+		foreach($cabinsAll as $cabinsItem)
+		{
+			$rooms_in_cabin = [];
+			$price = [];
+			foreach($cabinsItem->getRooms() as $room)
+			{
+	
+				if(in_array($room->getNumber(),$available_rooms) /*|| true*/)
+				{
+					$rooms_in_cabin[] = $room;
+				}				
+			}
+			foreach($cabinsItem->getPrices() as $prices)
+			{
+				$price[$prices->getPlace()->getRpName()] = $prices->getPlace()->getRpId();
+			}
+			
+			$cabins[] = [
+				'price'=>$price,
+				'rooms' => $rooms_in_cabin
+			];
+		}
 	
 		return [
 					'order'=>$order,
 					'form'=>$editForm->createView(),
-					'rooms'=>$this->get('cruise')->getRooms($order->getCruise()->getId()),
+					'rooms'=>$available_rooms,
+					'cruiseShipPrice'=>$cruiseShipPrice,
 					'allow_pay' => $allow_pay,
-					'orderPrice'=>$orderPrice
+					'orderPrice'=>$orderPrice,
+					'cabins' => $cabins
 				];
 	}
 	
 
+    /**
+     * @Route("/invoice_del/{hash}", name="invoice_del")
+     */
+    public function invoiceDeleteAction($hash)
+    {
+		$em = $this->getDoctrine()->getManager();
+		$id = $this->get('cruise')->hashOrderDecode($hash);
+		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($id);
+		if($order)
+		{
+			$em = $this->getDoctrine()->getManager();
+			$order->setActive(false);
+			$em->flush();
+		}
+		return $this->redirectToRoute('orders');
+    }	
+	
     /**
 	 * @Template("dump.html.twig")	
      * @Route("/order", name="order")
@@ -329,14 +387,14 @@ class OrderController extends Controller
 			->leftJoin('o.orderItems','oi')
 			->leftJoin('oi.room', 'room')
 			->leftJoin('oi.orderItemPlaces','oip')
-			
+			->andWhere('o.active = 1')
 			->orderBy('o.id','ASC')
 		;
 		if($this->getUser()->getAgency() !== null)
 		{
 			$qb 
 				//->leftJoin('o.user','user')
-				->where('o.agency = :agency')
+				->andWhere('o.agency = :agency')
 				->setParameter('agency',$this->getUser()->getAgency())
 			;				
 		}
@@ -347,21 +405,22 @@ class OrderController extends Controller
 		else
 		{
 			$qb 
-				->where('o.user = :user')
+				->andWhere('o.user = :user')
 				->setParameter('user',$this->getUser())
 			;			
 		}
 	
 		$orders = $qb	
+			->orderBy('o.id','DESC')
 			->getQuery()
 			->getResult()			
 		;	
-		/*
-		foreach($orders as $order)
+		
+		foreach($orders as &$order)
 		{
-			$order->idHash = $this->get('cruise')->hashOrderEncode($order->getId());
+			$order->orderPrice = $this->get('cruise')->getOrderPrice($order);
 		}
-		*/
+		//dump($orders );
 		
 		return ['orders'=>$orders];
 	}

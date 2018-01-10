@@ -93,7 +93,7 @@ class ReportController extends Controller
 		if(($order->getAgency() === null) && ($order->getBuyer() !== null) )
 		{
 			$aSheet->setCellValue(   'D32', $order->getBuyer()->getLastName() .' '. $order->getBuyer()->getName() . ' '. $order->getBuyer()->getFatherName() );
-			$aSheet->setCellValue(   'D33', $order->getBuyer()->getPhone() );			
+			$aSheet->setCellValue(   'D33', " ".(string)$order->getBuyer()->getPhone() );			
 		}	
 		
 		if(($order->getAgency() !== null) )
@@ -189,14 +189,20 @@ class ReportController extends Controller
 		$phpTemplateObject->setValue('SUM_ALL', $items['itogo']['priceDiscount'] );
 		$phpTemplateObject->setValue('SUM_ALL_PROPIS', $this->get('num2str')->num2str($items['itogo']['priceDiscount']) );
 		
-		
-		
+		header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+		header('Content-Disposition: attachment;filename="Договор.docx"');
+		$phpTemplateObject->saveAs('php://output');
+		die();
+		/*
 		$phpWordObject = $this->get('phpword')->getPhpWordObjFromTemplate($phpTemplateObject);
 		$writer = $this->get('phpword')->createWriter($phpWordObject, 'Word2007');
+		
+
+		
 		$response = $this->get('phpword')->createStreamedResponse($writer);
         $dispositionHeader = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            'stream-file.docx'
+            'dogovor.docx'
         );
         $response->headers->set('Content-Type', 'application/msword');
         $response->headers->set('Pragma', 'public');
@@ -204,6 +210,7 @@ class ReportController extends Controller
         $response->headers->set('Content-Disposition', $dispositionHeader);
 
         return $response; 		
+		*/
 	}
 
 
