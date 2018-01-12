@@ -17,6 +17,7 @@ class RegistrationType extends AbstractType
 			->add('firstName',null,['label'=>'Имя'])
 			->add('lastName',null,['label'=>'Фамилия'])
 			->add('fatherName',null,['label'=>'Отчество'])
+			->add('phone',null,['label'=>'Телефон'])
 		;	
     }
 

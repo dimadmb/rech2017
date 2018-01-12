@@ -37,7 +37,14 @@ class User extends BaseUser
      *
      * @ORM\Column(name="father_name", type="string", length=255, nullable=true)
      */
-    private $fatherName;	
+    private $fatherName;		
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="phone", type="string", length=255, nullable=true)
+     */
+    private $phone;	
 	
 	
 	/**
@@ -191,5 +198,29 @@ class User extends BaseUser
     public function getAgency()
     {
         return $this->agency;
+    }
+
+    /**
+     * Set phone
+     *
+     * @param string $phone
+     *
+     * @return User
+     */
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * Get phone
+     *
+     * @return string
+     */
+    public function getPhone()
+    {
+        return $this->phone;
     }
 }

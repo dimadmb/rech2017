@@ -145,7 +145,7 @@ class CruiseSearch
 		
 		$sql = "
 		SELECT 
-			c.id c_id , c.ship_id c_ship, c.startDate c_startdate, c.endDate c_enddate, c.dayCount c_daycount,  c.name c_name, c.tur_operator_id c_tur_operator
+			c.id c_id , c.ship_id c_ship, c.startDate c_startdate, c.endDate c_enddate, c.dayCount c_daycount,  c.name c_name, c.tur_operator_id c_tur_operator, c.type_discount_id c_type_discount
 			,
 			s.id s_id, s.name s_name, s.code s_code, s.shipId s_m_id 
 			,

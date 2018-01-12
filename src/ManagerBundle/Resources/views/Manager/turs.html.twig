@@ -13,6 +13,8 @@
 <h1>Скидки на туры</h1>
 
 {% for cruise in cruises %}
+
+
 <div class="row">
 	<div class="col-sm-1">
 	{{cruise.id}}
@@ -36,7 +38,11 @@
 		<div class="divGroup ">
         <label class=""><input data-cruise-id="{{cruise.id}}" class="doDiscount" name="type_request{{cruise.id}}" type="radio" {% if cruise.typeDiscount is null %}checked{% endif %} value="0">НЕТ</label>
 		{% for typeDiscount in typeDiscounts  %}
-			<label class=""><input data-cruise-id="{{cruise.id}}" class="doDiscount"  name="type_request{{cruise.id}}" type="radio" {% if cruise.typeDiscount == typeDiscount %}checked{% endif %} value="{{typeDiscount.id}}">{{typeDiscount.value | number_format(0, '.', ',')}}%</label>
+			<label class=""><input data-cruise-id="{{cruise.id}}" class="doDiscount"  name="type_request{{cruise.id}}" type="radio"
+			{% if cruise.typeDiscount is not null %}
+				{% if cruise.typeDiscount.id == typeDiscount.id %}checked{% endif %}
+			{% endif %}
+			value="{{typeDiscount.id}}">{{typeDiscount.value | number_format(0, '.', ',')}}%</label>
 		{% endfor %}
         </div>	
 	</div>	

@@ -61,3 +61,39 @@
 .nav-list span.name {
 	display:block;
 }
+
+.navbar-inverse {
+    background-image: -webkit-linear-gradient(top,#f00 0,#222 100%);
+    background-image: -o-linear-gradient(top,#f00 0,#222 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#f00),to(#222));
+    background-image: linear-gradient(to bottom,#f00 0,#222 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffff0000', endColorstr='#ff222222', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+    background-repeat: repeat-x;
+    border-radius: 4px;
+}
+
+.navbar-inverse {
+    background: #ff8e00;
+}
+.navbar-inverse {
+   /* background: #3cb6da;*/
+}
+
+
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a {
+    text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+}
+
+.navbar-inverse .navbar-nav>li>a {
+    color: #fff;
+}
+
+.navbar-default .navbar-nav>li>a:hover {
+    color: #ccc;
+}
+
+.navbar-inverse {
+
+    border-color: #fff; 
+}

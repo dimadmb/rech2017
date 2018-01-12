@@ -27,6 +27,62 @@ class ParseController extends Controller
 	}
 	
 	/**
+	 * @Route("/del_sold", name="del_sold" )
+     */	
+	public function delSoldAction()
+	{
+		$em = $this->getDoctrine()->getManager();
+		
+		$em_ra = $this->getDoctrine()->getManager('booking');
+		
+		$connectionB = $em_ra->getConnection();
+		$connection  = $em->getConnection();
+		
+		$sql = "
+			select  aa_schet.id_tur , aa_discount.num
+			from aa_schet 
+			left join aa_order ON aa_order.id_schet = aa_schet.id
+			left join aa_discount ON aa_discount.id_tur = aa_schet.id_tur and aa_discount.num = aa_order.num 
+			where aa_discount.id_tur is not null
+			and is_delete = 0
+			and aa_discount.id_tur >= 5589
+		";	
+		$statement = $connectionB->prepare($sql);
+		$statement->execute();
+		$results = $statement->fetchAll();	
+
+		//dump($results);
+		
+		
+		$idD = [];
+		foreach($results as $result)
+		{
+			$sql = 	"
+				SELECT `room_discount`.id 
+				FROM `room_discount` 
+				LEFT JOIN ship_room ON ship_room.id = room_discount.room_id
+				WHERE room_discount.cruise_id = ".$result['id_tur']."
+				And ship_room.number = 	".$result['num']."		
+			";
+			$statement = $connection->prepare($sql);
+			$statement->execute();
+			$res = $statement->fetchColumn();	
+			if($res)
+			$idD[] 	= $res;		
+			
+		}
+		
+		dump($idD);
+		
+		foreach($idD as $id)
+		{
+			$connection->delete('room_discount', array('id' => $id));
+		}
+		
+		return new Response("OK");		
+		
+	}	
+	/**
 	 * @Route("/pageIn", name="pageIn" )
      */	
 	public function pageInAction()

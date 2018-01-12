@@ -429,7 +429,10 @@ class LoadInfoflot  extends Controller
 		$turOperator = $this->doctrine->getRepository('CruiseBundle:TurOperator')->findOneById(3);		
 
 
-
+		// категория выходного дня  kruizy-vyhodnyh-dney
+		$cat_week_end = $categoryRepos->findOneByCode("kruizy-vyhodnyh-dney");
+		
+		
 		// ПОЛУЧИМ СПИСОК ПАЛУБ ИЗ БД
 		
 		$decksAll = $decksRepos->findAll();
@@ -628,8 +631,21 @@ class LoadInfoflot  extends Controller
 			{
 				$cruise = new Cruise();
 			}			
+			else
+			{
+				$cruise->removeAllCategory();
+				$em->flush();
+			}	
+		
+		
+			//dump($cruise_i['weekend']);
+			if($cruise_i['weekend'])
+			{
+				//dump("Выходной");
+				$cruise->addCategory($cat_week_end); 
+			}
 			
-
+			
 			$cruise
 				->setShip($ship)
 				->setId($code)

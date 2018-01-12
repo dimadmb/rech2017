@@ -171,7 +171,7 @@ $answer = '<?xml version="1.0" encoding="windows-1251" ?>
 				"Price"=> (int)($item['priceDiscount']*100),
 				"PayAttribute"=> 1,
 				"TaxId"=> 4,
-				"Description"=> "Договор " . $order->getId(). " т/х " . $order->getCruise()->getShip()->getName() . " каюта "   . " " . $order->getCruise()->getStartDate()->format("Y.m.d") ,
+				"Description"=> "Договор " . $order->getId(). " т/х " . $order->getCruise()->getShip()->getName() . " каюта " .$item['number']  . " " . $order->getCruise()->getStartDate()->format("Y.m.d") ,
 				];					
 			}
 		}

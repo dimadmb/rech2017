@@ -68,14 +68,15 @@ class OrderItemPlaceType extends AbstractType
 			->add('passWho'/*,null,['required'=>true]*/)
 			->add('typeDoc',null,['required'=>true])
 			;
-			
+		
 		if($options['is_manager'] === true )
 		{
 			$builder
 					->add('surcharge',null,[])
+					//->add('priceValue',null,['empty_data'=>''])
 				;			
 		}
-			
+			//dump($builder);	
 /*
 				
 

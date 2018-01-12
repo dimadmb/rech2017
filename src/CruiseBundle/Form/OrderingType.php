@@ -19,8 +19,19 @@ use CruiseBundle\Entity\Agency;
 use Doctrine\ORM\EntityRepository;
 
 
+use CruiseBundle\Service\Cruise;
+
 class OrderingType extends AbstractType
 {
+
+	private $cruiseService;
+	
+    public function __construct()
+    {
+      //  $this->cruiseService = new \CruiseBundle\Service\Cruise();
+    }	
+
+
     /**
      * {@inheritdoc}
      */

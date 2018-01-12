@@ -46,7 +46,9 @@
 <div class="tab-content">
   <div id="fiz" class="tab-pane fade {% if order.agency == null %}in active{% endif %}">
 {% if form.buyer is defined %}
-		<h3>Покупатель</h3>
+		<h3>Покупатель</h3> <button id="b2t" class="btn btn-success">Покупатель -> Турист</button>
+		<br>
+		<br>
 		<div class="row">
 			<div class="col-sm-1"><p style="text-align:right;">ФИО</p></div>
 			<div class="col-sm-4">{{ form_widget(form.buyer.lastName, { 'attr':{'placeholder':'Фамилия'}}) }}</div>			
@@ -208,7 +210,7 @@
 				<p style="text-align:right;">Тариф</p>
 				
 			</div>
-			<div class="col-sm-4">
+			<div class="col-sm-3">
 				
 				{% set discountValue = 0 %}
 				{% if orderItemPlace.vars.data.orderItem.typeDiscount != null %}
@@ -223,11 +225,19 @@
 
 			</div>
 			
-			<div class="col-sm-4">
+			<div class="col-sm-3">
 				{% if orderItemPlace.vars.data.orderItem.typeDiscount != null %}
 					<span style="color:red;">Цена со скидкой <span class="tariff-price-value"></span></span>
 				{% endif %}			
 			</div>
+			
+			
+			<div class="col-sm-2">
+				{% if orderItemPlace.priceValue is defined %}
+				{{ form_widget(orderItemPlace.priceValue) }}
+				{% endif %}
+			</div>			
+			
 			
 			<div class="col-sm-1">
 				Доплата
@@ -322,6 +332,29 @@
 	});
 	
 	$('.tariff-price').trigger('change');
+	
+	
+	$('#b2t').click(function(){
+		$('input#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_lastName').val($('input#cruisebundle_ordering_buyer_lastName').val());
+		$('input#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_fatherName').val($('input#cruisebundle_ordering_buyer_fatherName').val());
+		$('input#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_name').val($('input#cruisebundle_ordering_buyer_name').val());
+		
+		
+		$('input#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_passSeria').val($('input#cruisebundle_ordering_buyer_passSeria').val());
+		$('input#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_passNum').val($('input#cruisebundle_ordering_buyer_passNum').val());
+		$('input#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_passWho').val($('input#cruisebundle_ordering_buyer_passWho').val());
+		
+		$("select#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_birthday_day [value='"+$('select#cruisebundle_ordering_buyer_birthday_day :selected').val()+"']").attr("selected", "selected");
+		$("select#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_birthday_month [value='"+$('select#cruisebundle_ordering_buyer_birthday_month :selected').val()+"']").attr("selected", "selected");
+		$("select#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_birthday_year [value='"+$('select#cruisebundle_ordering_buyer_birthday_year :selected').val()+"']").attr("selected", "selected");
+		
+		$("select#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_passDate_day [value='"+$('select#cruisebundle_ordering_buyer_passDate_day :selected').val()+"']").attr("selected", "selected");
+		$("select#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_passDate_month [value='"+$('select#cruisebundle_ordering_buyer_passDate_month :selected').val()+"']").attr("selected", "selected");
+		$("select#cruisebundle_ordering_orderItems_0_orderItemPlaces_0_passDate_year [value='"+$('select#cruisebundle_ordering_buyer_passDate_year :selected').val()+"']").attr("selected", "selected");
+		
+		
+	});
+	
 
 {% endblock %}	
 

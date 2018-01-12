@@ -112,7 +112,7 @@ class UserController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->remove($user);
+            $user->setEnabled(false);
             $em->flush();
         }
 

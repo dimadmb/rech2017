@@ -105,6 +105,11 @@ class LoadMosturflot  extends Controller
 		$cabinPlaceRepos = $this->doctrine->getRepository('CruiseBundle:ShipCabinPlace');		
 		$categoryRepos = $this->doctrine->getRepository('CruiseBundle:Category');
 		
+		
+		// категория выходного дня  kruizy-vyhodnyh-dney
+		$cat_week_end = $categoryRepos->findOneByCode("kruizy-vyhodnyh-dney");
+		
+		
 		$turOperator = $this->doctrine->getRepository('CruiseBundle:TurOperator')->findOneById(2);
 		
 		$shipXML = $this->getShip($ship_id);
@@ -226,6 +231,11 @@ class LoadMosturflot  extends Controller
 					}
 					
 					;
+					
+					
+					//dump($rooms);
+					//dump($cabinTypeName);
+					
 					// НОВОЕ добавим каюты в теплоход					
 					foreach($rooms[$deckName][$cabinTypeName] as $roomItem)
 					{
@@ -240,7 +250,9 @@ class LoadMosturflot  extends Controller
 									$room = $roomTemp;
 								}
 							}
-						}								
+						}	
+
+						//dump($room); 
 
 						if(null == $room)
 						{
@@ -253,6 +265,14 @@ class LoadMosturflot  extends Controller
 							;
 							$cabin->addRoom($room);
 							$em->persist($room);						
+						}
+						else
+						{
+							$room
+								->setCabin($cabin)
+								->setCountPass((int) $roomItem->cabinmainpass)
+								->setCountPassMax((int) $roomItem->cabinmaxpass)
+								;
 						}
 						
 
@@ -332,18 +352,34 @@ class LoadMosturflot  extends Controller
 		
 		/// теперь КРУИЗЫ
 		
+		
+		
 		foreach($cruisesXML->answer->item as $cruiseItem)
 		{
 			$code_mos = (int)$cruiseItem->tourid;
 			$id  = (int)(1000000 + $code_mos);
+			
+			
+			//dump($cruiseItem);
 			
 			// есть ли уже такой круиз?
 			$cruise = $cruiseRepos->findOneById($id);
 			if($cruise === null)
 			{
 				$cruise = new Cruise();
+				//$cruise->addCategory();
+			}
+			else
+			{
+				$cruise->removeAllCategory();
+				$em->flush();
 			}
 			
+			if((int)$cruiseItem->tourid == 1)
+			{
+				//dump("Выходной"); 
+				$cruise->addCategory($cat_week_end);
+			}
 			
 			$route = (string)$cruiseItem->tourroute;
 			$startDate = new \DateTime((string)$cruiseItem->tourstart);

@@ -426,6 +426,8 @@ class OrderItemPlace
      */
     public function setPriceValue()
     {
+		//dump("зашли");
+		
 		$priceValue  = 0;
 		
 		if(($this->orderItem->getTypeDiscount() !== null) && ($this->price !== null))

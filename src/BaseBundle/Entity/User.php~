@@ -37,7 +37,14 @@ class User extends BaseUser
      *
      * @ORM\Column(name="father_name", type="string", length=255, nullable=true)
      */
-    private $fatherName;	
+    private $fatherName;		
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="phone", type="string", length=255, nullable=true)
+     */
+    private $phone;	
 	
 	
 	/**

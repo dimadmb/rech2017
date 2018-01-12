@@ -23,6 +23,7 @@ class UserType extends AbstractType
 			->add('firstName')
 			->add('lastName')
 			->add('fatherName')
+			->add('phone')
 			->add('agency',EntityType::class, [
 						'class' => Agency::class,
 						'query_builder' => function(EntityRepository $er)

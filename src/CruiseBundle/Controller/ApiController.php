@@ -34,6 +34,7 @@ class ApiController extends Controller
 	{
 
 		$cruises_json = $this->getCruises();
+
 		
 		if($pre) return array('cruises_json'=> '<pre>'.print_r($cruises_json,1).'</pre>');
 		return array('cruises_json'=> json_encode($cruises_json));
@@ -44,6 +45,9 @@ class ApiController extends Controller
 		$cruisesRepository = $this->getDoctrine()->getRepository('CruiseBundle:Cruise');
 		
 		$cruises = $cruisesRepository->findApiAll();
+		//$cruises = $this->get('cruise_search')->searchCruise();
+		
+		// если есть параметры для поиска, то можно давать поиск и из-за уменьшения строк скорость компенсируется 
 		
 		foreach($cruises as $cruise)
 		{
@@ -124,9 +128,11 @@ class ApiController extends Controller
 		$cruise_prices = $cruisesRepository->findOneApiByCode($cruise_code);
 		$prices = $cruise_prices->getPrices();
 		
-		$available_rooms = $this->get('cruise')->getAvailibleRooms($cruise);
+		$available_rooms = $this->get('cruise')->getRoomsIdArray($cruise->getId());
 		
+
 		
+		//dump($available_rooms);
 		
 		
 		$roomDiscounts = $this->getDoctrine()->getRepository("CruiseBundle:RoomDiscount")->findByCruise($cruise);
@@ -146,7 +152,7 @@ class ApiController extends Controller
 				$is_special_kayuta = 0;
 				
 				
-				if(in_array( $room->getNumber(), $available_rooms))
+				if(in_array( $room->getId(), $available_rooms))
 				{
 					$available_room = 1;
 				}
@@ -161,7 +167,7 @@ class ApiController extends Controller
 				{
 					if(in_array($room->getId() , $active_rooms))
 					{
-						$available_room = 1;
+						//$available_room = 1;
 						$koef = (100 - $cruise->getTypeDiscount()->getValue()) / 100; 
 						$price_koeff *= $koef;
 						

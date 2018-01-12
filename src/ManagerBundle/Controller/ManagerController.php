@@ -231,6 +231,9 @@ class ManagerController extends Controller
     {
 		$cruises = $this->get('cruise_search')->searchCruise($request->query->all());
 		$typeDiscounts = $this->getDoctrine()->getManager()->getRepository("CruiseBundle:TypeDiscount")->findAll();
+		
+		//dump($cruises);
+		
 		return ['cruises'=>$cruises, 'typeDiscounts' => $typeDiscounts];
 	}
 		
@@ -258,6 +261,13 @@ class ManagerController extends Controller
 		$typeDiscount = $em->getRepository("CruiseBundle:TypeDiscount")->findOneById($request->query->get('typeDiscount'));
 		$cruise->setTypeDiscount($typeDiscount);
 		$em->flush();
+		
+		// сбросим круиз из кэша 
+		
+		$this->get('memcache.default')->delete('cruise'.$cruise->getId());
+		
+		
+		
 		$roomDiscounts = $em->getRepository("CruiseBundle:RoomDiscount")->findByCruise($cruise);
 		foreach($roomDiscounts as $roomDiscount)
 		{

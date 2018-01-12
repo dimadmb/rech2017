@@ -146,7 +146,7 @@ class CruiseController extends Controller
 				}				
 			}
 			//$available_rooms = $this->get('cruise')->getAvailibleRooms($cruise);
-			$available_rooms = $this->get('cruise')->getRooms($cruise->getId());
+			$available_rooms = $this->get('cruise')->getRoomsIdArray($cruise->getId());
 
 			//dump($available_rooms);
 			
@@ -171,7 +171,7 @@ class CruiseController extends Controller
 						//$room->discount = false;
 					}
 					
-					if(in_array($room->getNumber(),$available_rooms) /*|| true*/)
+					if(in_array($room->getId(),$available_rooms) /*|| true*/)
 					{
 						$rooms_in_cabin[] = $room;
 					}

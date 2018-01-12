@@ -290,6 +290,7 @@ class OrderController extends Controller
 					$buyer->setLastName($user->getLastName());
 					$buyer->setFatherName($user->getFatherName());
 					$buyer->setEmail($user->getEmail());					
+					$buyer->setPhone($user->getPhone());
 				}
 
 				

@@ -47,6 +47,19 @@ class Cruise
 		return $roomsArr;
 	}
 	
+	public function getRoomsIdArray($cruise_id)
+	{
+		$rooms = $this->getRooms($cruise_id);
+		
+		$roomsArr = [];
+		foreach($rooms as $room)
+		{
+			$roomsArr[$room->getNumber()] = $room->getId();
+		}
+		
+		return $roomsArr;
+	}
+	
 	public function getRooms($cruise_id)
 	{
 		

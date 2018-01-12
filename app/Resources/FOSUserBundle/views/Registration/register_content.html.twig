@@ -1,0 +1,28 @@
+{% trans_default_domain 'FOSUserBundle' %}
+
+{#{dump(form)}#}
+
+<style>
+.required:after {
+    content: "*";
+	color:red;
+}
+</style>
+
+
+{{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
+
+    {#{ form_widget(form) }#}
+	
+	{{ form_row(form.username) }}
+	{{ form_row(form.email) }}
+	{{ form_row(form.plainPassword) }}
+	{{ form_row(form.firstName) }}
+	{{ form_row(form.lastName) }}
+	{{ form_row(form.fatherName) }}
+	{{ form_row(form.phone) }}
+
+    <div>
+        <input type="submit" value="Зарегистрироваться" />
+    </div>
+{{ form_end(form) }}

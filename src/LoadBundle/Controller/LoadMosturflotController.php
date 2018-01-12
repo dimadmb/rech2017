@@ -10,12 +10,12 @@ class LoadMosturflotController extends Controller
 {
 	/**
 	 * @Template()
-	 * @Route("/loadmosturflot_ship/{ship_id}", name="loadmosturflot_ship" )
+	 * @Route("/loadmosturflot_ship/{ship_id}/{up}", name="loadmosturflot_ship" )
      */			
-	public function loadShipAction($ship_id = null)
+	public function loadShipAction($ship_id = null, $up = false)
 	{
 		$load = $this->get('load.loadmosturflot');
-		$res = $load->load($ship_id, false);
+		$res = $load->load($ship_id, $up);
 		return  $res;
 		//return $load->load($ship_id);
 	}	
