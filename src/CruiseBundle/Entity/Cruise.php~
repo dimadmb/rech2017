@@ -22,7 +22,7 @@ class Cruise
     private $id;
 	
 	/**
-	 * @ORM\ManyToMany(targetEntity="Category" )
+	 * @ORM\ManyToMany(targetEntity="Category", inversedBy="cruises" )
 	 */
 	private $category;
 
@@ -84,6 +84,14 @@ class Cruise
      * @ORM\ManyToOne(targetEntity="TypeDiscount")
      */
     private $typeDiscount;
+	
+	
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="active", type="boolean")
+     */
+    private $active = true;	
 	
 	
 	

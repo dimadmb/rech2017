@@ -312,6 +312,7 @@ class LoadVodohod  extends Controller
 			$cruise->setEndDate(new \DateTime($cruise_v["date_stop"]));
 			$cruise->setDayCount($cruise_v["days"]);
 			$cruise->setTurOperator($turOperator);
+			$cruise->setActive(true);
 			
 			// удаляем связи с категориями
 			$cruise->removeAllCategory();
@@ -453,6 +454,27 @@ class LoadVodohod  extends Controller
 		
 		
 		$em->persist($ship);
+		$em->flush();
+		
+		$ship->getCruises()->setInitialized(true);
+		$cruises1 = $ship->getCruises()->toArray();
+		$ship2 = $em->createQueryBuilder()
+				->select('s,c')
+				->from("CruiseBundle:Ship",'s')
+				->leftJoin('s.cruises','c')
+				->where('s.id ='.$ship->getId())
+				->getQuery()
+				->getOneOrNullResult()
+			;	
+		$ship2->getCruises()->setInitialized(false);
+		$cruises2 = $ship2->getCruises()->toArray();
+		foreach($cruises2 as $cruise)
+		{
+			if(!in_array($cruise , $cruises1))
+			{
+				$cruise->setActive(false);
+			}
+		}
 		$em->flush();
 
 			

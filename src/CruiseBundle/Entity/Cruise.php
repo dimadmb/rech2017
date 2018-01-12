@@ -86,6 +86,14 @@ class Cruise
     private $typeDiscount;
 	
 	
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="active", type="boolean")
+     */
+    private $active = true;	
+	
+	
 	
 	/**
 	 * @ORM\OneToMany(targetEntity="RoomDiscount", mappedBy="cruise")
@@ -474,5 +482,29 @@ class Cruise
     public function getRoomDiscount()
     {
         return $this->roomDiscount;
+    }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     *
+     * @return Cruise
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean
+     */
+    public function getActive()
+    {
+        return $this->active;
     }
 }

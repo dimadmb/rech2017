@@ -173,7 +173,7 @@ class CruiseSearch
 				GROUP BY p2.cruise_id
 			) p ON c.id = p.cruise_id
 
-		WHERE 1
+		WHERE c.active = 1
 		"
 		.$where.
 		"

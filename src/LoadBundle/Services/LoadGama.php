@@ -330,6 +330,7 @@ class LoadGama  extends Controller
 							->setStartDate($dateStart)
 							->setEndDate($dateEnd)
 							->setDayCount($dayCount)
+							->setActive(true)
 							;						
 					// круиз готов, теперь программы и прайсы
 					
@@ -606,10 +607,34 @@ class LoadGama  extends Controller
 		}
 		$em->flush();
 		
+		
+		$em->persist($ship);
+		$em->flush();
+		
+		$ship->getCruises()->setInitialized(true);
+		$cruises1 = $ship->getCruises()->toArray();
+		$ship2 = $em->createQueryBuilder()
+				->select('s,c')
+				->from("CruiseBundle:Ship",'s')
+				->leftJoin('s.cruises','c')
+				->where('s.id ='.$ship->getId())
+				->getQuery()
+				->getOneOrNullResult()
+			;	
+		$ship2->getCruises()->setInitialized(false);
+		$cruises2 = $ship2->getCruises()->toArray();
+		foreach($cruises2 as $cruise)
+		{
+			if(!in_array($cruise , $cruises1))
+			{
+				$cruise->setActive(false);
+			}
+		}
+		$em->flush();		
+		
 		//dump($ship);
 		//dump($roomAll);
-		
-		
+		return ['ship'=>$ship->getName()];
 	}
 	
 
