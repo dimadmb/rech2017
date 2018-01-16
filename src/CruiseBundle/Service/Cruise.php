@@ -21,7 +21,6 @@ class Cruise
         $this->doctrine = $doctrine;
     }
 
-
 	public function curl_get_file_contents($URL)
 	{
 		$c = curl_init();
@@ -29,7 +28,6 @@ class Cruise
 		curl_setopt($c, CURLOPT_URL, $URL);
 		$contents = curl_exec($c);
 		curl_close($c);
-
 		if ($contents) return $contents;
 			else return FALSE;
 	}
@@ -37,7 +35,6 @@ class Cruise
 	public function getRoomsArray($cruise_id)
 	{
 		$rooms = $this->getRooms($cruise_id);
-		
 		$roomsArr = [];
 		foreach($rooms as $room)
 		{
@@ -65,7 +62,6 @@ class Cruise
 		
 		$em = $this->doctrine->getManager();
 		
-		
 		// все каюты
 		$cruise = $em->createQueryBuilder()
 			->select('cruise,ship,cabin,room')
@@ -74,11 +70,8 @@ class Cruise
 			->leftJoin('cruise.ship','ship')
 			->leftJoin('ship.cabin','cabin')
 			->leftJoin('cabin.rooms','room')
-			
 			->where('cruise.id = '.$cruise_id)
-			
 			->orderBy('room.number+0')
-			
 			->getQuery()
 			->getOneOrNullResult()
 		;	
@@ -109,13 +102,10 @@ class Cruise
 			}
 		}
 
-
-
 		// доступные из водохода каюты
 		$available_rooms = $this->getAvailibleRooms($cruise);
 		
 
-		
 		// каюты со скидками
 		$roomDiscounts = $this->doctrine->getRepository("CruiseBundle:RoomDiscount")->findByCruise($cruise);
 		$discount = $cruise->getTypeDiscount();
@@ -128,7 +118,6 @@ class Cruise
 			}				
 		}		
 
-
 		$rooms = [];
 		
 		foreach($cruise->getShip()->getCabin() as $cabin)
@@ -139,8 +128,6 @@ class Cruise
 				{
 					continue;
 				}
-				
-				
 				$room->discount = false;
 				if(in_array($room,$discount_rooms))
 				{
@@ -153,25 +140,17 @@ class Cruise
 					$rooms[] = $room;
 				}				
 			}
-			
-
-				
 		}
 		
-		
 		return $rooms;
+	}
+	
+	
+	public function createOrderMosturflot($order)
+	{
+		//dump("create");
 		
-		// берём ве каюты из $cruise
-		
-		// оставляем только те, которые разрешает водоход
-		
-		// добавляем скидочные
-		
-		// вычетаем купленные
-
-
-
-		
+		return null;
 	}
 	
 	public function getAvailibleRooms($cruise)
@@ -242,13 +221,22 @@ class Cruise
 		return $available_rooms;
 	}
 
-	private $discounts_this_year = [1=>6,2=>5,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0,];
+	private $discounts_this_year = [1=>5,2=>5,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0,];
 	private $discounts_next_year = [1=>12,2=>12,3=>12,4=>12,5=>12,6=>11,7=>11,8=>11,9=>10,10=>9,11=>8,12=>7,];
 	
 	public function getSesonDiscount($order, $year_now = null)
 	{
 		$cruise = $order->getCruise();
 		return $this->getSesonDiscountCruise($cruise, $year_now = null);		
+	}
+	
+	public function  getSesonDiscountMosturflot($order)
+	{
+		$cruise = $order->getCruise();
+		$url = "https://booking.mosturflot.ru/api?userhash=60b5fe8b827586ece92f85865c186513ed3e7bfa&section=rivercruises&request=tour&loading=true&tourid=". ($cruise->getId()-1000000);
+		$xml = $this->curl_get_file_contents($url);
+		//dump($xml);
+		return (int)simplexml_load_string($xml)->answer->tourdiscount;
 	}
 	
 	public function getSesonDiscountCruise($cruise, $year_now = null)

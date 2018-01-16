@@ -26,6 +26,36 @@ class ParseController extends Controller
 			else return FALSE;
 	}
 	
+	
+	const BASE_URL_KEY = "https://booking.mosturflot.ru/api?userhash=60b5fe8b827586ece92f85865c186513ed3e7bfa&section=rivercruises&";
+	
+	public function URL2XML( $url )
+	{
+		$string = $this->curl_get_file_contents($url);
+		return simplexml_load_string($string);
+	}	
+	
+	// ПОЛУЧИТЬ СПИСОК КРУИЗОВ ТЕПЛОХОДА
+	public function getCruises($ship_id)
+	{
+		$url = self::BASE_URL_KEY."request=tours&routedetail=true&shipid=".$ship_id."&tariffs=true";
+		return $this->URL2XML( $url );
+	}	
+
+	
+	
+	/**
+	 * @Route("/mosturflot/{ship_id}", name="mosturflot" )
+     */	
+	public function mosturflotAction($ship_id)	
+	{
+		$cruises = $this->getCruises($ship_id);
+		
+		dump($cruises);
+		
+		return new Response("OK");
+	}
+	
 	/**
 	 * @Route("/del_sold", name="del_sold" )
      */	

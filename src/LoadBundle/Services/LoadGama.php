@@ -66,7 +66,7 @@ class LoadGama  extends Controller
 	
 	public function load($ship_id, $update = false)
 	{
-		
+		//file_put_contents ("log.txt","Начало\n".date("Y-m-d H:i:s")."\n\n", FILE_APPEND | LOCK_EX);
 		$em = $this->em;
 		
 		ini_set("memory_limit","2G");
@@ -291,16 +291,22 @@ class LoadGama  extends Controller
 		
 		$xml = $this->URL2XML($this->path_cruises);
 		
+		//file_put_contents ("log.txt","Начинаем круизы\n".date("Y-m-d H:i:s")."\n\n", FILE_APPEND | LOCK_EX);
+		
 		foreach($xml->navigations->navigation as $ways)
 		{
 			if($ways->attributes()['ship_iid'] ==  $ship_id )
 			{
 				//dump($ways);
 				
+				file_put_contents ("log.txt","теплоход ".$ways->attributes()['ship_iid']."\n".date("Y-m-d H:i:s")."\n\n", FILE_APPEND | LOCK_EX);
+				
 				foreach($ways->ways->way as $way)
 				{
 					//dump($way);
 					// создаём круизы
+					
+					//file_put_contents ("log.txt","круиз ".$way->attributes()['iid']."\n".date("Y-m-d H:i:s")."\n\n", FILE_APPEND | LOCK_EX);
 					
 					$cruise = $em->getRepository("CruiseBundle:Cruise")->findOneById($way->attributes()['iid'] + 3000000);
 					if(null === $cruise)

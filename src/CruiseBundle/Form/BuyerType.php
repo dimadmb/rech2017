@@ -31,7 +31,7 @@ class BuyerType extends AbstractType
 			->add('name',null,[/*'required'=>true*/])
 			->add('lastName',null,[/*'required'=>true*/])
 			->add('fatherName',null,[/*'required'=>true*/])
-			->add('birthday',null,[/*'required'=>true,*/'years'=> range((date("Y") - 80), (date("Y")-10))])
+			->add('birthday',null,[/*'required'=>true,*/'years'=> range((date("Y") - 90), (date("Y")-10))])
 			->add('passSeria',null,[/*'required'=>true*/])
 			->add('passNum',null,[/*'required'=>true*/])
 			->add('passDate',null,[/*'required'=>true,*/ 'years' => range((date("Y") - 50), date("Y"))])

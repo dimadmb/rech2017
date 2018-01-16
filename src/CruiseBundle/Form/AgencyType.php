@@ -30,6 +30,7 @@ class AgencyType extends AbstractType
 
 			->add('auth')
 			->add('active')
+			->add('region')
 			
 		;	
     }/**

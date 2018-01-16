@@ -61,7 +61,7 @@ class OrderItemPlaceType extends AbstractType
 			->add('lastName'/*,null,['required'=>true]*/)
 			->add('fatherName'/*,null,['required'=>true]*/)
 			->add('gender'/*,null,['required'=>true]*/)
-			->add('birthday',null,[/*'required'=>true,*/'years'=> range((date("Y") - 90), (date("Y")-10))])
+			->add('birthday',null,[/*'required'=>true,*/'years'=> range((date("Y") - 90), (date("Y")-0))])
 			->add('passSeria'/*,null,['required'=>true]*/)
 			->add('passNum'/*,null,['required'=>true]*/)
 			->add('passDate',null,[/*'required'=>true, */'years' => range((date("Y") - 50), date("Y"))])

@@ -390,7 +390,7 @@ label.checked {
 				</div> <!-- end row -->
 				<div style="display:table-row;">
 					{% for image in type.cabin.images %}
-						<a class="photo" title="{{ image.title }}" href="{{ (upload_path~image.filename) | imagine_filter('show') }}" rel="group" >
+						<a class="photo" title="{{ image.title }}" href="{{ (upload_path~image.filename) | imagine_filter('show') }}" rel="group{{type.cabin.id}}" >
 							<img class="img-responsive" style="float:left; margin-right:5px;" alt="{{ image.title }}" title="{{ image.title }}" src="{{ (upload_path~image.filename) | imagine_filter('thumb_70') }}" />
 						</a>
 					{% endfor %}						

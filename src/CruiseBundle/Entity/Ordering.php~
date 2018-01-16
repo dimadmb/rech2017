@@ -92,6 +92,14 @@ class Ordering
      */
     private $paid= false;
 	
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="outer_id", type="integer", nullable=true)
+     */
+    private $outerId;	
+	
+	
 	
 	/**
 	 * @ORM\OneToMany(targetEntity="OrderItem", mappedBy="ordering") 
@@ -128,7 +136,7 @@ class Ordering
 	
 	private $idHash;
 	
-	
+	/*
 	private $summ;
 
     public function getSumm()
@@ -155,7 +163,14 @@ class Ordering
 
         return $this;
     }	
-		
+	*/	
+	
+	
+	public function __toString()
+	{
+		return (string)$this->id;
+	}
+	
 	
     /**
      * Get id

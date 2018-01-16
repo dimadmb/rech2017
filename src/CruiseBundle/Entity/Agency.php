@@ -139,6 +139,12 @@ class Agency
 	private $orders;
 	
 	
+	/**
+	 * @ORM\ManyToOne(targetEntity="Region")
+	 */
+	private $region;
+	
+	
 	
     /**
      * @var string
@@ -654,5 +660,29 @@ class Agency
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * Set region
+     *
+     * @param \CruiseBundle\Entity\Region $region
+     *
+     * @return Agency
+     */
+    public function setRegion(\CruiseBundle\Entity\Region $region = null)
+    {
+        $this->region = $region;
+
+        return $this;
+    }
+
+    /**
+     * Get region
+     *
+     * @return \CruiseBundle\Entity\Region
+     */
+    public function getRegion()
+    {
+        return $this->region;
     }
 }

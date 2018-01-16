@@ -108,12 +108,20 @@ class OrderController extends Controller
 			->getOneOrNullResult()
 		;
 	
+	
  
 			// проверить водоход ли это и выставить скидку
 			if(($order->getCruise()->getShip()->getTurOperator()->getCode() == 'vodohod') && ($order->getSesonDiscount() === null))
 			{
-
 				$order->setSesonDiscount($this->get('cruise')->getSesonDiscount($order));
+				//$this->getDoctrine()->getManager()->flush();
+			} 	
+ 
+			// проверить мостурфлот ли это и выставить скидку
+			if(($order->getCruise()->getShip()->getTurOperator()->getCode() == 'mosturflot') && ($order->getSesonDiscount() === null))
+			{
+				//dump("");
+				$order->setSesonDiscount($this->get('cruise')->getSesonDiscountMosturflot($order));
 				//$this->getDoctrine()->getManager()->flush();
 			} 
 			// если агентство - ставим комиссию
@@ -152,6 +160,7 @@ class OrderController extends Controller
 		
 		
 		/// проверка заполнения свех полей для оплаты
+		$allow_order = true;
 		$allow_pay = true;
 		foreach($order->getOrderItems() as $orderItem)
 		{
@@ -173,23 +182,30 @@ class OrderController extends Controller
 				{
 
 					$allow_pay = false;
+					$allow_order = false;
 				}
 			}
 		}
 		if(($order->getSesonDiscount() === null) && ($order->getCruise()->getShip()->getTurOperator()->getCode() !== 'vodohod'))
 		{
-
 			$allow_pay = false;
+			//$allow_order = false;
 		}
 		
 		if($order->getPermanentRequest())
 		{
 			if(($order->getPermanentDiscount() == null) /*or ($order->getPermanentDiscount() == 0)*/ ) // возможно убрать второй аргумент
 			{
-
 				$allow_pay = false;
+				$allow_order = false;
 			}
 		}
+		
+		if( $allow_order && ($order->getCruise()->getShip()->getTurOperator()->getCode() === 'mosturflot'))
+		{
+			$this->get('cruise')->createOrderMosturflot($order);
+		}
+		
 		
 		
 		$orderPrice = $this->get('cruise')->getOrderPrice($order);
