@@ -16,9 +16,10 @@ class Cruise
     private $doctrine;
 
 
-    public function __construct($doctrine)
+    public function __construct($doctrine, $mailer)
     {
         $this->doctrine = $doctrine;
+        $this->mailer = $mailer;
     }
 
 	public function curl_get_file_contents($URL)
@@ -375,6 +376,24 @@ class Cruise
 		}	
 		return $this->discounts_this_year[date('n')];		
 	}	
+	
+	public function deleteOrder($order)
+	{
+		if($order)
+		{
+			$em = $this->doctrine->getManager();
+			$order->setActive(false);
+			$em->flush();
+		}
+		
+		$message = \Swift_Message::newInstance()
+							->setSubject('Удаление заявки '.$order->getId())
+							->setFrom('test-rech-agent@yandex.ru')
+							->setTo(['dkochetkov@vodohod.ru','info@reach-agent.ru'])
+							->setBody("Заявка № ".$order->getId()." удалена")
+						;
+        $this->mailer->send($message);		
+	}
 	
 	public function getOrderPrice($order)
 	{

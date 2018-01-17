@@ -115,6 +115,17 @@ class LoadMosturflot  extends Controller
 		$shipXML = $this->getShip($ship_id);
 		$shipName = (string)$shipXML->answer->shipname;
 		$shipCode = Helper\Convert::translit($shipName);
+		
+
+			$room_places = array();
+			$room_places_all = $cabinPlaceRepos->findAll();
+			foreach($room_places_all as $room_place)
+			{
+				$room_places[$room_place->getRpName()] = $room_place;
+				$room_places_count[$room_place->getId()] = $room_place;
+			}			
+		
+		
 
 		$cruisesXML = $this->getCruises($ship_id);		
 
@@ -229,7 +240,7 @@ class LoadMosturflot  extends Controller
 						;
 						$ship->addCabin($cabin);					
 					}
-					
+					$cabin->setPlaceCount($room_places_count[$item["place_count"]]);
 					;
 					
 					
@@ -310,13 +321,7 @@ class LoadMosturflot  extends Controller
 				$cruiseSpec[$cruiseSpecItem->getCode()] = $cruiseSpecItem;
 			}
 			*/
-			$room_places = array();
-			$room_places_all = $cabinPlaceRepos->findAll();
-			foreach($room_places_all as $room_place)
-			{
-				$room_places[$room_place->getRpName()] = $room_place;
-				$room_places_count[$room_place->getId()] = $room_place;
-			}	
+
 
 
 			$tariffs = array();
@@ -433,7 +438,11 @@ class LoadMosturflot  extends Controller
 				{
 					continue;
 				}
-				$rp_id = $room_places_count[$rt_name->getPlaceCountMax()];	
+				//$rp_id = $room_places_count[$rt_name->getPlaceCountMax()];	
+				
+				//dump($cabin);
+				
+				//$rp_id = $cabin->getPlaceCount();
 				
 
 				
@@ -482,7 +491,7 @@ class LoadMosturflot  extends Controller
 						{
 														
 							$price = $em->getRepository("CruiseBundle:Price")->findOneBy([
-												'place' => $rp_id,
+												'place' => $cab->getPlaceCount(),
 												'cabin' => $cab,
 												'meals' => $meal,
 												'tariff' => $tarriff,
@@ -496,7 +505,7 @@ class LoadMosturflot  extends Controller
 							}
 							
 							$price	
-									->setPlace($rp_id)
+									->setPlace($cab->getPlaceCount())
 									->setTariff( $tarriff )
 									->setCruise($cruise)
 									->setCabin($cab)    

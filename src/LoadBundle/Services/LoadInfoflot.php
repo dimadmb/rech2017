@@ -441,6 +441,16 @@ class LoadInfoflot  extends Controller
 			$decksByName[$deck->getName()] = $deck;
 			$decksById[$deck->getDeckId()] = $deck;
 		}
+		
+		// ТИПЫ РАЗМЕЩЕНИЯ
+		$room_places = array();
+		$room_places_all = $cabinPlaceRepos->findAll();
+		foreach($room_places_all as $room_place)
+		{
+			$room_places[$room_place->getRpName()] = $room_place;
+			$room_places_count[$room_place->getId()] = $room_place;
+		}		
+		
 		// ПОЛУЧИМ СПИСОК ТИПОВ КАЮТ ИЗ БД
 		
 		$room_types_all = $cabinTypeRepos->findAll();
@@ -497,8 +507,16 @@ class LoadInfoflot  extends Controller
 				}
 				
 				
+
 				foreach($cabinss as $cabinName => $rooms )
 				{
+					
+					$countPlace = 10;
+					foreach($rooms as $room)
+					{
+						$countPlace = $room['count'] < $countPlace ? $room['count'] : $countPlace;
+					}
+					
 					// проверим есть ли такой тип каюты, нет - добавим
 					if(!isset($room_types[$cabinName]))
 					{
@@ -506,7 +524,7 @@ class LoadInfoflot  extends Controller
 						$cabinType 
 							->setName($cabinName)
 							->setComment($cabinName)
-							->setPlaceCountMax($rooms[0]['count'])
+							->setPlaceCountMax($countPlace)
 						;
 						$em->persist($cabinType);
 						$em->flush();
@@ -537,13 +555,27 @@ class LoadInfoflot  extends Controller
 						$em->persist($cabin);
 						$ship->addCabin($cabin);					
 					}
-					
+					$cabin->setPlaceCount($room_places_count[$countPlace]);
 
 
 					foreach($rooms as $roomItem)
 					{
 
+						$room = null;
+						
+						foreach($ship->getCabin() as $cabinTemp)
+						{
+							foreach($cabinTemp->getRooms() as $roomTemp )
+							{
+								if($roomTemp->getNumber() == $roomItem['name'] )
+								{
+									$room = $roomTemp;
+								}
+							}
+						}
 					
+					if(null == $room)
+					{
 						$room = new ShipRoom();
 						$room
 							->setNumber($roomItem['name'])
@@ -552,6 +584,16 @@ class LoadInfoflot  extends Controller
 						;
 						$em->persist($room);
 						$cabin->addRoom($room);
+					}
+					else
+					{
+						$room
+							->setCabin($cabin)
+							->setCountPass($roomItem['count'])
+							//->setCountPassMax((int) $roomItem->cabinmaxpass)
+							;
+					}					
+
 					}
 					// 	И ДОБАВИМ ЭТИ КАЮТЫ В ТЕПЛОХОД
 					
@@ -576,13 +618,7 @@ class LoadInfoflot  extends Controller
 		{
 			$cabins[$cabin->getType()->getId()][$cabin->getDeck()->getDeckId()] = $cabin;
 		}
-		$room_places = array();
-		$room_places_all = $cabinPlaceRepos->findAll();
-		foreach($room_places_all as $room_place)
-		{
-			$room_places[$room_place->getRpName()] = $room_place;
-			$room_places_count[$room_place->getId()] = $room_place;
-		}
+
 		$tariffs = array();
 		$cruiseTariffs = $tariffRepos->findAll();  
 		foreach($cruiseTariffs as $tariff)
@@ -693,7 +729,7 @@ class LoadInfoflot  extends Controller
 				foreach($cabin as $cab)
 				{
 					$price = $em->getRepository("CruiseBundle:Price")->findOneBy([
-										'place' => $rp_id,
+										'place' => $cab->getPlaceCount(),
 										'cabin' => $cab,
 										'meals' => $mealss[""],
 										'tariff' => $tariffs[1],
@@ -707,7 +743,7 @@ class LoadInfoflot  extends Controller
 					}
 							
 					$price	
-							->setPlace($rp_id)  
+							->setPlace($cab->getPlaceCount())  
 							->setTariff( $tariffs[1] )
 							->setCruise($cruise)
 							->setCabin($cab)
@@ -716,10 +752,10 @@ class LoadInfoflot  extends Controller
 					;
 					$em->persist($price);
 					
-					if($rt_name->getPlaceCountMax() > 1)
+					if($cab->getPlaceCount()->getRpId() > 1)
 					{
 						$price = $em->getRepository("CruiseBundle:Price")->findOneBy([
-											'place' => $rp_id,
+											'place' => $cab->getPlaceCount(),
 											'cabin' => $cab,
 											'meals' => $mealss[""],
 											'tariff' => $tariffs[2],
@@ -732,7 +768,7 @@ class LoadInfoflot  extends Controller
 							$price = new Price();						
 						}
 						$price	
-								->setPlace($rp_id)  // а тут можно разрешить запись значения вместо объекта ( -1 запрос) 
+								->setPlace($cab->getPlaceCount())  // а тут можно разрешить запись значения вместо объекта ( -1 запрос) 
 								->setTariff( $tariffs[2] )
 								->setCruise($cruise)
 								->setCabin($cab)

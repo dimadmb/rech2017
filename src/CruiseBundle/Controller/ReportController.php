@@ -38,7 +38,7 @@ class ReportController extends Controller
 		$cruise = $order->getCruise();
 
 		$dayFirst = $em->getRepository("CruiseBundle:ProgramItem")->findOneBy(["cruise"=>$cruise],['dateStart'=>'ASC']);
-		$dayLast = $em->getRepository("CruiseBundle:ProgramItem")->findOneBy(["cruise"=>$cruise],['dateStop'=>'DESC']);
+		$dayLast = $em->getRepository("CruiseBundle:ProgramItem")->findOneBy(["cruise"=>$cruise],['dateStart'=>'DESC']);
 		
 		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject( __DIR__ .'/../Resources/report/boarding_card.xlsx');
 		$phpExcelObject->setActiveSheetIndex(0);
@@ -142,7 +142,7 @@ class ReportController extends Controller
 		$items = $this->get('cruise')->getOrderPrice($order);
 		
 		$dayFirst = $em->getRepository("CruiseBundle:ProgramItem")->findOneBy(["cruise"=>$order->getCruise()],['dateStart'=>'ASC']);
-		$dayLast = $em->getRepository("CruiseBundle:ProgramItem")->findOneBy(["cruise"=>$order->getCruise()],['dateStop'=>'DESC']);
+		$dayLast = $em->getRepository("CruiseBundle:ProgramItem")->findOneBy(["cruise"=>$order->getCruise()],['dateStart'=>'DESC']);
 		
 	
 		$phpTemplateObject = $this->get('phpword')->createTemplateObject( __DIR__ .'/../Resources/report/contract.docx');

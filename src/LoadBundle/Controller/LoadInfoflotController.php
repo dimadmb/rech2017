@@ -10,12 +10,12 @@ class LoadInfoflotController extends Controller
 {
 	/**
 	 * @Template()
-	 * @Route("/loadinfoflot_ship/{ship_id}", name="loadinfoflot_ship" )
+	 * @Route("/loadinfoflot_ship/{ship_id}/{up}", name="loadinfoflot_ship" )
      */			
-	public function loadShipAction($ship_id = null)
+	public function loadShipAction($ship_id = null, $up = false)
 	{
 		$load = $this->get('load.loadinfoflot');
-		$res = $load->load($ship_id, false);
+		$res = $load->load($ship_id, $up);
 		return  $res;
 		//return $load->load($ship_id);
 	}	

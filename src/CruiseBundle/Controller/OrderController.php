@@ -264,21 +264,8 @@ class OrderController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		$id = $this->get('cruise')->hashOrderDecode($hash);
 		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($id);
-		if($order)
-		{
-			$em = $this->getDoctrine()->getManager();
-			$order->setActive(false);
-			$em->flush();
-		}
-		
-		$message = \Swift_Message::newInstance()
-							->setSubject('Удаление заявки '.$order->getId())
-							->setFrom('test-rech-agent@yandex.ru')
-							->setTo(['dkochetkov@vodohod.ru','info@reach-agent.ru'])
-							->setBody("Заявка № ".$order->getId()." удалена")
-						;
-        $this->get('mailer')->send($message);							
-		
+	
+		$this->get('cruise')->deleteOrder($order);		
 		
 		return $this->redirectToRoute('orders');
     }	
@@ -345,10 +332,21 @@ class OrderController extends Controller
 				
 				$room = $em->getRepository("CruiseBundle:ShipRoom")->findOneById($room_id);
 				
-				if($room->getCountPassMax() < $place_id )
+				if($room->getCountPassMax() !==  null)
 				{
-					//$place_id  = $room->getCountPassMax();
+					if($room->getCountPassMax() < $place_id )
+					{
+						$place_id  = $room->getCountPassMax();
+					}
 				}
+				elseif($room->getCountPass() !==  null)
+				{
+					if($room->getCountPass() < $place_id )
+					{
+						$place_id  = $room->getCountPass();
+					}					
+				}
+
 				
 				$place = $em->getRepository("CruiseBundle:ShipCabinPlace")->findOneByRpId($place_id);
 				

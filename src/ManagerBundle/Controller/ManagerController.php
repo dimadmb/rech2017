@@ -48,19 +48,8 @@ class ManagerController extends Controller
      */
     public function invoiceDeleteAction(Ordering $order)
     {
-		if($order)
-		{
-			$em = $this->getDoctrine()->getManager();
-			$order->setActive(false);
-			$em->flush();
-		}
-		$message = \Swift_Message::newInstance()
-							->setSubject('Удаление заявки '.$order->getId())
-							->setFrom('test-rech-agent@yandex.ru')
-							->setTo(['dkochetkov@vodohod.ru','info@reach-agent.ru'])
-							->setBody("Заявка № ".$order->getId()." удалена")
-						;
-        $this->get('mailer')->send($message);							
+		
+		$this->get('cruise')->deleteOrder($order);
 		
 		
 		return $this->redirectToRoute('manager_invoices');		

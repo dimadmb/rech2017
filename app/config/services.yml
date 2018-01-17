@@ -14,7 +14,7 @@ services:
 
     cruise:
         class: CruiseBundle\Service\Cruise
-        arguments: ['@doctrine']
+        arguments: ['@doctrine','@mailer']
 
     num2str:
         class: CruiseBundle\Service\NumToString

@@ -44,7 +44,12 @@ class ShipCabin
     /**
      * @ORM\ManyToOne(targetEntity="ShipCabinType")
      */
-    private $type;	
+    private $type;		
+
+    /**
+     * @ORM\ManyToOne(targetEntity="ShipCabinPlace")
+     */
+    private $placeCount;	
 	
 	
 	/**
@@ -267,5 +272,29 @@ class ShipCabin
     public function getImages()
     {
         return $this->images;
+    }
+
+    /**
+     * Set placeCount
+     *
+     * @param \CruiseBundle\Entity\ShipCabinPlace $placeCount
+     *
+     * @return ShipCabin
+     */
+    public function setPlaceCount(\CruiseBundle\Entity\ShipCabinPlace $placeCount = null)
+    {
+        $this->placeCount = $placeCount;
+
+        return $this;
+    }
+
+    /**
+     * Get placeCount
+     *
+     * @return \CruiseBundle\Entity\ShipCabinPlace
+     */
+    public function getPlaceCount()
+    {
+        return $this->placeCount;
     }
 }
