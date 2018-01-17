@@ -43,7 +43,24 @@ class ParseController extends Controller
 	}	
 
 	
+	// ПОЛУЧИТЬ ИНФОРМАЦИЮ О ТЕПЛОХОДЕ
+	public function getShip($ship_id)
+	{
+		$url = self::BASE_URL_KEY."request=ship&shipid=".$ship_id."&cabins=true";
+		return $this->URL2XML( $url );
+	}	
 	
+	/**
+	 * @Route("/mosturflot_ship/{ship_id}", name="mosturflot_ship" )
+     */	
+	public function mosturflotShipAction($ship_id)	
+	{
+		$cruises = $this->getShip($ship_id);
+		
+		dump($cruises);
+		
+		return new Response("OK");
+	}	
 	/**
 	 * @Route("/mosturflot/{ship_id}", name="mosturflot" )
      */	

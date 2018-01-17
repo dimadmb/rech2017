@@ -146,9 +146,135 @@ class Cruise
 	}
 	
 	
-	public function createOrderMosturflot($order)
+	public function createOrderMosturflot($order, $fullOrder = false)
 	{
-		//dump("create");
+		$request = [];		
+		// проверить создал ли счёт у мостурфлота 
+		if(null === $order->getOuterId())
+		{
+			//dump("create");
+			$action = 'ordercreate';
+		}
+		else
+		{
+			//dump("edit");
+			$action = 'orderedit';
+			$request['orderid'] = $order->getOuterId();
+		}
+		
+		//$request['test'] = 1;
+		$request['ordertourid'] = $order->getCruise()->getId() - 1000000;
+
+		$url = "https://booking.mosturflot.ru/api?userhash=60b5fe8b827586ece92f85865c186513ed3e7bfa&section=rivercruises&request=ship&cabins=1&shipid=".($order->getCruise()->getShip()->getId() - 1000);
+		
+		$tariff_assocc = [
+			10 => 1,
+			11 => 2,
+			6  => 3,
+			7  => 5,
+			8  => 4,
+			9  => 6,
+		];
+		
+		$type_docs_assocc = [
+			1 => 0,
+			2 => 4,
+			3 => 3,
+		];
+		
+		$xml = simplexml_load_string($this->curl_get_file_contents($url));
+
+		//dump($xml->answer->shipcabins);
+		
+		foreach($order->getOrderItems() as $orderItem)
+		{
+			//dump( $orderItem);
+			
+			$cabin_id = null;
+			$room_num = $orderItem->getRoom()->getNumber();
+			
+			foreach($xml->answer->shipcabins->item as $room_mosturflot)
+			{
+				//dump($room_mosturflot);
+				//dump($room_num);
+				
+				
+				if($room_mosturflot->cabinnumber == $room_num)
+				{
+					$cabin_id = (int)$room_mosturflot->cabinid;
+				}
+			}
+			//dump($cabin_id);
+
+			if(null === $cabin_id)
+			{
+				return null;
+			}
+			
+			
+			foreach($orderItem->getOrderItemPlaces() as $orderItemPlace)
+			{
+				
+				$passanger = [
+						'cabinid' => $cabin_id,
+						'berthtype' => "main",
+						'tariffid' => $tariff_assocc[$orderItemPlace->getPrice()->getTariff()->getId()] ,
+						'mealid' => $orderItemPlace->getPrice()->getMeals()->getId() - 1,
+						];
+				if($fullOrder)
+				{
+					$passanger['passenger'] = 
+					[
+						'cpname' => $orderItemPlace->getLastName() . " ". $orderItemPlace->getName() . " " . $orderItemPlace->getFatherName(),
+						'cpgender' => $orderItemPlace->getGender()->getId(),
+						'cpdoctype' => $type_docs_assocc[$orderItemPlace->getTypeDoc()->getId()],
+						'cpdocser' => $orderItemPlace->getPassSeria(),
+						'cpdocnum' => $orderItemPlace->getPassNum(),
+						'cpdocby' => $orderItemPlace->getPassWho(),
+						'cpdocdate' => $orderItemPlace->getPassDate()->format("c"),
+						'cpcitizenship' => 185,
+						'cpbirthdate' => $orderItemPlace->getBirthday()->format("c"),					
+					];
+				}
+				$request['orderpassengers'][] = $passanger;
+				
+				//dump( $orderItemPlace);
+				/*
+				$request['orderpassengers'][] = [
+						'cabinid' => $cabin_id,
+						'berthtype' => "main",
+						'tariffid' => $tariff_assocc[$orderItemPlace->getPrice()->getTariff()->getId()] ,
+						'mealid' => $orderItemPlace->getPrice()->getMeals()->getId() - 1,
+						'passenger' => [
+										'cpname' => $orderItemPlace->getLastName() . " ". $orderItemPlace->getName() . " " . $orderItemPlace->getFatherName(),
+										'cpgender' => $orderItemPlace->getGender()->getId(),
+										'cpdoctype' => $type_docs_assocc[$orderItemPlace->getTypeDoc()->getId()],
+										'cpdocser' => $orderItemPlace->getPassSeria(),
+										'cpdocnum' => $orderItemPlace->getPassNum(),
+										'cpdocby' => $orderItemPlace->getPassWho(),
+										'cpdocdate' => $orderItemPlace->getPassDate()->format("c"),
+										'cpcitizenship' => 185,
+										'cpbirthdate' => $orderItemPlace->getBirthday()->format("c"),
+									]
+				];
+				*/
+			}
+		}
+		
+		$url = "https://booking.mosturflot.ru/api?userhash=60b5fe8b827586ece92f85865c186513ed3e7bfa&section=rivercruises&request=$action&";
+		
+		
+		//dump($request);
+		//dump(http_build_query($request));
+		
+		$xml = simplexml_load_string($this->curl_get_file_contents($url.http_build_query($request)));
+		
+		//dump($xml);
+		
+		$outerId = (int)$xml->answer->orderid;
+		
+		$order->setOuterId($outerId);
+		$this->doctrine->getManager()->flush();
 		
 		return null;
 	}

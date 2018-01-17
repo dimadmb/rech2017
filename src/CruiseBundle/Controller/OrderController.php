@@ -182,8 +182,14 @@ class OrderController extends Controller
 				{
 
 					$allow_pay = false;
+					//$allow_order = false;
+				}
+				if($orderItemPlace->getPrice() === null)
+				{
 					$allow_order = false;
 				}
+				
+				
 			}
 		}
 		if(($order->getSesonDiscount() === null) && ($order->getCruise()->getShip()->getTurOperator()->getCode() !== 'vodohod'))
@@ -203,7 +209,7 @@ class OrderController extends Controller
 		
 		if( $allow_order && ($order->getCruise()->getShip()->getTurOperator()->getCode() === 'mosturflot'))
 		{
-			$this->get('cruise')->createOrderMosturflot($order);
+			$this->get('cruise')->createOrderMosturflot($order, $allow_pay);
 		}
 		
 		
@@ -264,6 +270,16 @@ class OrderController extends Controller
 			$order->setActive(false);
 			$em->flush();
 		}
+		
+		$message = \Swift_Message::newInstance()
+							->setSubject('Удаление заявки '.$order->getId())
+							->setFrom('test-rech-agent@yandex.ru')
+							->setTo(['dkochetkov@vodohod.ru','info@reach-agent.ru'])
+							->setBody("Заявка № ".$order->getId()." удалена")
+						;
+        $this->get('mailer')->send($message);							
+		
+		
 		return $this->redirectToRoute('orders');
     }	
 	
@@ -325,7 +341,15 @@ class OrderController extends Controller
 			
 			foreach($basket_session['rooms'] as $room_id => $place_id)
 			{
+				
+				
 				$room = $em->getRepository("CruiseBundle:ShipRoom")->findOneById($room_id);
+				
+				if($room->getCountPassMax() < $place_id )
+				{
+					//$place_id  = $room->getCountPassMax();
+				}
+				
 				$place = $em->getRepository("CruiseBundle:ShipCabinPlace")->findOneByRpId($place_id);
 				
 				$typeDiscount = null;

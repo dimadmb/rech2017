@@ -54,7 +54,17 @@ class ManagerController extends Controller
 			$order->setActive(false);
 			$em->flush();
 		}
-		return $this->redirectToRoute('manager_invoices');
+		$message = \Swift_Message::newInstance()
+							->setSubject('Удаление заявки '.$order->getId())
+							->setFrom('test-rech-agent@yandex.ru')
+							->setTo(['dkochetkov@vodohod.ru','info@reach-agent.ru'])
+							->setBody("Заявка № ".$order->getId()." удалена")
+						;
+        $this->get('mailer')->send($message);							
+		
+		
+		return $this->redirectToRoute('manager_invoices');		
+
     }
 
     /**
@@ -68,6 +78,10 @@ class ManagerController extends Controller
 			$order->setActive(true);
 			$em->flush();
 		}
+		
+						
+		
+		
 		return $this->redirectToRoute('manager_invoices');
     }
 	
