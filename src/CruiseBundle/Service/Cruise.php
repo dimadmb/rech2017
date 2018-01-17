@@ -280,6 +280,20 @@ class Cruise
 		return null;
 	}
 	
+	public function deleteOrderMosturflot($order)
+	{
+		
+		if($order->getOuterId() !== null)
+		{
+			$url = "https://booking.mosturflot.ru/api?userhash=60b5fe8b827586ece92f85865c186513ed3e7bfa&section=rivercruises&request=ordercancel&orderid=".$order->getOuterId();
+			
+			$order->setOuterId(null);
+			$this->doctrine->getManager()->flush();
+		}
+		
+		return null;
+	}
+	
 	public function getAvailibleRooms($cruise)
 	{
 		$available_rooms = [];		
@@ -384,6 +398,11 @@ class Cruise
 			$em = $this->doctrine->getManager();
 			$order->setActive(false);
 			$em->flush();
+		}
+		
+		if($order->getCruise()->getTuroperator()->getCode() == 'mosturflot')
+		{
+			$this->deleteorderMosturflot($order);
 		}
 		
 		$message = \Swift_Message::newInstance()
