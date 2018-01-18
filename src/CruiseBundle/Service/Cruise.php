@@ -450,7 +450,10 @@ class Cruise
 						'priceDiscount' => 0,
 						'fee_summ' => 0,
 						'pay' =>0,
+						'tariffs' => []
 						];
+						
+						
 		if(null !== $order)	
 		{
 			foreach($order->getOrderItems() as $orderItem)
@@ -495,7 +498,12 @@ class Cruise
 					$itogo['priceDiscount'] += 	$priceDiscount;
 					$itogo['fee_summ'] += 	$fee_summ;
 					
-					isset($itogo['tariffs'][$orderItemPlace->getPrice()->getTariff()->getName()]) ? $itogo['tariffs'][$orderItemPlace->getPrice()->getTariff()->getName()]++ : $itogo['tariffs'][$orderItemPlace->getPrice()->getTariff()->getName()] = 1;	
+					
+					if(null !== $orderItemPlace->getPrice())
+					{
+						isset($itogo['tariffs'][$orderItemPlace->getPrice()->getTariff()->getName()]) ? $itogo['tariffs'][$orderItemPlace->getPrice()->getTariff()->getName()]++ : $itogo['tariffs'][$orderItemPlace->getPrice()->getTariff()->getName()] = 1;
+					}
+						
 				}
 			}
 			$itogo['pays'] = $order->getPays();

@@ -102,6 +102,20 @@ filter='yui_css'
 			
 			</div>
 			
+			<div class="visible-xs" style="position:absolute; right:70px; top:90px; "  >
+
+            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                
+				<a href="{{path('fos_user_profile_show')}}">{{app.user.username}}</a><br>
+                <a class="" href="{{ path('fos_user_security_logout') }}">
+                    {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
+                </a>
+            {% else %}
+               <a style="color:#fff; font-weight:400;" href="{{ path('fos_user_security_login') }}">ВОЙТИ<br>(регистрация)</a>
+            {% endif %}					
+			
+			</div>
+			
 
 			
 			
