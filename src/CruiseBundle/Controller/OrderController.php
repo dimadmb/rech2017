@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 use CruiseBundle\Entity\Pay;
 use CruiseBundle\Entity\Buyer;
+use CruiseBundle\Entity\ShipRoom;
 use CruiseBundle\Entity\Ordering;
 use CruiseBundle\Entity\OrderItem;
 use CruiseBundle\Entity\OrderItemPlace;
@@ -75,6 +76,176 @@ class OrderController extends Controller
 
 	return $this->redirect($href);
 		
+	}
+
+
+
+	/**
+     * @Route("/order/remove_room/{hash}/{orderitem}", name="invoice_remove_room")
+     */
+	public function invoiceRemoveRoomAction(Request $request,$hash,OrderItem $orderitem)
+	{
+		$em = $this->getDoctrine()->getManager();
+		
+		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($this->get('cruise')->hashOrderDecode($hash));
+		
+		$em->remove($orderitem);
+		
+		
+		
+		//return new Response("OK");
+		
+		$em->flush();
+		
+		return $this->redirectToRoute('invoice', ['hash'=>$hash]);
+	}
+	
+	/**
+     * @Route("/order/add_room/{hash}", name="invoice_add_room")
+     */
+	public function invoiceAddRoomAction(Request $request,$hash)
+	{
+		$em = $this->getDoctrine()->getManager();
+		
+		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($this->get('cruise')->hashOrderDecode($hash));
+		$room = $em->getRepository("CruiseBundle:ShipRoom")->findOneById($request->query->get("room"));
+		$place = $em->getRepository("CruiseBundle:ShipCabinPlace")->findOneById($request->query->get("place"));
+
+
+		$typeDiscount = null;
+		$discount = $em->getRepository("CruiseBundle:RoomDiscount")->findOneBy(['cruise'=>$order->getCruise(),'room'=>$room]) === null ? false : true;
+		if($discount)
+		{
+			$typeDiscount = $order->getCruise()->getTypeDiscount();
+		}
+		
+		$orderItem = new OrderItem();
+		$orderItem->setRoom($room);
+		$orderItem->setPlace($place);
+		$orderItem->setOrdering($order);
+		$orderItem->setTypeDiscount($typeDiscount);
+		
+		$em->persist($orderItem);	
+
+		$order->addOrderItem($orderItem);
+	
+		for($i=1;$i<=$place->getRpId();$i++)
+		{
+			$orderItemPlace = new OrderItemPlace();
+			$orderItemPlace->setOrderItem($orderItem);
+			$em->persist($orderItemPlace);
+			$orderItem->addOrderItemPlace($orderItemPlace);
+		}
+	
+		$em->flush();
+		
+		return $this->redirectToRoute('invoice', ['hash'=>$hash]);
+	}
+
+	
+	/**
+	 * Удалить место из каюты
+     * @Route("/order/remove_place/{hash}/{place}", name="invoice_remove_place")
+     */
+    public function invoiceRemovePlaceAction(Request $request,$hash,OrderItemPlace $place)
+    {
+		$em = $this->getDoctrine()->getManager();
+
+		$em->remove($place);
+		
+		$orderItem  = $place->getOrderItem();
+		
+		// место на одно меньше
+		$place = $em->getRepository("CruiseBundle:ShipCabinPlace")
+						->findOneByRpId( $orderItem->getPlace()->getRpId() - 1 );
+		$orderItem->setPlace($place);	
+
+
+		// прайс на размещение ниже
+		foreach($orderItem->getOrderItemPlaces() as $orderItemPlace)
+		{
+			$oldPrice = $orderItemPlace->getPrice();
+			if(null !== $oldPrice)
+			{
+				$newPrice = $em->getRepository("CruiseBundle:Price")
+							->findOneBy([
+								'place' => $oldPrice->getPlace()->getRpId() - 1 ,
+								'cabin' => $oldPrice->getCabin(),
+								'cruise' => $oldPrice->getCruise(),
+								'tariff' => $oldPrice->getTariff(),
+								'meals' => $oldPrice->getMeals(),
+							]);
+				//dump($newPrice);			
+				$orderItemPlace->setPrice($newPrice);		
+				//$orderItemPlace->setPriceValue($newPrice->getPrice());		
+			}
+
+		}		
+		
+		$em->flush();
+		return $this->redirectToRoute('invoice', ['hash'=>$hash]);
+	}
+	/**
+	 * Добавить место в каюту	
+     * @Route("/order/add_place/{hash}/{room}", name="invoice_add_place")
+     */
+    public function invoiceAddPlaceAction(Request $request,$hash,ShipRoom $room)
+    {
+		$em = $this->getDoctrine()->getManager();
+		$orderItem = $em->createQueryBuilder()
+			->select('oi,oip,price')
+			->from('CruiseBundle:OrderItem','oi')
+			->leftJoin('oi.orderItemPlaces','oip')
+			->leftJoin('oip.price','price')
+			->where('oi.ordering = '.$this->get('cruise')->hashOrderDecode($hash))
+			->andWhere('oi.room = '.$room->getId())
+			->getQuery()
+			->getOneOrNullResult()
+		;
+		
+		// место на одно больше 
+		$place = $em->getRepository("CruiseBundle:ShipCabinPlace")
+						->findOneByRpId( $orderItem->getPlace()->getRpId() + 1 );
+		if(null === $place)
+		{
+			return $this->redirectToRoute('invoice', ['hash'=>$hash]);
+		}
+		
+		$orderItem->setPlace($place);
+
+		// прайс на размещение выше
+		foreach($orderItem->getOrderItemPlaces() as $orderItemPlace)
+		{
+			$oldPrice = $orderItemPlace->getPrice();
+			if(null !== $oldPrice)
+			{
+				$newPrice = $em->getRepository("CruiseBundle:Price")
+							->findOneBy([
+								'place' => $oldPrice->getPlace()->getRpId() + 1 ,
+								'cabin' => $oldPrice->getCabin(),
+								'cruise' => $oldPrice->getCruise(),
+								'tariff' => $oldPrice->getTariff(),
+								'meals' => $oldPrice->getMeals(),
+							]);
+							
+				if(null === $newPrice)
+				{
+					return $this->redirectToRoute('invoice', ['hash'=>$hash]);
+				}
+				//dump($newPrice);			
+				$orderItemPlace->setPrice($newPrice);		
+				//$orderItemPlace->setPriceValue($newPrice->getPrice());		
+			}
+
+		}
+		
+		$newOrderItemPlace = new OrderItemPlace();
+		$newOrderItemPlace->setOrderItem($orderItem);
+		$em->persist($newOrderItemPlace);
+		$orderItem->addOrderItemPlace($newOrderItemPlace);		
+		
+		$em->flush();
+		return $this->redirectToRoute('invoice', ['hash'=>$hash]);
 	}
 
 	
@@ -191,6 +362,34 @@ class OrderController extends Controller
 				
 				
 			}
+			// ищем другие варианты размещений 
+			$prices = $em->createQueryBuilder()
+					->select("price")
+					->from("CruiseBundle:Price","price")
+					->leftJoin("price.cabin","cabin")
+					->leftJoin("cabin.rooms", "room")
+					->andWhere("room.id = ".$orderItem->getRoom()->getId())
+					->andWhere("price.cruise = ".$order->getCruise()->getId())
+					->groupBy("price.place")
+					->getQuery()
+					->getResult()
+				;
+			$places = ['add'=>false,'remove'=>false];
+			foreach($prices as $price)
+			{
+				if($price->getPlace()->getRpId() > $orderItem->getPlace()->getRpId() )
+				{
+					$places['add'] = true;
+				}
+				if($price->getPlace()->getRpId() < $orderItem->getPlace()->getRpId() )
+				{
+					$places['remove'] = true;
+				}
+				
+				
+			}
+			$orderItem->otherPlaces = $places;			
+			
 		}
 		if(($order->getSesonDiscount() === null) && ($order->getCruise()->getShip()->getTurOperator()->getCode() !== 'vodohod'))
 		{
@@ -331,6 +530,14 @@ class OrderController extends Controller
 				
 				
 				$room = $em->getRepository("CruiseBundle:ShipRoom")->findOneById($room_id);
+				
+				
+				$available_rooms = $this->get('cruise')->getRooms($cruise->getId());
+				
+				if(!in_array($room,$available_rooms))
+				{
+					return new Response("Каюта уже занята");
+				}
 				
 				if($room->getCountPassMax() !==  null)
 				{

@@ -166,7 +166,7 @@
  <div style="border:1px solid #aaa; margin-bottom:10px;">
    
 	<div class="col-xs-12">
-		<p {% if orderItem.vars.data.typeDiscount != null %} style="color:red" {% endif %}><b>Каюта № {{orderItem.vars.data.room.number}} {{ orderItem.vars.data.room.cabin.type.name }}</b></p>
+		<p {% if orderItem.vars.data.typeDiscount != null %} style="color:red" {% endif %}><b>Каюта № {{orderItem.vars.data.room.number}} {{ orderItem.vars.data.room.cabin.type.name }}</b>&nbsp;&nbsp;&nbsp; {% if is_granted('ROLE_MANAGER') and orderItem.vars.data.otherPlaces.add  %}<a class="btn btn-warning add_place" href="{{path('invoice_add_place',{'hash':order.idHash,'room':orderItem.vars.data.room.id})}}">Добавить место в каюту</a>{% endif %} &nbsp;&nbsp;&nbsp; {% if is_granted('ROLE_MANAGER') %} <a class="btn btn-danger del_room" href="{{path('invoice_remove_room',{'hash':order.idHash, 'orderitem':orderItem.vars.data.id})}}">Удалить каюту</a> {% endif %}</p>
 	</div>
 	
 	
@@ -176,7 +176,7 @@
 			<p><b>Место {{i+1}}</b></p>
 		</div>
 		<div class="col-xs-6">
-			<p> <a href="{{path('boarding_card',{'hash':orderItemPlace.vars.data.idHash})}}" class="btn btn-success">Посадочный талон</a> </p>
+			<p> <a href="{{path('boarding_card',{'hash':orderItemPlace.vars.data.idHash})}}" class="btn btn-success">Посадочный талон</a>&nbsp;&nbsp;&nbsp; {% if is_granted('ROLE_MANAGER') and orderItem.vars.data.otherPlaces.remove  %}<a class="btn btn-danger del_place" href="{{path('invoice_remove_place',{'hash':order.idHash,'place':orderItemPlace.vars.data.id})}}">Удалить место</a>{% endif %}</p>
 		</div>
 		<div class="row">
 			<div class="col-sm-1"><p style="text-align:right;">ФИО</p></div>
@@ -294,7 +294,7 @@
 
 
 
-{{ form_row(form.submit, {'label':'Сохранить'}) }}
+{{ form_row(form.submit, {'label':'Сохранить', 'attr':{'class':'btn btn-primary'}}) }}
 
 {{ form_end(form) }}
 
@@ -310,15 +310,19 @@
 
 {% if is_granted('ROLE_MANAGER') %}
 <p>Добавить каюту</p>
-<select name="" id="">
+<select name="" id="add_room_select">
 {% for cabin in cabins %}
 	{% for placeName,price in cabin.price  %}
 		{% for room in cabin.rooms  %}
-			<option value="{{room.id}}-{{price}}">{{room.number}} {{placeName}}</option>
+			<option data-room-id="{{room.id}}" data-place-id="{{price}}" value="{{room.id}}-{{price}}">{{room.number}} {{placeName}}</option>
 		{% endfor %}
 	{% endfor %}
 {% endfor %}
 </select>
+&nbsp;
+<button class="btn btn-warning add_room">Добавить каюту</button>
+
+
 {% endif %}
 
 {% endblock %}
@@ -338,6 +342,24 @@
 	});
 	
 	$('.tariff-price').trigger('change');
+	
+	$('.del_place').click(function(){
+		if (!confirm("Удалить?")) return false;
+	});	
+	$('.add_place').click(function(){
+		if (!confirm("Добавить?")) return false;
+	});
+
+	$('.del_room').click(function(){
+		if (!confirm("Удалить?")) return false;
+	});
+	$('.add_room').click(function(){
+		if (!confirm("Добавить?")) return false;
+		roomId = $('#add_room_select option:selected').attr('data-room-id');
+		placeId = $('#add_room_select option:selected').attr('data-place-id');
+		document.location.replace("{{path('invoice_add_room',{'hash':order.idHash})}}?room="+roomId+"&place="+placeId);
+	});	
+	
 	
 	
 	$('#b2t').click(function(){
