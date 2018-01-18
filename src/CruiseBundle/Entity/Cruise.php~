@@ -483,4 +483,28 @@ class Cruise
     {
         return $this->roomDiscount;
     }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     *
+     * @return Cruise
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
 }

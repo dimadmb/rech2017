@@ -43,6 +43,14 @@ class TurOperator
      */
     private $inSale;
 	
+
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="text_cruise", type="text", nullable=true)
+     */
+    private $text_cruise;
 	
 	/**
 	 * @ORM\OneToMany(targetEntity="Ship", mappedBy="turOperator")

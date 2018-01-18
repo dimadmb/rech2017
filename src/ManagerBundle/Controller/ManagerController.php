@@ -95,6 +95,8 @@ class ManagerController extends Controller
 										->orderBy('s.name', 'ASC');
 										},
 										
+										'label'=>"Теплоход"
+										
 
 															])
 								
@@ -106,6 +108,7 @@ class ManagerController extends Controller
 										'Оплачен' => 3,
 										'Переплата' => 4,
 									),
+									'label'=>"Оплата"
 								])								
 				->add('del', CheckboxType::class,[
 								'required'=> false,
@@ -113,9 +116,11 @@ class ManagerController extends Controller
 								])
 				->add('region',EntityType::class,[
 								'required'=> false,
-								'class' => Region::class,				
+								'class' => Region::class,
+								'label'=>"Регион"								
 								])
-				->add('buyer',TextType::class,['required'=> false])
+				->add('buyer',TextType::class,['required'=> false,'label'=>"Покупатель"])
+				->add('agency',TextType::class,['required'=> false,'label'=>"Агентство"])
 				->add('submit', SubmitType::class,array('label' => 'Фильтровать'))
 				->getForm()
 			;	
@@ -162,6 +167,17 @@ class ManagerController extends Controller
 							$qb->expr()->like('b.phone', ':buyer') 
 							));
 			$qb->setParameter('buyer', '%'.$search['buyer'].'%');				
+			
+		}
+		if(isset($search['agency']))
+		{
+			$qb->leftJoin('o.agency','a');			
+			$qb->andWhere($qb->expr()->orX(
+							$qb->expr()->like('a.name', ':agency') , 
+							$qb->expr()->like('a.shortName', ':agency') , 
+							$qb->expr()->like('a.phone', ':agency') 
+							));
+			$qb->setParameter('agency', '%'.$search['agency'].'%');				
 			
 		}
 		

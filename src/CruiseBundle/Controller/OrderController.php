@@ -207,7 +207,7 @@ class OrderController extends Controller
 			}
 		}
 		
-		if( $allow_order && ($order->getCruise()->getShip()->getTurOperator()->getCode() === 'mosturflot'))
+		if( $allow_order && ($order->getCruise()->getShip()->getTurOperator()->getCode() === 'mosturflot') && $order->getActive())
 		{
 			$this->get('cruise')->createOrderMosturflot($order, $allow_pay);
 		}

@@ -286,9 +286,15 @@ class Cruise
 		if($order->getOuterId() !== null)
 		{
 			$url = "https://booking.mosturflot.ru/api?userhash=60b5fe8b827586ece92f85865c186513ed3e7bfa&section=rivercruises&request=ordercancel&orderid=".$order->getOuterId();
+			$xml = simplexml_load_string($this->curl_get_file_contents($url));
+			
+			
+			
 			
 			$order->setOuterId(null);
 			$this->doctrine->getManager()->flush();
+			
+			
 		}
 		
 		return null;
@@ -408,7 +414,7 @@ class Cruise
 		$message = \Swift_Message::newInstance()
 							->setSubject('Удаление заявки '.$order->getId())
 							->setFrom('test-rech-agent@yandex.ru')
-							->setTo(['dkochetkov@vodohod.ru','info@reach-agent.ru'])
+							->setTo(['dkochetkov@vodohod.ru','info@rech-agent.ru','spb@rech-agent.ru'])
 							->setBody("Заявка № ".$order->getId()." удалена")
 						;
         $this->mailer->send($message);		
@@ -482,12 +488,14 @@ class Cruise
 							'cabinDeck' => $orderItem->getRoom()->getCabin()->getDeck()->getName(),
 							'orderItemPlace' =>$orderItemPlace,
 							
+							
 						];
 					$itogo['price'] += 	$price ;
 					$itogo['discount'] += 	$discount;
 					$itogo['priceDiscount'] += 	$priceDiscount;
 					$itogo['fee_summ'] += 	$fee_summ;
-						
+					
+					isset($itogo['tariffs'][$orderItemPlace->getPrice()->getTariff()->getName()]) ? $itogo['tariffs'][$orderItemPlace->getPrice()->getTariff()->getName()]++ : $itogo['tariffs'][$orderItemPlace->getPrice()->getTariff()->getName()] = 1;	
 				}
 			}
 			$itogo['pays'] = $order->getPays();

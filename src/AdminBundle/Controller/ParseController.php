@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 use CruiseBundle\Entity\Agency;
+use CruiseBundle\Entity\Ordering;
 use BaseBundle\Entity\Page;
 use BaseBundle\Entity\Image;
 use CruiseBundle\Entity\RoomDiscount;
@@ -71,6 +72,72 @@ class ParseController extends Controller
 		dump($cruises);
 		
 		return new Response("OK");
+	}
+	
+	/**
+	 * @Route("/invoice_parse/{invoice_id}", name="invoice_parse" )
+     */		
+	public function invoiceParse($invoice_id = null)
+	{
+		$em = $this->getDoctrine()->getManager();
+		$em_booking = $this->getDoctrine()->getManager('booking');	
+
+		$connection_booking = $em_booking->getConnection();
+
+		$sql = "
+			select  id_tur
+			from aa_schet
+			where id = $invoice_id
+		";	
+		$statement = $connection_booking->prepare($sql);
+		$statement->execute();		
+		$res = $statement->fetchColumn();	
+		
+		dump($res);
+		
+		
+		$cruise = $em->getRepository("CruiseBundle:Cruise")->findOneById($res);
+		
+		dump($cruise); 
+		
+		$sql = "
+			select * 
+			from aa_order
+			where aa_order.id_schet = $invoice_id
+		";	
+		$statement = $connection_booking->prepare($sql);
+		$statement->execute();
+		$results = $statement->fetchAll();	
+
+		dump($results);
+		
+		//$order = new Ordering();
+		$arr = [];
+		
+		foreach($results as $result)
+		{
+			///  создать заказ 
+			//$room = $em->getRepository("CruiseBundle:ShipRoom")->findOneByNumber($result['num']);
+			
+			$room = $em->createQueryBuilder()
+					->select('r')
+					->from("CruiseBundle:ShipRoom", "r")
+					->leftJoin("r.cabin","cab")
+					->leftJoin("cab.ship" , "ship")
+					->leftJoin("ship.cruises","c")
+					
+					->where("c.id = ".$res)
+					->andWhere("r.number = ".$result['num'])
+					->getQuery()
+					->getOneOrNullResult()
+				;
+			
+			
+			$arr[$room->getId()] =  $result['places'];
+		}
+		dump(http_build_query(['rooms'=>$arr,'cruise'=>$cruise->getId()]));
+		
+		return new Response("OK");		
 	}
 	
 	/**

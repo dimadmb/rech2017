@@ -43,6 +43,14 @@ class TurOperator
      */
     private $inSale;
 	
+
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="text_cruise", type="text", nullable=true)
+     */
+    private $text_cruise;
 	
 	/**
 	 * @ORM\OneToMany(targetEntity="Ship", mappedBy="turOperator")
@@ -173,5 +181,29 @@ class TurOperator
     public function getCode()
     {
         return $this->code;
+    }
+
+    /**
+     * Set textCruise
+     *
+     * @param string $textCruise
+     *
+     * @return TurOperator
+     */
+    public function setTextCruise($textCruise)
+    {
+        $this->text_cruise = $textCruise;
+
+        return $this;
+    }
+
+    /**
+     * Get textCruise
+     *
+     * @return string
+     */
+    public function getTextCruise()
+    {
+        return $this->text_cruise;
     }
 }

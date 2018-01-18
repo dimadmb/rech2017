@@ -426,6 +426,8 @@ class OrderItemPlace
      */
     public function setPriceValue()
     {
+		//dump("зашли");
+		
 		$priceValue  = 0;
 		
 		if(($this->orderItem->getTypeDiscount() !== null) && ($this->price !== null))
@@ -531,5 +533,29 @@ class OrderItemPlace
     public function getSurcharge()
     {
         return $this->surcharge;
+    }
+
+    /**
+     * Set gender
+     *
+     * @param \CruiseBundle\Entity\Gender $gender
+     *
+     * @return OrderItemPlace
+     */
+    public function setGender(\CruiseBundle\Entity\Gender $gender = null)
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    /**
+     * Get gender
+     *
+     * @return \CruiseBundle\Entity\Gender
+     */
+    public function getGender()
+    {
+        return $this->gender;
     }
 }

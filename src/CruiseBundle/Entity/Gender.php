@@ -69,4 +69,3 @@ class Gender
         return $this->name;
     }
 }
-

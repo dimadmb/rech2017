@@ -636,4 +636,28 @@ class Ordering
 		$hashids_schet = new \Hashids\Hashids($schet_salt,32);
 		return $hashids_schet->encode($this->id);
 	}
+
+    /**
+     * Set outerId
+     *
+     * @param integer $outerId
+     *
+     * @return Ordering
+     */
+    public function setOuterId($outerId)
+    {
+        $this->outerId = $outerId;
+
+        return $this;
+    }
+
+    /**
+     * Get outerId
+     *
+     * @return integer
+     */
+    public function getOuterId()
+    {
+        return $this->outerId;
+    }
 }

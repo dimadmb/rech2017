@@ -2,7 +2,7 @@
 
 {% block body %}
 
-{#{dump(cabins)}#}
+{#{dump(orderPrice)}#}
 
 {#% for room in rooms %}
 	<span style="padding:10px; margin:5px;">{{room.number}}</span>
@@ -284,7 +284,13 @@
 	{% endif %}	
 {% endif %}	
 </div>	
+<div class="row">
+{% for tariffName,count in orderPrice.itogo.tariffs %}
+	<div class="col-sm-12">{{tariffName}} - {{count}}</div>
+{% endfor %}	
 
+</div>
+<br>
 
 
 
