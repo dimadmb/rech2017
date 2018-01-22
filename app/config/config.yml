@@ -96,27 +96,27 @@ doctrine:
             #   2. Uncomment database_path in parameters.yml.dist
             #   3. Uncomment next line:
             #     path:     "%database_path%"
-          booking:
-            driver: pdo_mysql
-            host:     "%database_host%"
-            port:     "%database_port%"			
-            dbname:   "%database_booking_name%"
-            user:     "%database_booking_user%"
-            password: "%database_booking_password%"
-            charset:  UTF8
-            mapping_types:
-                enum: string
-
-          ra:
-            driver: pdo_mysql
-            host:     "%database_host%"
-            port:     "%database_port%"			
-            dbname:   dkocheuj_ra
-            user:     dkocheuj_ra
-            password: kopter2045
-            charset:  UTF8
-            mapping_types:
-                enum: string
+#          booking:
+#            driver: pdo_mysql
+#            host:     "%database_host%"
+#            port:     "%database_port%"			
+#            dbname:   "%database_booking_name%"
+#            user:     "%database_booking_user%"
+#            password: "%database_booking_password%"
+#            charset:  UTF8
+#            mapping_types:
+#                enum: string
+#
+#          ra:
+#            driver: pdo_mysql
+#            host:     "%database_host%"
+#            port:     "%database_port%"			
+#            dbname:   dkocheuj_ra
+#            user:     dkocheuj_ra
+#            password: kopter2045
+#            charset:  UTF8
+#            mapping_types:
+#                enum: string
 
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
@@ -130,11 +130,11 @@ doctrine:
                     BaseBundle: ~
                     CruiseBundle: ~
 
-            booking:
-                connection:       booking
-
-            ra:
-                connection:       ra
+#            booking:
+#                connection:       booking
+#
+#            ra:
+#                connection:       ra
 
 
 
