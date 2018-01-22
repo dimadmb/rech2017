@@ -82,7 +82,7 @@ class ReportController extends Controller
 		}
 		$aSheet->setCellValue(   'G18', $fio  );
 
-		if((null !== $orderItemPlace->getPassSeria()) &&  (null !== $orderItemPlace->getPassNum()) &&  (null !== $orderItemPlace->getPassDate()) &&  (null !== $orderItemPlace->getPassWho())   )
+		if(/*(null !== $orderItemPlace->getPassSeria()) && */ (null !== $orderItemPlace->getPassNum()) &&  (null !== $orderItemPlace->getPassDate()) &&  (null !== $orderItemPlace->getPassWho())   )
 		$aSheet->setCellValue(   'G19',
 			$orderItemPlace->getTypeDoc()->getName().', серия '.
 			$orderItemPlace->getPassSeria()
