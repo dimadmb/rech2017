@@ -450,6 +450,7 @@ class Cruise
 						'priceDiscount' => 0,
 						'fee_summ' => 0,
 						'pay' =>0,
+						'nds' =>0,
 						'tariffs' => []
 						];
 						
@@ -468,22 +469,40 @@ class Cruise
 					
 					$surcharge = $orderItemPlace->getSurcharge();
 					
+					
+					
 					$price += + $surcharge;
 					
+					
+					
 					$priceDiscount = round( $price * (100 - $seson) * (100 - $permanent) /10000) ;
+					
+					
 					$discount = $price - $priceDiscount;
 						
 					
 					$fee = $order->getFee();
-					$fee_summ = $fee * $priceDiscount / 100;			
+					$fee_summ = $fee * $priceDiscount / 100;
+
+
+					$nds = 0;
+					if($orderItemPlace->getTypePlace()->getNds())
+					{
+						$nds = round(($priceDiscount - $fee_summ)*18/118,2);
+					}
+					
+					
+					
+					//dump($nds);
 					
 					$items[] = [
-							'name' => $order->getCruise()->getName().', ' .$order->getCruise()->getStartDate()->format('d.m.Y'). ' - ' .$order->getCruise()->getEndDate()->format('d.m.Y'). ', '.$order->getCruise()->getShip()->getName().', каюта '.$orderItem->getRoom()->getNumber() ,
+							'name' => $order->getCruise()->getName().', ' .$order->getCruise()->getStartDate()->format('d.m.Y'). ' - ' .$order->getCruise()->getEndDate()->format('d.m.Y'). ', '.$order->getCruise()->getShip()->getName().', каюта '.$orderItem->getRoom()->getNumber(). " ".$orderItemPlace->getTypePlace()->getName() ,
 							'price' => $price,
 							'seson' => $seson,
 							'permanent' => $permanent,
 							'discount' => $discount,
 							'priceDiscount' => $priceDiscount,
+							'nds' => $nds,
 							'fee' => $fee,
 							'fee_summ' => $fee_summ,
 							'number' => $orderItem->getRoom()->getNumber(),
@@ -497,6 +516,7 @@ class Cruise
 					$itogo['discount'] += 	$discount;
 					$itogo['priceDiscount'] += 	$priceDiscount;
 					$itogo['fee_summ'] += 	$fee_summ;
+					$itogo['nds'] += 	$nds;
 					
 					
 					if(null !== $orderItemPlace->getPrice())

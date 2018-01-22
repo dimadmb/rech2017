@@ -182,4 +182,28 @@ class TurOperator
     {
         return $this->code;
     }
+
+    /**
+     * Set textCruise
+     *
+     * @param string $textCruise
+     *
+     * @return TurOperator
+     */
+    public function setTextCruise($textCruise)
+    {
+        $this->text_cruise = $textCruise;
+
+        return $this;
+    }
+
+    /**
+     * Get textCruise
+     *
+     * @return string
+     */
+    public function getTextCruise()
+    {
+        return $this->text_cruise;
+    }
 }

@@ -187,9 +187,9 @@ class OrderController extends Controller
 	}
 	/**
 	 * Добавить место в каюту	
-     * @Route("/order/add_place/{hash}/{room}", name="invoice_add_place")
+     * @Route("/order/add_place/{hash}/{room}/{type}", name="invoice_add_place")
      */
-    public function invoiceAddPlaceAction(Request $request,$hash,ShipRoom $room)
+    public function invoiceAddPlaceAction(Request $request,$hash,ShipRoom $room, $type = null)
     {
 		$em = $this->getDoctrine()->getManager();
 		$orderItem = $em->createQueryBuilder()
@@ -203,44 +203,67 @@ class OrderController extends Controller
 			->getOneOrNullResult()
 		;
 		
-		// место на одно больше 
-		$place = $em->getRepository("CruiseBundle:ShipCabinPlace")
-						->findOneByRpId( $orderItem->getPlace()->getRpId() + 1 );
-		if(null === $place)
+		
+		if($type === null)
 		{
-			return $this->redirectToRoute('invoice', ['hash'=>$hash]);
+			// место на одно больше 
+			$place = $em->getRepository("CruiseBundle:ShipCabinPlace")
+							->findOneByRpId( $orderItem->getPlace()->getRpId() + 1 );
+			if(null === $place)
+			{
+				return $this->redirectToRoute('invoice', ['hash'=>$hash]);
+			}
+			
+			$orderItem->setPlace($place);
+
+			// прайс на размещение выше
+			foreach($orderItem->getOrderItemPlaces() as $orderItemPlace)
+			{
+				$oldPrice = $orderItemPlace->getPrice();
+				if(null !== $oldPrice)
+				{
+					$newPrice = $em->getRepository("CruiseBundle:Price")
+								->findOneBy([
+									'place' => $oldPrice->getPlace()->getRpId() + 1 ,
+									'cabin' => $oldPrice->getCabin(),
+									'cruise' => $oldPrice->getCruise(),
+									'tariff' => $oldPrice->getTariff(),
+									'meals' => $oldPrice->getMeals(),
+								]);
+								
+					if(null === $newPrice)
+					{
+						return $this->redirectToRoute('invoice', ['hash'=>$hash]);
+					}
+					//dump($newPrice);			
+					$orderItemPlace->setPrice($newPrice);		
+					//$orderItemPlace->setPriceValue($newPrice->getPrice());		
+				}
+
+			}			
 		}
 		
-		$orderItem->setPlace($place);
 
-		// прайс на размещение выше
-		foreach($orderItem->getOrderItemPlaces() as $orderItemPlace)
-		{
-			$oldPrice = $orderItemPlace->getPrice();
-			if(null !== $oldPrice)
-			{
-				$newPrice = $em->getRepository("CruiseBundle:Price")
-							->findOneBy([
-								'place' => $oldPrice->getPlace()->getRpId() + 1 ,
-								'cabin' => $oldPrice->getCabin(),
-								'cruise' => $oldPrice->getCruise(),
-								'tariff' => $oldPrice->getTariff(),
-								'meals' => $oldPrice->getMeals(),
-							]);
-							
-				if(null === $newPrice)
-				{
-					return $this->redirectToRoute('invoice', ['hash'=>$hash]);
-				}
-				//dump($newPrice);			
-				$orderItemPlace->setPrice($newPrice);		
-				//$orderItemPlace->setPriceValue($newPrice->getPrice());		
-			}
-
-		}
 		
 		$newOrderItemPlace = new OrderItemPlace();
 		$newOrderItemPlace->setOrderItem($orderItem);
+		
+		$typePlace = null;
+		switch($type)
+		{
+			case null: 
+					$typePlace = $em->getRepository("CruiseBundle:TypePlace")->findOneByCode("main");
+					break;
+			case 'add':
+					$typePlace = $em->getRepository("CruiseBundle:TypePlace")->findOneByCode("add");
+					break;			
+			case 'without':
+					$typePlace = $em->getRepository("CruiseBundle:TypePlace")->findOneByCode("without");
+					break;			
+		}
+		
+		$newOrderItemPlace->setTypePlace($typePlace);
+		
 		$em->persist($newOrderItemPlace);
 		$orderItem->addOrderItemPlace($newOrderItemPlace);		
 		
@@ -388,6 +411,7 @@ class OrderController extends Controller
 				
 				
 			}
+			
 			$orderItem->otherPlaces = $places;			
 			
 		}
@@ -523,7 +547,7 @@ class OrderController extends Controller
 			
 			$em->persist($order);
 			
-			
+			$mainTypePlace = $em->getRepository("CruiseBundle:TypePlace")->findOneByCode("main");
 			
 			foreach($basket_session['rooms'] as $room_id => $place_id)
 			{
@@ -570,6 +594,7 @@ class OrderController extends Controller
 				$orderItem->setOrdering($order);
 				$orderItem->setTypeDiscount($typeDiscount);
 				
+				
 				$em->persist($orderItem);
 				
 				$order->addOrderItem($orderItem);
@@ -578,6 +603,7 @@ class OrderController extends Controller
 				{
 					$orderItemPlace = new OrderItemPlace();
 					$orderItemPlace->setOrderItem($orderItem);
+					$orderItemPlace->setTypePlace($mainTypePlace);
 					$em->persist($orderItemPlace);
 					$orderItem->addOrderItemPlace($orderItemPlace);
 				}

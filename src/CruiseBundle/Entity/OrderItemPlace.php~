@@ -91,6 +91,15 @@ class OrderItemPlace
      * @ORM\Column(name="updated", type="datetime", nullable=true)
      */
     private $updated;
+
+
+	/**
+	 * @ORM\ManyToOne(targetEntity="TypePlace")
+	 */
+	private $typePlace;
+
+
+	
 	
 	
 	/**
@@ -413,7 +422,19 @@ class OrderItemPlace
 
 
 
+    /**
+     * Set priceValue
+     *
+     * @param string $priceValue
+     *
+     * @return OrderItemPlace
+     */
+    public function setPriceValue($priceValue)
+    {
+        $this->priceValue = $priceValue;
 
+        return $this;
+    }
 
     /**
      * Set priceValue
@@ -424,10 +445,10 @@ class OrderItemPlace
 	 * @ORM\PrePersist()	
 	 * @ORM\PreUpdate()		 
      */
-    public function setPriceValue()
+    public function setPrePriceValue()
     {
 		//dump("зашли");
-		
+				
 		$priceValue  = 0;
 		
 		if(($this->orderItem->getTypeDiscount() !== null) && ($this->price !== null))
@@ -558,4 +579,8 @@ class OrderItemPlace
     {
         return $this->gender;
     }
+
+
+
+
 }

@@ -2,7 +2,7 @@
 
 {% block body %}
 
-{#{dump(orderPrice)}#}
+{{dump(orderPrice)}}
 
 {#% for room in rooms %}
 	<span style="padding:10px; margin:5px;">{{room.number}}</span>
@@ -166,17 +166,17 @@
  <div style="border:1px solid #aaa; margin-bottom:10px;">
    
 	<div class="col-xs-12">
-		<p {% if orderItem.vars.data.typeDiscount != null %} style="color:red" {% endif %}><b>Каюта № {{orderItem.vars.data.room.number}} {{ orderItem.vars.data.room.cabin.type.name }}</b>&nbsp;&nbsp;&nbsp; {% if is_granted('ROLE_MANAGER') and orderItem.vars.data.otherPlaces.add  %}<a class="btn btn-warning add_place" href="{{path('invoice_add_place',{'hash':order.idHash,'room':orderItem.vars.data.room.id})}}">Добавить место в каюту</a>{% endif %} &nbsp;&nbsp;&nbsp; {% if is_granted('ROLE_MANAGER') %} <a class="btn btn-danger del_room" href="{{path('invoice_remove_room',{'hash':order.idHash, 'orderitem':orderItem.vars.data.id})}}">Удалить каюту</a> {% endif %}</p>
+		<p {% if orderItem.vars.data.typeDiscount != null %} style="color:red" {% endif %}><b>Каюта № {{orderItem.vars.data.room.number}} {{ orderItem.vars.data.room.cabin.type.name }}</b>&nbsp;&nbsp;&nbsp; {% if is_granted('ROLE_MANAGER') and orderItem.vars.data.otherPlaces.add  %}<a class="btn btn-warning add_place" href="{{path('invoice_add_place',{'hash':order.idHash,'room':orderItem.vars.data.room.id})}}">Добавить место в каюту</a>{% endif %} &nbsp;&nbsp;&nbsp; {% if is_granted('ROLE_MANAGER') %} <a class="btn btn-warning add_place" href="{{path('invoice_add_place',{'hash':order.idHash,'room':orderItem.vars.data.room.id,'type':'add'})}}">Добавить доп место в каюту</a>&nbsp;&nbsp;&nbsp;<a class="btn btn-warning add_place" href="{{path('invoice_add_place',{'hash':order.idHash,'room':orderItem.vars.data.room.id,'type':'without'})}}">Добавить пассажира без места в каюту</a>&nbsp;&nbsp;&nbsp;<a class="btn btn-danger del_room" href="{{path('invoice_remove_room',{'hash':order.idHash, 'orderitem':orderItem.vars.data.id})}}">Удалить каюту</a> {% endif %}</p>
 	</div>
 	
 	
 	{% for i, orderItemPlace in orderItem.orderItemPlaces %}
 		<div style="border:1px solid #aaa;">
 		<div class="col-xs-6">
-			<p><b>Место {{i+1}}</b></p>
+			<p><b>Место {{i+1}}</b>&nbsp;&nbsp;&nbsp; {{orderItemPlace.vars.data.typePlace.name}} </p>
 		</div>
 		<div class="col-xs-6">
-			<p> <a href="{{path('boarding_card',{'hash':orderItemPlace.vars.data.idHash})}}" class="btn btn-success">Посадочный талон</a>&nbsp;&nbsp;&nbsp; {% if is_granted('ROLE_MANAGER') and orderItem.vars.data.otherPlaces.remove  %}<a class="btn btn-danger del_place" href="{{path('invoice_remove_place',{'hash':order.idHash,'place':orderItemPlace.vars.data.id})}}">Удалить место</a>{% endif %}</p>
+			<p> <a href="{{path('boarding_card',{'hash':orderItemPlace.vars.data.idHash})}}" class="btn btn-success">Посадочный талон</a>&nbsp;&nbsp;&nbsp; {% if is_granted('ROLE_MANAGER') and (orderItem.vars.data.otherPlaces.remove or orderItemPlace.vars.data.typePlace.code != 'main') %}<a class="btn btn-danger del_place" href="{{path('invoice_remove_place',{'hash':order.idHash,'place':orderItemPlace.vars.data.id})}}">Удалить место</a>{% endif %}</p>
 		</div>
 		<div class="row">
 			<div class="col-sm-1"><p style="text-align:right;">ФИО</p></div>
@@ -220,9 +220,14 @@
 				{% endif %}
 				
 				
-				
-				{{ form_widget(orderItemPlace.price, {'attr':{'data-discount':discountValue, 'class':'tariff-price' }}) }}
+				{% if orderItemPlace.price is defined %}
+					{{ form_widget(orderItemPlace.price, {'attr':{'data-discount':discountValue, 'class':'tariff-price' }}) }}
+				{% elseif orderItemPlace.priceValue is defined %}
+					{{ form_widget(orderItemPlace.priceValue, {'attr':{'data-discount':discountValue, 'class':'tariff-price' }}) }}
 
+				{% else %}
+					{{orderItemPlace.vars.data.priceValue}}
+				{% endif %}	
 			</div>
 			
 			<div class="col-sm-3">
@@ -246,6 +251,8 @@
 			<div class="col-sm-2">
 				{% if orderItemPlace.surcharge is defined %}
 				{{ form_widget(orderItemPlace.surcharge) }}
+				{% else %}
+				{{orderItemPlace.vars.data.surcharge * 1}}
 				{% endif %}
 			</div>
 			

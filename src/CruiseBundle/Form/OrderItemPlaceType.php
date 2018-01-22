@@ -32,7 +32,7 @@ class OrderItemPlaceType extends AbstractType
 				$data  = $event->getData();
 				$form = $event->getForm();
 				
-					
+
 				
 				
 				
@@ -41,16 +41,25 @@ class OrderItemPlaceType extends AbstractType
 				
 				$prices = $cabin->getPrices();
 
+				if($data->getTypePlace()->getPrice())
+				{
+					$form->add('price', EntityType::class, [
+							'class' => Price::class,
+							'choices' => $prices,
+							'choice_attr' => function ($val, $key, $index) {
+									return ['data-price' => $val->getPrice()];
+								},
+							
+						])
+						;					
+				}
+				else
+				{
+					if($form->getConfig()->getOptions()['is_manager'])
+						$form->add('priceValue');	
+				}
 				
-				$form->add('price', EntityType::class, [
-						'class' => Price::class,
-						'choices' => $prices,
-						'choice_attr' => function ($val, $key, $index) {
-								return ['data-price' => $val->getPrice()];
-							},
-						
-					])
-					;	
+	
 					
 			
 

@@ -277,6 +277,13 @@ class ReportController extends Controller
 			
 			$aSheet->setCellValue("AH$row", $item['fee']);
 			
+			if($item['nds'] !== 0)
+			{
+				$aSheet->setCellValue("AS$row", '18%');
+				$aSheet->setCellValue("AW$row", $item['nds']);
+			}
+			
+			
 			$aSheet->setCellValue("AM$row", $item['fee_summ']);
 			
 			
@@ -287,15 +294,21 @@ class ReportController extends Controller
 		}
 
 		$row++;
-
+		
+		$itogo = $items['itogo']['priceDiscount'] - $items['itogo']['fee_summ'];
+		
 		$aSheet->setCellValue("Y$row", $items['itogo']['price']);
 		$aSheet->setCellValue("AM$row", $items['itogo']['fee_summ']);
+		$aSheet->setCellValue("BA$row", $itogo );
 
-		$itogo = $items['itogo']['priceDiscount'] - $items['itogo']['fee_summ'];
+		
 
-		$aSheet->setCellValue("BA$row", "");
+		//$aSheet->setCellValue("BA$row", "");
 
-		$row += 2;
+		$row ++;
+		$aSheet->mergeCells("BA{$row}:BE{$row}");
+		$aSheet->setCellValue("BA$row", $items['itogo']['nds']);
+		$row ++;
 
 		$aSheet->setCellValue("BA$row", $itogo );
 		$row++;

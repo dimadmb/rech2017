@@ -91,6 +91,15 @@ class OrderItemPlace
      * @ORM\Column(name="updated", type="datetime", nullable=true)
      */
     private $updated;
+
+
+	/**
+	 * @ORM\ManyToOne(targetEntity="TypePlace")
+	 */
+	private $typePlace;
+
+
+	
 	
 	
 	/**
@@ -413,7 +422,19 @@ class OrderItemPlace
 
 
 
+    /**
+     * Set priceValue
+     *
+     * @param string $priceValue
+     *
+     * @return OrderItemPlace
+     */
+    public function setPriceValue($priceValue)
+    {
+        $this->priceValue = $priceValue;
 
+        return $this;
+    }
 
     /**
      * Set priceValue
@@ -424,9 +445,14 @@ class OrderItemPlace
 	 * @ORM\PrePersist()	
 	 * @ORM\PreUpdate()		 
      */
-    public function setPriceValue()
+    public function setPrePriceValue()
     {
 		//dump("зашли");
+				
+		if(!$this->getTypePlace()->getPrice())
+		{
+			return $this;
+		}
 		
 		$priceValue  = 0;
 		
@@ -557,5 +583,33 @@ class OrderItemPlace
     public function getGender()
     {
         return $this->gender;
+    }
+
+
+
+
+
+    /**
+     * Set typePlace
+     *
+     * @param \CruiseBundle\Entity\TypePlace $typePlace
+     *
+     * @return OrderItemPlace
+     */
+    public function setTypePlace(\CruiseBundle\Entity\TypePlace $typePlace = null)
+    {
+        $this->typePlace = $typePlace;
+
+        return $this;
+    }
+
+    /**
+     * Get typePlace
+     *
+     * @return \CruiseBundle\Entity\TypePlace
+     */
+    public function getTypePlace()
+    {
+        return $this->typePlace;
     }
 }
