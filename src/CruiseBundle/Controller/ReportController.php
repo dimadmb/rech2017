@@ -171,23 +171,39 @@ class ReportController extends Controller
 		$phpTemplateObject->setValue('DAYS_1', $order->getCruise()->getDayCount() - 1 );
 
 		
-		$phpTemplateObject->cloneRow('NUM', count($items['items']));
+		$phpTemplateObject->cloneRow('NUM', $items['itogo']['countPass']);
 		
 		$i = 1;
 		foreach($items['items'] as $item)
 		{
-			$phpTemplateObject->setValue("NUM#$i", $item['number'] );
-			$phpTemplateObject->setValue("SUM#$i", $item['priceDiscount'] );
-			$phpTemplateObject->setValue("CLASS#$i", $item['cabinType'] );
-			$phpTemplateObject->setValue("DECK#$i", $item['cabinDeck'] );
-			
-			
-			$phpTemplateObject->setValue("PASS#$i", $item['orderItemPlace']->getLastName(). " ".$item['orderItemPlace']->getName(). " ".$item['orderItemPlace']->getFatherName() );
-			
-			
-			$i++;
+			if($item['orderItemPlace'] !== null)
+			{
+				$phpTemplateObject->setValue("NUM#$i", $item['number'] );
+				$phpTemplateObject->setValue("SUM#$i", $item['priceDiscount'] );
+				$phpTemplateObject->setValue("CLASS#$i", $item['cabinType'] );
+				$phpTemplateObject->setValue("DECK#$i", $item['cabinDeck'] );
+				
+				$phpTemplateObject->setValue("PASS#$i", $item['orderItemPlace']->getLastName(). " ".$item['orderItemPlace']->getName(). " ".$item['orderItemPlace']->getFatherName() );
+				
+				
+				$i++;				
+			}
 		}
 		
+
+		$phpTemplateObject->cloneRow('SERVICE_NAME', $items['itogo']['countService']);
+		
+		$i = 1;
+		foreach($items['items'] as $item)
+		{
+			if($item['orderItemPlace'] === null)
+			{
+				$phpTemplateObject->setValue("SERVICE_NAME#$i", $item['name'] );
+				$phpTemplateObject->setValue("SERVICE_PRICE#$i", $item['priceDiscount'] );
+				$i++;				
+			}
+		}			
+
 		$phpTemplateObject->setValue('SUM_ALL', $items['itogo']['priceDiscount'] );
 		$phpTemplateObject->setValue('SUM_ALL_PROPIS', $this->get('num2str')->num2str($items['itogo']['priceDiscount']) );
 		

@@ -449,6 +449,11 @@ class OrderItemPlace
     {
 		//dump("зашли");
 				
+		if(!$this->getTypePlace()->getPrice())
+		{
+			return $this;
+		}
+		
 		$priceValue  = 0;
 		
 		if(($this->orderItem->getTypeDiscount() !== null) && ($this->price !== null))
@@ -583,4 +588,28 @@ class OrderItemPlace
 
 
 
+
+    /**
+     * Set typePlace
+     *
+     * @param \CruiseBundle\Entity\TypePlace $typePlace
+     *
+     * @return OrderItemPlace
+     */
+    public function setTypePlace(\CruiseBundle\Entity\TypePlace $typePlace = null)
+    {
+        $this->typePlace = $typePlace;
+
+        return $this;
+    }
+
+    /**
+     * Get typePlace
+     *
+     * @return \CruiseBundle\Entity\TypePlace
+     */
+    public function getTypePlace()
+    {
+        return $this->typePlace;
+    }
 }

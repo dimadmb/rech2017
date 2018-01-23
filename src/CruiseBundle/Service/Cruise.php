@@ -424,6 +424,8 @@ class Cruise
 	{
 		$em = $this->doctrine->getManager();
 		
+		$order_id = $order->getId();
+		
 		$order = $em->createQueryBuilder()
 			->select('o,oi,oip,price,room,cabin,cabin_type,cabin_deck,typeDiscount,pay')
 			->from('CruiseBundle:Ordering','o')
@@ -442,7 +444,18 @@ class Cruise
 			->getQuery()
 			->getOneOrNullResult()
 		;
-
+		
+		if(null === $order)
+		{
+			$order = $order = $em->createQueryBuilder()
+				->select('o')
+				->from('CruiseBundle:Ordering','o')
+				->where('o.id = '.$order_id)
+				->getQuery()
+				->getOneOrNullResult()
+			;			
+		}
+		
 		// создать массив заказа со всеми суммами и скидками
 		$items = [];
 		$itogo = [		'price' => 0,
@@ -451,12 +464,20 @@ class Cruise
 						'fee_summ' => 0,
 						'pay' =>0,
 						'nds' =>0,
+						'countPass' => 0,
+						'countService' => 0,
 						'tariffs' => []
 						];
 						
 						
 		if(null !== $order)	
 		{
+			$seson = $order->getSesonDiscount();
+			$permanent = $order->getPermanentDiscount();
+			$fee = $order->getFee();
+			
+			
+
 			foreach($order->getOrderItems() as $orderItem)
 			{
 				
@@ -464,37 +485,23 @@ class Cruise
 				foreach($orderItem->getOrderItemPlaces() as $orderItemPlace)
 				{
 					$price = $orderItemPlace->getPriceValue();
-					$seson = $order->getSesonDiscount();
-					$permanent = $order->getPermanentDiscount();
-					
 					$surcharge = $orderItemPlace->getSurcharge();
-					
-					
-					
-					$price += + $surcharge;
-					
-					
-					
-					$priceDiscount = round( $price * (100 - $seson) * (100 - $permanent) /10000) ;
-					
-					
-					$discount = $price - $priceDiscount;
-						
-					
-					$fee = $order->getFee();
-					$fee_summ = $fee * $priceDiscount / 100;
 
+					$price += + $surcharge;
+
+					$priceDiscount = round( $price * (100 - $seson) * (100 - $permanent) /10000) ;
+
+					$discount = $price - $priceDiscount;
+
+					
+					$fee_summ = $fee * $priceDiscount / 100;
 
 					$nds = 0;
 					if($orderItemPlace->getTypePlace()->getNds())
 					{
 						$nds = round(($priceDiscount - $fee_summ)*18/118,2);
 					}
-					
-					
-					
-					//dump($nds);
-					
+
 					$items[] = [
 							'name' => $order->getCruise()->getName().', ' .$order->getCruise()->getStartDate()->format('d.m.Y'). ' - ' .$order->getCruise()->getEndDate()->format('d.m.Y'). ', '.$order->getCruise()->getShip()->getName().', каюта '.$orderItem->getRoom()->getNumber(). " ".$orderItemPlace->getTypePlace()->getName() ,
 							'price' => $price,
@@ -509,14 +516,13 @@ class Cruise
 							'cabinType' => $orderItem->getRoom()->getCabin()->getType()->getComment(),
 							'cabinDeck' => $orderItem->getRoom()->getCabin()->getDeck()->getName(),
 							'orderItemPlace' =>$orderItemPlace,
-							
-							
 						];
 					$itogo['price'] += 	$price ;
 					$itogo['discount'] += 	$discount;
 					$itogo['priceDiscount'] += 	$priceDiscount;
 					$itogo['fee_summ'] += 	$fee_summ;
 					$itogo['nds'] += 	$nds;
+					$itogo['countPass']++ ;
 					
 					
 					if(null !== $orderItemPlace->getPrice())
@@ -526,6 +532,44 @@ class Cruise
 						
 				}
 			}
+			
+			foreach($order->getService() as $service)
+			{
+				$price = $service->getPriceValue();
+				
+				$priceDiscount = round( $price * (100 - $seson*(int)$service->getIsSesonDiscount()) * (100 - $permanent*(int)$service->getIsPermanentDiscount()) /10000) ;
+				
+				$discount = $price - $priceDiscount;
+				
+				$fee_summ = $fee * $priceDiscount * (int)$service->getIsFee()/ 100;
+				
+				$nds = round(($priceDiscount - $fee_summ)*18/118,2);
+				
+				
+				$items[] = [
+						'name' => $service->getName(),
+						'price' => $price,
+						'seson' => $seson,
+						'permanent' => $permanent,
+						'discount' => $discount,
+						'priceDiscount' => $priceDiscount,
+						'nds' => $nds,
+						'fee' => $fee,
+						'fee_summ' => $fee_summ,
+						'number' => "",//$orderItem->getRoom()->getNumber(),
+						'cabinType' => "",//$orderItem->getRoom()->getCabin()->getType()->getComment(),
+						'cabinDeck' => "",//$orderItem->getRoom()->getCabin()->getDeck()->getName(),
+						'orderItemPlace' =>null,						
+				];
+				
+				$itogo['price'] += 	$price ;
+				$itogo['discount'] += 	$discount;
+				$itogo['priceDiscount'] += 	$priceDiscount;
+				$itogo['fee_summ'] += 	$fee_summ;
+				$itogo['nds'] += 	$nds;				
+				$itogo['countService']++ ;
+			}			
+			
 			$itogo['pays'] = $order->getPays();
 			foreach($order->getPays() as $key => &$pay)
 			{

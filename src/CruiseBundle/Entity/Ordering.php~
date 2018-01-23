@@ -133,6 +133,11 @@ class Ordering
 	 */
 	private $region;
 	
+	/**
+	 * @ORM\OneToMany(targetEntity="OrderItemService", mappedBy="order")
+	 */
+	private $service;
+	
 	
 	private $idHash;
 	
@@ -659,5 +664,39 @@ class Ordering
     public function getOuterId()
     {
         return $this->outerId;
+    }
+
+    /**
+     * Add service
+     *
+     * @param \CruiseBundle\Entity\OrderItemService $service
+     *
+     * @return Ordering
+     */
+    public function addService(\CruiseBundle\Entity\OrderItemService $service)
+    {
+        $this->service[] = $service;
+
+        return $this;
+    }
+
+    /**
+     * Remove service
+     *
+     * @param \CruiseBundle\Entity\OrderItemService $service
+     */
+    public function removeService(\CruiseBundle\Entity\OrderItemService $service)
+    {
+        $this->service->removeElement($service);
+    }
+
+    /**
+     * Get service
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getService()
+    {
+        return $this->service;
     }
 }

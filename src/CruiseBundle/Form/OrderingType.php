@@ -54,6 +54,13 @@ class OrderingType extends AbstractType
 					'entry_options' => ['label' => false , 'is_manager'=>$options['is_manager']],
 				]
 			)
+			->add('service',CollectionType::class,
+				[
+					'entry_type' => OrderItemServiceType::class,
+					'entry_options' => ['label' => false , 'is_manager'=>$options['is_manager']],
+					'label'=>false,
+				]
+			)
 			->add('submit',SubmitType::class)
 			
 			
