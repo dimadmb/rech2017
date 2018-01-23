@@ -380,7 +380,7 @@ class ApiController extends Controller
 		}
 		else // нет ошибок
 		{
-			
+			$mainTypePlace = $em->getRepository("CruiseBundle:TypePlace")->findOneByCode("main");
 			$order = new Ordering();
 			$order
 					->setFee($agency->getFee())
@@ -436,6 +436,7 @@ class ApiController extends Controller
 							->setPassDate(new \DateTime($placeItem['pass_date']))
 							->setPassWho($placeItem['pass_who'])
 							->setPrice($price)
+							->setTypePlace($mainTypePlace)
 						;
 					$orderItem->addOrderItemPlace($orderItemPlace);
 					$em->persist($orderItemPlace);
