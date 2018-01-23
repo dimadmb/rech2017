@@ -15,7 +15,6 @@ use CruiseBundle\Entity\ShipRoom;
 use CruiseBundle\Entity\Ordering;
 use CruiseBundle\Entity\OrderItem;
 use CruiseBundle\Entity\OrderItemPlace;
-use CruiseBundle\Entity\OrderItemService;
 
 
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -79,7 +78,6 @@ class OrderController extends Controller
 		
 	}
 
-
 	/**
      * @Route("/order/remove_service/{hash}/{service}", name="invoice_remove_service")
      */
@@ -109,7 +107,6 @@ class OrderController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		
 		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($this->get('cruise')->hashOrderDecode($hash));
-
 		$service = new OrderItemService();
 		
 		$service
@@ -117,7 +114,6 @@ class OrderController extends Controller
 		;
 		$em->persist($service);
 		$em->flush();
-
 		return $this->redirectToRoute('invoice', ['hash'=>$hash]);
 	}
 
@@ -148,7 +144,7 @@ class OrderController extends Controller
 	{
 		$em = $this->getDoctrine()->getManager();
 		
-		$mainTypePlace = $em->getRepository("CruiseBundle:TypePlace")->findOneByCode("main");		
+		$mainTypePlace = $em->getRepository("CruiseBundle:TypePlace")->findOneByCode("main");
 		
 		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($this->get('cruise')->hashOrderDecode($hash));
 		$room = $em->getRepository("CruiseBundle:ShipRoom")->findOneById($request->query->get("room"));
@@ -163,7 +159,7 @@ class OrderController extends Controller
 		}
 		
 		$orderItem = new OrderItem();
-		$orderItem->setRoom($room);
+		$orderItem->setRoom($room); 
 		$orderItem->setPlace($place);
 		$orderItem->setOrdering($order);
 		$orderItem->setTypeDiscount($typeDiscount);
@@ -176,7 +172,7 @@ class OrderController extends Controller
 		{
 			$orderItemPlace = new OrderItemPlace();
 			$orderItemPlace->setOrderItem($orderItem);
-			$orderItemPlace->setTypePlace($mainTypePlace);			
+			$orderItemPlace->setTypePlace($mainTypePlace);
 			$em->persist($orderItemPlace);
 			$orderItem->addOrderItemPlace($orderItemPlace);
 		}
@@ -196,6 +192,12 @@ class OrderController extends Controller
 		$em = $this->getDoctrine()->getManager();
 
 		$em->remove($place);
+		
+		if($place->getTypePlace()->getCode() !== 'main')
+		{
+			$em->flush();
+			return $this->redirectToRoute('invoice', ['hash'=>$hash]);			
+		}
 		
 		$orderItem  = $place->getOrderItem();
 		
@@ -333,7 +335,6 @@ class OrderController extends Controller
 		
 		$order = $em->createQueryBuilder()
 			->select('o,oi,oip,price,room,cabin')
-			//->select('o')
 			->from('CruiseBundle:Ordering','o')
 			->leftJoin('o.orderItems','oi')
 			->leftJoin('oi.orderItemPlaces','oip')
@@ -346,18 +347,6 @@ class OrderController extends Controller
 			->getQuery()
 			->getOneOrNullResult()
 		;
-		
-		
-		if(null === $order)
-		{
-			$order = $order = $em->createQueryBuilder()
-				->select('o')
-				->from('CruiseBundle:Ordering','o')
-				->where('o.id = '.$this->get('cruise')->hashOrderDecode($hash))
-				->getQuery()
-				->getOneOrNullResult()
-			;			
-		}
 	
 	
  

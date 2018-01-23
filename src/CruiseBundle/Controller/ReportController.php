@@ -39,8 +39,19 @@ class ReportController extends Controller
 
 		$dayFirst = $em->getRepository("CruiseBundle:ProgramItem")->findOneBy(["cruise"=>$cruise],['dateStart'=>'ASC']);
 		$dayLast = $em->getRepository("CruiseBundle:ProgramItem")->findOneBy(["cruise"=>$cruise],['dateStart'=>'DESC']);
+
+
 		
-		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject( __DIR__ .'/../Resources/report/boarding_card.xlsx');
+		if(($order->getRegion() !== null) && ($order->getRegion()->getId() == 2))
+		{
+			$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject( __DIR__ .'/../Resources/report//boarding_card_spb.xlsx');
+		}
+		else
+		{
+			$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject( __DIR__ .'/../Resources/report//boarding_card.xlsx');
+		}
+
+		
 		$phpExcelObject->setActiveSheetIndex(0);
 		$aSheet = $phpExcelObject->getActiveSheet();
 
@@ -386,69 +397,121 @@ class ReportController extends Controller
 		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($id);
 		$items = $this->get('cruise')->getOrderPrice($order);
 		
-		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject( __DIR__ .'/../Resources/report/invoice_fiz.xlsx');
+
+		
+		if(($order->getRegion() !== null) && ($order->getRegion()->getId() == 2))
+		{
+			$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject( __DIR__ .'/../Resources/report/invoice_fiz_spb.xlsx');
+		}
+		else
+		{
+			$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject( __DIR__ .'/../Resources/report/invoice_fiz.xlsx');
+		}
+		
+		
+		
 		
 		$phpExcelObject->setActiveSheetIndex(0);
 		$aSheet = $phpExcelObject->getActiveSheet();	
 
 
-	$aSheet->setCellValue("B11", "Оплата по счету № $id от ".$order->getCreated()->format('d.m.Y').'г.');
-	$aSheet->setCellValue("B13", "Счет на оплату № $id от ".$order->getCreated()->format('d.m.Y').'г.');
-	$aSheet->setCellValue("H17", $order->getBuyer()->getLastName().' '.$order->getBuyer()->getName().' '.$order->getBuyer()->getFatherName());
-	
-	
-	$col = count($items['items']);
-	if ($col > 1) $aSheet->insertNewRowBefore(21, $col - 1);
-	$row = 20;
-	
-	foreach($items['items'] as $item)
-	{
-		$aSheet->mergeCells("B{$row}:C{$row}");
-		$aSheet->mergeCells("D{$row}:X{$row}");
-		$aSheet->mergeCells("Y{$row}:AA{$row}");
-		$aSheet->mergeCells("AB{$row}:AC{$row}");
-		$aSheet->mergeCells("AD{$row}:AG{$row}");
-		$aSheet->mergeCells("AH{$row}:AL{$row}");
-		$aSheet->mergeCells("AM{$row}:AR{$row}");
-		$aSheet->mergeCells("AS{$row}:AW{$row}");
+		$aSheet->setCellValue("B11", "Оплата по счету № $id от ".$order->getCreated()->format('d.m.Y').'г.');
+		$aSheet->setCellValue("B13", "Счет на оплату № $id от ".$order->getCreated()->format('d.m.Y').'г.');
+		$aSheet->setCellValue("H17", $order->getBuyer()->getLastName().' '.$order->getBuyer()->getName().' '.$order->getBuyer()->getFatherName());
 		
-		$aSheet->setCellValue("B$row", $row - 19);
-		
-		$aSheet->setCellValue("D$row", $item['name']);
+		$col = count($items['items']);
 
-		$aSheet->setCellValue("Y$row", "1");
-		$aSheet->setCellValue("AB$row", "шт");
-		$aSheet->setCellValue("AD$row",  $item['priceDiscount']);
-		
-		
-		
+		if ($col > 1) $aSheet->insertNewRowBefore(21, $col - 1);
 
-		$aSheet->setCellValue("AS$row", $item['priceDiscount']);
+		$row = 20;
+		
+		foreach($items['items'] as $item)
+		{
+			$aSheet->mergeCells("B{$row}:C{$row}");
+			$aSheet->mergeCells("D{$row}:O{$row}");
+			$aSheet->mergeCells("P{$row}:R{$row}");
+			$aSheet->mergeCells("S{$row}:T{$row}");
+			$aSheet->mergeCells("U{$row}:X{$row}");
+			$aSheet->mergeCells("Y{$row}:AC{$row}");
+			$aSheet->mergeCells("AD{$row}:AG{$row}");
+			$aSheet->mergeCells("AH{$row}:AK{$row}");
+			$aSheet->mergeCells("AL{$row}:AO{$row}");
+			$aSheet->mergeCells("AP{$row}:AT{$row}");
+			//$aSheet->mergeCells("AW{$row}:AZ{$row}");
+			//$aSheet->mergeCells("BA{$row}:BE{$row}");
 
-		$aSheet->getRowDimension($row)->setRowHeight(20);
+
+			$aSheet->setCellValue("B$row", $row - 19);
+			
+			
+			$aSheet->setCellValue("D$row", $item['name']);
+
+
+			$aSheet->setCellValue("U$row", $item['price'] );
+			$aSheet->setCellValue("AD$row", $item['discount'] );
+
+			$aSheet->setCellValue("AH$row", 'Без НДС');
+			$aSheet->setCellValue("S$row", 'шт');
+
+			// добавлено
+			$aSheet->setCellValue("P$row","1");
+			
+			$aSheet->setCellValue("Y$row", $item['price']);
+			
+			//$aSheet->setCellValue("AH$row", $item['fee']);
+			
+			if($item['nds'] !== 0)
+			{
+				$aSheet->setCellValue("AH$row", '18%');
+				$aSheet->setCellValue("AL$row", $item['nds']);
+			}
+			
+			
+			//$aSheet->setCellValue("AM$row", $item['fee_summ']);
+			
+			
+			$aSheet->setCellValue("AP$row", $item['priceDiscount'] - $item['fee_summ']);
+
+
+			$row++;
+		}
 
 		$row++;
 		
-	}
-
-	$row++;
-	$aSheet->setCellValue("AS$row", $items['itogo']['priceDiscount']);
-	$row++;
-	$row++;
-	$aSheet->setCellValue("AS$row", $items['itogo']['priceDiscount']);
-
-	$row++;
-
-
-	//$itogo = $items['itogo']['priceDiscount'];//num2str($all_sum);
-	$itogo = $this->get('num2str')->num2str($items['itogo']['priceDiscount']);
-	
-	$st = "Всего наименований $col , на сумму ".$itogo;
-
-	$aSheet->setCellValue("B$row", $st);
+		$itogo = $items['itogo']['priceDiscount'] - $items['itogo']['fee_summ'];
 		
+		$aSheet->setCellValue("Y$row", $items['itogo']['price']);
+		//$aSheet->setCellValue("AM$row", $items['itogo']['fee_summ']);
+		$aSheet->setCellValue("AP$row", $itogo );
+
 		
-		
+
+		//$aSheet->setCellValue("BA$row", "");
+
+		$row ++;
+		$aSheet->mergeCells("AP{$row}:AT{$row}");
+		$aSheet->setCellValue("AP$row", $items['itogo']['nds']);
+		$row ++;
+
+		$aSheet->setCellValue("AP$row", $itogo );
+		$row++;
+
+		//$aSheet->setCellValue("AP$row", $items['itogo']['fee_summ'] );
+
+		$row++;
+
+		$st = "Всего наименований $col , на сумму ". $itogo ." RUB";
+
+		$aSheet->setCellValue("B$row", $st);
+
+		$row++;
+
+
+	//$itogo =  floor($itogo);
+		$st =$this->get('num2str')->num2str($itogo);
+
+
+		$aSheet->setCellValue("B$row", $st);
 
 
 		$writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel5');
