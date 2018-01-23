@@ -99,6 +99,7 @@ class ManagerController extends Controller
 										
 
 															])
+				->add('order',TextType::class,['required'=> false,'label'=>"Заявка"]) 
 								
 				->add('oplata', ChoiceType::class,[
 								'required'=> false,
@@ -140,6 +141,13 @@ class ManagerController extends Controller
 						->select('o')
 						->from('CruiseBundle:Ordering','o')
 						;
+		if(isset($search['order']))
+		{
+			$qb
+			->andWhere($qb->expr()->like('o.id', ':id'))
+			->setParameter('id','%'.$search['order'].'%')
+			;
+		}
 		if(isset($search['region']))
 		{
 			$qb
