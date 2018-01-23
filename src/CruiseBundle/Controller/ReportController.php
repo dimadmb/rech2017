@@ -248,7 +248,16 @@ class ReportController extends Controller
 		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($id);
 		$items = $this->get('cruise')->getOrderPrice($order);
 		
-		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject( __DIR__ .'/../Resources/report/invoice_agent.xlsx');
+		if(($order->getRegion() !== null) && ($order->getRegion()->getId() == 2))
+		{
+			$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject( __DIR__ .'/../Resources/report/invoice_agent_spb.xlsx');
+		}
+		else
+		{
+			$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject( __DIR__ .'/../Resources/report/invoice_agent.xlsx');
+		}
+		
+		
 		
 		$phpExcelObject->setActiveSheetIndex(0);
 		$aSheet = $phpExcelObject->getActiveSheet();	
