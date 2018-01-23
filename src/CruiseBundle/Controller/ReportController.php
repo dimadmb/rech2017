@@ -147,6 +147,8 @@ class ReportController extends Controller
 	
 		$phpTemplateObject = $this->get('phpword')->createTemplateObject( __DIR__ .'/../Resources/report/contract.docx');
 		
+		$passDate  = ($order->getBuyer()->getPassDate() !== null) ? $order->getBuyer()->getPassDate()->format("d.m.Y") .'г.' : "";
+		
 		$phpTemplateObject->setValue('ID', $id);
 		$phpTemplateObject->setValue('DAY', $order->getCreated()->format("d"));
 		$phpTemplateObject->setValue('MONTH', $month[$order->getCreated()->format("m")]);
@@ -154,7 +156,7 @@ class ReportController extends Controller
 		$phpTemplateObject->setValue('FIO', $order->getBuyer()->getLastName().' '.$order->getBuyer()->getName().' '.$order->getBuyer()->getFatherName());
 		$phpTemplateObject->setValue('ADDRESS', $order->getBuyer()->getAddress());
 
-		$phpTemplateObject->setValue('PASSPORT', $order->getBuyer()->getPassSeria() .' № '. $order->getBuyer()->getPassNum() .', выдан '. 	$order->getBuyer()->getPassWho() .' ' . $order->getBuyer()->getPassDate()->format("d.m.Y") .'г.');
+		$phpTemplateObject->setValue('PASSPORT', $order->getBuyer()->getPassSeria() .' № '. $order->getBuyer()->getPassNum() .', выдан '. 	$order->getBuyer()->getPassWho() .' ' . $passDate);
 		$phpTemplateObject->setValue('PHONE', $order->getBuyer()->getPhone());
 		$phpTemplateObject->setValue('WAY', $order->getCruise()->getName());
 		$phpTemplateObject->setValue('TEPLOHOD', $order->getCruise()->getShip()->getName());
@@ -188,6 +190,10 @@ class ReportController extends Controller
 		
 		$phpTemplateObject->setValue('SUM_ALL', $items['itogo']['priceDiscount'] );
 		$phpTemplateObject->setValue('SUM_ALL_PROPIS', $this->get('num2str')->num2str($items['itogo']['priceDiscount']) );
+		
+		
+		$phpTemplateObject->setValue('NDS', $items['itogo']['nds'] );
+		$phpTemplateObject->setValue('NDS_PROPIS', $this->get('num2str')->num2str($items['itogo']['nds']) );
 		
 		header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
 		header('Content-Disposition: attachment;filename="Договор.docx"');
