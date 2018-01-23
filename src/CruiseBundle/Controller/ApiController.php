@@ -326,6 +326,11 @@ class ApiController extends Controller
 		
 		
 		$arr  = json_decode($json, true );
+
+		if(!isset($arr['cruise_id']))
+		{
+			return ['json'=>json_encode(['error'=>["Нет круиза в звпросе"]])];
+		}	
 		
 		$cruise_id = $arr['cruise_id'];
 		$rooms = $arr['rooms'];
