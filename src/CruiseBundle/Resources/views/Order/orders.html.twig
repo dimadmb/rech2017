@@ -5,6 +5,31 @@
 {#{dump(orders)}#}
 
 
+
+{% if app.user.agency != null %}
+
+<div class="row" style="background:#fff; margin-bottom:10px;"> 
+{{ form_start(formOrder) }}	
+<div class="col-sm-2">
+{{ form_row(formOrder.ship) }}	
+</div>	
+<div class="col-sm-2">
+{{ form_row(formOrder.oplata) }}	
+</div>	
+		
+<div class="col-sm-2">
+{{ form_row(formOrder.order) }}	
+</div>	
+
+
+<div class="col-sm-2">
+{{ form_row(formOrder.submit) }}	
+</div>
+{{ form_end(formOrder) }}
+</div>
+
+{% endif %}
+
 {% for order in orders %}
 	<div class="row" style="background:#fff; margin-bottom:10px;"> 
 		

@@ -11,17 +11,26 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 use CruiseBundle\Entity\Pay;
 use CruiseBundle\Entity\Buyer;
+use CruiseBundle\Entity\Ship;
 use CruiseBundle\Entity\ShipRoom;
 use CruiseBundle\Entity\Ordering;
 use CruiseBundle\Entity\OrderItem;
 use CruiseBundle\Entity\OrderItemPlace;
+use CruiseBundle\Entity\Region;
 
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+
 use CruiseBundle\Form\BuyerType;
 use CruiseBundle\Form\OrderItemType;
 use CruiseBundle\Form\OrderingType;
+
+use Doctrine\ORM\EntityRepository;
 
 use Hashids\Hashids;
 
@@ -691,9 +700,60 @@ class OrderController extends Controller
 	 * @Template()	
      * @Route("/orders", name="orders")
      */
-    public function ordersAction()
+    public function ordersAction(Request $request)
 	{
 		$em = $this->getDoctrine()->getManager();
+		$form = $this->createFormBuilder()
+				->add('ship',EntityType::class,[
+								'required'=> false,
+								'class' => Ship::class,
+								'query_builder' => function (EntityRepository $er) {
+									return $er->createQueryBuilder('s')
+										->orderBy('s.name', 'ASC');
+										},
+										
+										'label'=>"Теплоход"
+										
+
+															])
+				->add('order',TextType::class,['required'=> false,'label'=>"Заявка"]) 
+								
+				->add('oplata', ChoiceType::class,[
+								'required'=> false,
+									'choices'  => array(
+										'Неоплачен' => 1,
+										'Частично оплачен' => 2,
+										'Оплачен' => 3,
+										'Переплата' => 4,
+									),
+									'label'=>"Оплата"
+								])								
+				/*
+				->add('del', CheckboxType::class,[
+								'required'=> false,
+								'label'  => "Показать удалённые",
+								])
+								
+				->add('region',EntityType::class,[
+								'required'=> false,
+								'class' => Region::class,
+								'label'=>"Регион"								
+								])
+								
+				->add('buyer',TextType::class,['required'=> false,'label'=>"Покупатель"])
+				->add('agency',TextType::class,['required'=> false,'label'=>"Агентство"])
+				*/
+				->add('submit', SubmitType::class,array('label' => 'Фильтровать'))
+				->getForm()
+			;	
+		$form->handleRequest($request);		
+		
+		$search = [];
+		if ($form->isSubmitted() && $form->isValid()) 
+		{
+			$search = $form->getData();
+		}	
+		//dump($search);
 		
 		$qb = $em->createQueryBuilder()
 			->select('o,oi,oip,room,cruise,buyer,agency,user')
@@ -708,6 +768,25 @@ class OrderController extends Controller
 			->andWhere('o.active = 1')
 			->orderBy('o.id','ASC')
 		;
+		
+		
+		if(isset($search['ship']))
+		{
+			$qb
+			//->leftJoin('o.cruise','c')
+			->leftJoin('cruise.ship','s')
+			->andWhere('s = :ship')
+			->setParameter('ship',$search['ship'])
+			;
+		}
+		if(isset($search['order']))
+		{
+			$qb
+			->andWhere($qb->expr()->like('o.id', ':id'))
+			->setParameter('id','%'.$search['order'].'%')
+			;
+		}		
+		
 		if($this->getUser()->getAgency() !== null)
 		{
 			$qb 
@@ -740,7 +819,44 @@ class OrderController extends Controller
 		}
 		//dump($orders );
 		
-		return ['orders'=>$orders];
+   // оплаты можно посчитать позже на PHP b удалить лишние
+		if(isset($search['oplata']))
+		{
+			foreach($orders as $key => &$order)
+			{
+				$orderPrice = $order->orderPrice;
+				
+				// не оплачен
+				if ( ($search['oplata'] == 1 ) && ($orderPrice['itogo']['pay'] > 0) ) 
+				{
+					unset($orders[$key]);
+				}
+				
+				//частично оплачен
+				if (($search['oplata'] == 2 ) && ( ($orderPrice['itogo']['pay'] == 0) ||  $orderPrice['itogo']['pay'] >= $orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'])  )
+				{
+					unset($orders[$key]);
+				}
+				
+				// оплачен
+				if (($search['oplata'] == 3 ) && ( $orderPrice['itogo']['pay'] < $orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'])  )
+				{
+					unset($orders[$key]);
+				}
+				
+				// переплата
+				if (($search['oplata'] == 4 ) && ( $orderPrice['itogo']['pay'] <= $orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'])  )
+				{
+					unset($orders[$key]);
+				}
+				
+ 
+			}
+				
+		}		
+		
+		
+		return ['orders'=>$orders,'formOrder'=>$form->createView()];
 	}
 	
     /**
