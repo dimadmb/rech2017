@@ -189,6 +189,7 @@ class ReportController extends Controller
 		{
 			if($item['orderItemPlace'] !== null)
 			{
+				$phpTemplateObject->setValue("NUMITEM#$i", $i );
 				$phpTemplateObject->setValue("NUM#$i", $item['number'] );
 				$phpTemplateObject->setValue("SUM#$i", $item['priceDiscount'] );
 				$phpTemplateObject->setValue("CLASS#$i", $item['cabinType'] );
@@ -215,10 +216,12 @@ class ReportController extends Controller
 			}
 		}			
 
+		$phpTemplateObject->setValue('SUM_ALLPASS', $items['itogo']['priceDiscountPass'] );
 		$phpTemplateObject->setValue('SUM_ALL', $items['itogo']['priceDiscount'] );
 		$phpTemplateObject->setValue('SUM_ALL_PROPIS', $this->get('num2str')->num2str($items['itogo']['priceDiscount']) );
 		
 		
+		$phpTemplateObject->setValue('NDSPASS', $items['itogo']['ndsPass'] );
 		$phpTemplateObject->setValue('NDS', $items['itogo']['nds'] );
 		$phpTemplateObject->setValue('NDS_PROPIS', $this->get('num2str')->num2str($items['itogo']['nds']) );
 		

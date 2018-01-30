@@ -61,20 +61,20 @@
 		
 		<div class="col-sm-2">
 		{% if order.orderPrice.itogo.pay | round(2) > (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ)  | round(2)  %}
-			<span style="color:#a34ae0;  font-weight:900;">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
-			<span style="">переплата {{ (order.orderPrice.itogo.pay - (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) )| number_format(2, '.', ' ') }} руб.</span>
+			<span style="color:#a34ae0;  font-weight:900; white-space: nowrap;">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
+			<span style="white-space: nowrap;">переплата {{ (order.orderPrice.itogo.pay - (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) )| number_format(2, '.', ' ') }} руб.</span>
 		{% endif %}
 		{% if order.orderPrice.itogo.pay | round(2)  == (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | round(2) %}
-			<span style="color:#f00;  font-weight:900;">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
+			<span style="color:#f00;  font-weight:900;white-space: nowrap;">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
 			
 		{% endif %}
 		{% if order.orderPrice.itogo.pay  | round(2)  == 0 %}
-			<span style="color:#000; ">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
+			<span style="color:#000;white-space: nowrap; ">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
 			
 		{% endif %}
 		{% if (order.orderPrice.itogo.pay  | round(2)  < (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | round(2) ) and (order.orderPrice.itogo.pay > 0)  %}
-			<span style="color:#b9b500; font-weight:900; ">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
-			<span style="">остаток {{ (-1*(order.orderPrice.itogo.pay - (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ)) )| number_format(2, '.', ' ') }} руб.</span>
+			<span style="color:#b9b500; font-weight:900; white-space: nowrap;">{{ (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ) | number_format(2, '.', ' ') }} руб.</span>
+			<span style="white-space: nowrap;">остаток {{ (-1*(order.orderPrice.itogo.pay - (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ)) )| number_format(2, '.', ' ') }} руб.</span>
 			
 		{% endif %}
 		

@@ -16,6 +16,7 @@ use CruiseBundle\Entity\ShipRoom;
 use CruiseBundle\Entity\Ordering;
 use CruiseBundle\Entity\OrderItem;
 use CruiseBundle\Entity\OrderItemPlace;
+use CruiseBundle\Entity\OrderItemService;
 use CruiseBundle\Entity\Region;
 
 
@@ -597,6 +598,8 @@ class OrderController extends Controller
 			else
 			{
 				$order->setAgency($user->getAgency());
+				
+				$order->setRegion($user->getAgency()->getRegion());
 			}
 
 			

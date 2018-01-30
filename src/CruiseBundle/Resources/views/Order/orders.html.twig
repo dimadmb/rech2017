@@ -54,16 +54,16 @@
 		<div class="col-sm-1">
 		
 		{% if (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ ) | round(2) == order.orderPrice.itogo.pay | round(2)%}
-		<span style="color:red; font-weight:700;">{{(order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ )| number_format(2, '.', ' ')}}</span>
+		<span style="color:red; font-weight:700; white-space: nowrap; ">{{(order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ )| number_format(2, '.', ' ')}}</span>
 		<br>оплачен
 		{% elseif ((order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ ) | round(2)  < order.orderPrice.itogo.pay | round(2)) and (order.orderPrice.itogo.pay > 0) %}
 		<span style="color:#f0f; font-weight:700;">{{(order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ )| number_format(2, '.', ' ')}}</span>
-		<br>переплата 	{{( order.orderPrice.itogo.pay - (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ )) | number_format(2, '.', ' ')}}
+		<br>переплата 	<span style="white-space: nowrap;">{{( order.orderPrice.itogo.pay - (order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ )) | number_format(2, '.', ' ')}}</span>
 		{% elseif ((order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ ) | round(2) > order.orderPrice.itogo.pay | round(2)) and (order.orderPrice.itogo.pay > 0) %}
 		<span style="color:#ffb300; font-weight:700;">{{(order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ )| number_format(2, '.', ' ')}}</span>
-		<br>остаток 	{{((order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ ) - order.orderPrice.itogo.pay) | number_format(2, '.', ' ')}}
+		<br>остаток 	<span style="white-space: nowrap;">{{((order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ ) - order.orderPrice.itogo.pay) | number_format(2, '.', ' ')}}</span>
 		{% else %}
-		{{(order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ )| number_format(2, '.', ' ')}}
+		<span style="white-space: nowrap;">{{(order.orderPrice.itogo.priceDiscount - order.orderPrice.itogo.fee_summ )| number_format(2, '.', ' ')}}</span>
 		{% endif %}
 		</div>
 		<div class="col-sm-1">

@@ -461,9 +461,13 @@ class Cruise
 		$itogo = [		'price' => 0,
 						'discount' => 0,
 						'priceDiscount' => 0,
+						'priceDiscountPass' => 0,
+						'priceDiscountService' => 0,
 						'fee_summ' => 0,
 						'pay' =>0,
 						'nds' =>0,
+						'ndsPass' =>0,
+						'ndsService' =>0,
 						'countPass' => 0,
 						'countService' => 0,
 						'tariffs' => []
@@ -519,9 +523,11 @@ class Cruise
 						];
 					$itogo['price'] += 	$price ;
 					$itogo['discount'] += 	$discount;
+					$itogo['priceDiscountPass'] += 	$priceDiscount;
 					$itogo['priceDiscount'] += 	$priceDiscount;
 					$itogo['fee_summ'] += 	$fee_summ;
 					$itogo['nds'] += 	$nds;
+					$itogo['ndsPass'] += 	$nds;
 					$itogo['countPass']++ ;
 					
 					
@@ -565,8 +571,10 @@ class Cruise
 				$itogo['price'] += 	$price ;
 				$itogo['discount'] += 	$discount;
 				$itogo['priceDiscount'] += 	$priceDiscount;
+				$itogo['priceDiscountService'] += 	$priceDiscount;
 				$itogo['fee_summ'] += 	$fee_summ;
 				$itogo['nds'] += 	$nds;				
+				$itogo['ndsService'] += 	$nds;				
 				$itogo['countService']++ ;
 			}			
 			

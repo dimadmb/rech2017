@@ -18,6 +18,7 @@
                 <th>Короткое название</th>				
                 <th>Название</th>
                 <th>Телефон</th>
+                <th>Регион</th>
                 <th>Комиссия</th>
                 <th>Номер договора</th>
                 <th></th>
@@ -31,6 +32,7 @@
 				<td>{{ agency.name }}</td>
 				
 				<td>{{ agency.phone }}</td>
+				<td>{% if  agency.region != null %}{{ agency.region.name }}{% endif %}</td>
 				<td>{{ agency.fee }}</td>
                 <td>{{ agency.numDog }}</td>
                 <td>
