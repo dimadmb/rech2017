@@ -1,0 +1,40 @@
+{% extends 'basemanager.html.twig' %}
+
+{% block body %}
+
+
+{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}
+
+
+<a href="{{path('manager_agency_report')}}"></a>
+
+
+<button class="btn btn-success" id="report">Отчёт агента</button>
+
+<button class="btn btn-success" id="act">Акт агента</button>
+
+	
+{% endblock %}
+
+
+{% block javascriptsready %}
+
+	$('#report').click(function(){
+		agency_id = $('#form_agency option:selected').val();
+		console.log(agency_id);		
+		date_month = $('#form_date_month option:selected').val();
+		console.log(date_month);		
+		date_year = $('#form_date_year option:selected').val();
+		console.log(date_year);
+		
+		url = "{{path('manager_agency_report')}}" + "?agency_id=" + agency_id + "&date_year=" + date_year + "&date_month=" + date_month;
+		
+		console.log(url);
+		
+		window.open(url,'_blank');	
+		
+	});
+	
+{% endblock %}	

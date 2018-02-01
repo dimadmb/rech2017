@@ -16,6 +16,10 @@ services:
         class: CruiseBundle\Service\Cruise
         arguments: ['@doctrine','@mailer']
 
+    report_agent:
+        class: CruiseBundle\Service\ReportAgent
+        arguments: ['@doctrine','@phpexcel','@cruise','@num2str']
+
     num2str:
         class: CruiseBundle\Service\NumToString
 

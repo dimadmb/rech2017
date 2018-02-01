@@ -111,6 +111,14 @@ class Agency
      * @ORM\Column(name="num_dog", type="integer", nullable=true)
      */
     private $numDog;
+	
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="date_dog", type="date", nullable=true)
+     */
+    private $dateDog;	
+	
 
     /**
      * @var \DateTime
@@ -691,5 +699,29 @@ class Agency
     public function getRegion()
     {
         return $this->region;
+    }
+
+    /**
+     * Set email
+     *
+     * @param string $email
+     *
+     * @return Agency
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * Get email
+     *
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
     }
 }

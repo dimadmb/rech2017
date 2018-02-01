@@ -225,19 +225,19 @@ class ManagerController extends Controller
 				}
 				
 				//частично оплачен
-				if (($search['oplata'] == 2 ) && ( ($orderPrice['itogo']['pay'] == 0) ||  $orderPrice['itogo']['pay'] >= $orderPrice['itogo']['priceDiscount'])  )
+				if (($search['oplata'] == 2 ) && ( ($orderPrice['itogo']['pay'] == 0) ||  $orderPrice['itogo']['pay'] >= ($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] ))  )
 				{
 					unset($orders[$key]);
 				}
 				
 				// оплачен
-				if (($search['oplata'] == 3 ) && ( $orderPrice['itogo']['pay'] < $orderPrice['itogo']['priceDiscount'])  )
+				if (($search['oplata'] == 3 ) && ( $orderPrice['itogo']['pay'] < ($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] ))  )
 				{
 					unset($orders[$key]);
 				}
 				
 				// переплата
-				if (($search['oplata'] == 4 ) && ( $orderPrice['itogo']['pay'] <= $orderPrice['itogo']['priceDiscount'])  )
+				if (($search['oplata'] == 4 ) && ( $orderPrice['itogo']['pay'] <= ($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] ))  )
 				{
 					unset($orders[$key]);
 				}
