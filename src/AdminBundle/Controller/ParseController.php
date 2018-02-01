@@ -15,6 +15,8 @@ use CruiseBundle\Entity\RoomDiscount;
 class ParseController extends Controller
 {
 	
+	const BASE_URL_KEY = "http://api.infoflot.com/JSON/68a3d0c23cf277febd26dc1fa459787522f32006";
+	
 	public function curl_get_file_contents($URL)
 	{
 		$c = curl_init();
@@ -27,6 +29,36 @@ class ParseController extends Controller
 			else return FALSE;
 	}
 	
+			
+	
+	
+	/**
+	 * @Route("/infoflot_ship/{ship_id}", name="infoflot_ship" )
+	 */
+	public function getCruisesInfoflot($ship_id)
+	{
+		$url = self::BASE_URL_KEY."/Cabins/$ship_id/";
+		$ans = $this->curl_get_file_contents($url);
+		
+		$ans = json_decode($ans, true);
+		
+		$kauta_id = null;
+		
+		foreach($ans as $id => $kauta)
+		{
+			if($kauta['name'] == '202')
+			{
+				$kauta_id = $id;
+			}
+		}
+		
+		
+		dump($kauta_id);
+		dump($ans);
+		return new Response("OK");
+	}
+	
+/*	
 	
 	const BASE_URL_KEY = "https://booking.mosturflot.ru/api?userhash=60b5fe8b827586ece92f85865c186513ed3e7bfa&section=rivercruises&";
 	
@@ -50,7 +82,7 @@ class ParseController extends Controller
 		$url = self::BASE_URL_KEY."request=ship&shipid=".$ship_id."&cabins=true";
 		return $this->URL2XML( $url );
 	}	
-	
+*/	
 	/**
 	 * @Route("/mosturflot_ship/{ship_id}", name="mosturflot_ship" )
      */	

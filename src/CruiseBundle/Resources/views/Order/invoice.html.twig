@@ -25,12 +25,28 @@
 	{% else %}
 		{{order.user.username}}	
 	{% endif %}	
+	
+	
 	{% if (order.user.agency != null) %}
-	«{{order.user.agency.name}}»  {{order.user.agency.phone}}
+	«{{order.user.agency.name}}»   
 	{% endif %}
-</p>	
-{% endif %}
+	
+	
+	{% if (is_granted('ROLE_MANAGER')) %}
+		{{order.user.email}} 
+	{% endif %}
+	
+	{% if (order.agency != null)  %}
+	
+	{{order.agency.phone}} 
+	
+	{{order.agency.email}} 	
 
+	{% endif %}	
+	
+</p>
+
+{% endif %}
 
 
 {{ form_start(form) }}

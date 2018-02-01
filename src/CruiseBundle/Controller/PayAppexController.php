@@ -16,7 +16,8 @@ class PayAppexController extends Controller
 
 	private function curl_get_file_contents_starrus($command, $data = null)
 	{
-		$URL = "http://62.117.111.84:54444/fr/api/v2/".$command;
+		//$URL = "http://62.117.111.84:54444/fr/api/v2/".$command;
+		$URL = "http://195.146.71.42:64444/fr/api/v2/".$command;
 		$c = curl_init();
 		curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($c, CURLOPT_URL, $URL);

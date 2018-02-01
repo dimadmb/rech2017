@@ -276,9 +276,12 @@ class ReportController extends Controller
 		$phpExcelObject->setActiveSheetIndex(0);
 		$aSheet = $phpExcelObject->getActiveSheet();	
 
-
-		$aSheet->setCellValue("B11", "Оплата по счету № $id от ".$order->getCreated()->format('d.m.Y').'г.');
-		$aSheet->setCellValue("B13", "Счет на оплату № $id от ".$order->getCreated()->format('d.m.Y').'г.');
+		$dateNow = new \DateTime;
+		
+		//$aSheet->setCellValue("B11", "Оплата по счету № $id от ".$order->getCreated()->format('d.m.Y').'г.');
+		//$aSheet->setCellValue("B13", "Счет на оплату № $id от ".$order->getCreated()->format('d.m.Y').'г.');
+		$aSheet->setCellValue("B11", "Оплата по счету № $id от ". $dateNow->format('d.m.Y').'г.');
+		$aSheet->setCellValue("B13", "Счет на оплату № $id от ".$dateNow->format('d.m.Y').'г.');
 		$aSheet->setCellValue("H17", $order->getAgency()->getName() . ", ИНН " . $order->getAgency()->getInn(). ", КПП " .  $order->getAgency()->getKpp(). ", " .  $order->getAgency()->getUrAddress(). ", тел. ".  $order->getAgency()->getPhone());
 		
 		$col = count($items['items']);

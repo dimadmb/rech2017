@@ -25,6 +25,7 @@ class AgencyType extends AbstractType
 			->add('urAddress')
 			->add('faktAddress')
 			->add('phone')
+			->add('email')
 			->add('fee')
 			->add('numDog')
 
