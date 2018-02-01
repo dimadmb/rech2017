@@ -65,7 +65,7 @@ class ReportAgent
 					->from("CruiseBundle:Ordering","o")
 					->leftJoin("o.pays","pay")
 					
-					->where("pay.created LIKE '".$year.'-'.str_pad($month, 2, '0', STR_PAD_LEFT)."%'")
+					->where("pay.date LIKE '".$year.'-'.str_pad($month, 2, '0', STR_PAD_LEFT)."%' OR (pay.date IS NULL AND pay.created LIKE '".$year.'-'.str_pad($month, 2, '0', STR_PAD_LEFT)."%')")
 					
 					->andWhere("o.agency = ".$agency->getId())
 					
@@ -80,6 +80,8 @@ class ReportAgent
 		$totalFee = 0;
 		$totalPriceDiscount = 0;
 		$totalPriceDiscountWithoutFee = 0;
+		
+		//dump($orders);
 		
 		foreach($orders as $order)
 		{
