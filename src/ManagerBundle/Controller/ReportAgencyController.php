@@ -10,8 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+//use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
+//use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 use CruiseBundle\Entity\Agency;
 
@@ -29,6 +30,28 @@ class ReportAgencyController extends Controller
 	 */
 	public function index(Request $request)
 	{
+		
+		$years = [];
+		foreach(range(date("Y"), 2017) as $year)
+		{
+			$years[$year] = $year;
+		}
+		
+		$months = [
+					'январь' => 1,
+					'февраль' => 2,
+					'март' => 3,
+					'апрель' => 4,
+					'май' => 5,
+					'июнь' => 6,
+					'июль' => 7,
+					'август' => 8,
+					'сентябрь' => 9,
+					'октябрь' => 10,
+					'ноябрь' => 11,
+					'декабрь' => 12,
+					];
+					
 		$form = $this->createFormBuilder()
 				
 				->add('agency',EntityType::class,[
@@ -41,7 +64,9 @@ class ReportAgencyController extends Controller
 										},
 										'label'=>"Агентство"
 				])
-				->add('date',DateType::class,['required'=>true,'years'=> range(date("Y"), 2017), 'days' => range(1,1)])											
+				->add('date_month',ChoiceType::class,['choices'=> $months, 'label'=>'Месяц'])
+				->add('date_year',ChoiceType::class, ['choices'=> $years,'label'=>'Год'])											
+															
 													
 															
 				->getForm()
@@ -65,6 +90,24 @@ class ReportAgencyController extends Controller
 
 
 		$response = $this->get('report_agent')->report($agency_id,$date_year,$date_month);
+		
+
+		
+		return $response;
+	}
+	
+	/**
+	 * @Route("/agency_act", name="manager_agency_act")
+	 */
+	public function act(Request $request)
+	{
+		
+		$agency_id = $request->query->get('agency_id');
+		$date_year = $request->query->get('date_year');
+		$date_month = $request->query->get('date_month');
+
+
+		$response = $this->get('report_agent')->act($agency_id,$date_year,$date_month);
 		
 
 		

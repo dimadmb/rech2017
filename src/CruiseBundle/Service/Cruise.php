@@ -484,14 +484,14 @@ class Cruise
 
 			foreach($order->getOrderItems() as $orderItem)
 			{
-				
+				$specDiscoutKoef = $orderItem->getTypeDiscount() === null ? 1 : (100 - $orderItem->getTypeDiscount()->getValue())/100;
 
 				foreach($orderItem->getOrderItemPlaces() as $orderItemPlace)
 				{
 					$price = $orderItemPlace->getPriceValue();
 					$surcharge = $orderItemPlace->getSurcharge();
 
-					$price += + $surcharge;
+					$price += + $surcharge*$specDiscoutKoef;
 
 					$priceDiscount = round( $price * (100 - $seson) * (100 - $permanent) /10000) ;
 

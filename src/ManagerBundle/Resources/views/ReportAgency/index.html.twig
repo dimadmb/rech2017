@@ -4,7 +4,14 @@
 
 
 {{ form_start(form) }}
-{{ form_widget(form) }}
+
+
+<div class="row">
+	<div class="col-sm-4">{{ form_row(form.agency) }}</div>
+	<div class="col-sm-4">{{ form_row(form.date_month) }}</div>
+	<div class="col-sm-4">{{ form_row(form.date_year) }}</div>
+</div>
+
 {{ form_end(form) }}
 
 
@@ -23,18 +30,18 @@
 
 	$('#report').click(function(){
 		agency_id = $('#form_agency option:selected').val();
-		console.log(agency_id);		
 		date_month = $('#form_date_month option:selected').val();
-		console.log(date_month);		
 		date_year = $('#form_date_year option:selected').val();
-		console.log(date_year);
-		
 		url = "{{path('manager_agency_report')}}" + "?agency_id=" + agency_id + "&date_year=" + date_year + "&date_month=" + date_month;
-		
-		console.log(url);
-		
 		window.open(url,'_blank');	
-		
+	});
+	
+	$('#act').click(function(){
+		agency_id = $('#form_agency option:selected').val();
+		date_month = $('#form_date_month option:selected').val();
+		date_year = $('#form_date_year option:selected').val();
+		url = "{{path('manager_agency_act')}}" + "?agency_id=" + agency_id + "&date_year=" + date_year + "&date_month=" + date_month;
+		window.open(url,'_blank');	
 	});
 	
 {% endblock %}	
