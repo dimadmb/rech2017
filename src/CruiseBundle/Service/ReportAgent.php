@@ -117,7 +117,7 @@ class ReportAgent
 		$date_dog =  $agency->getDateDog() === null ? '________' : $agency->getDateDog()->format("d.m.Y");;
 
 				
-		$st = $agency->getName().", именуемое в дальнейшем \"Агент\", в лице _______________, ".
+		$st = $agency->getName().", именуемое в дальнейшем \"Агент\", в лице ______________________________________________, ".
 			"действующего на основании _______________, представляет, а ООО \"Речное Агентство\",".
 			" именуемое в дальнейшем \"Компания\",  в лице Генерального директора Гладилиной Любови Владимировны, действующего на основании Устава,".
 			" принимает настоящий отчет об исполнении агентского поручения по агентскому договору №{$num_dog} от $date_dog";
@@ -133,6 +133,8 @@ class ReportAgent
 		
 		if ($col > 1) $aSheet->insertNewRowBefore($row+1, $col - 1);	
 		
+		$i = 1;
+		
 		foreach($orderPrices as $orderPrice)
 		{
 			$numRooms = [];
@@ -141,6 +143,7 @@ class ReportAgent
 				$numRooms[$item['number']] = $item['number'];
 			}
 			
+			$aSheet->setCellValue("A$row", $i );
 			$aSheet->setCellValue("B$row", $orderPrice['order']->getCruise()->getShip()->getName() );
 			$aSheet->setCellValue("C$row", $orderPrice['order']->getCruise()->getStartDate()->format("d.m.Y") . " - " .$orderPrice['order']->getCruise()->getEndDate()->format("d.m.Y")  );
 
@@ -155,6 +158,7 @@ class ReportAgent
 			$aSheet->setCellValue("J$row", $orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] );
 
 		$row++;	
+		$i++;	
 		}
 
 
@@ -247,7 +251,7 @@ class ReportAgent
 		$phpExcelObject->setActiveSheetIndex(0);
 		$aSheet = $phpExcelObject->getActiveSheet();			
 		
-		$aSheet->setCellValue('A1', "Акт оказанных услуг по реализации турпродукта _______ от  ". cal_days_in_month(CAL_GREGORIAN, $month, $year). " ". $this->month2[$month]. " " .$year);
+		$aSheet->setCellValue('A1', "Акт оказанных услуг по реализации турпродукта от  ". cal_days_in_month(CAL_GREGORIAN, $month, $year). " ". $this->month2[$month]. " " .$year);
 		
 		
 		$num_dog =  $agency->getNumDog() === null ? '________' : $agency->getNumDog();

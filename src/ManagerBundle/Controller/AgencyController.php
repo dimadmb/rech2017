@@ -9,6 +9,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 /**
  * Agency controller.
  *
@@ -21,16 +27,52 @@ class AgencyController extends Controller
      *
      * @Template()
      * @Route("/", name="manager_agency_index")
-     * @Method("GET")
+
      */
     public function indexAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
 		
 		
+		$form = $this->get('form.factory')->createNamedBuilder('')
+				->add('agency',EntityType::class,[
+								'required'=> false,
+								'class' => Agency::class,
+								'query_builder' => function (EntityRepository $er) {
+									return $er->createQueryBuilder('a')
+										->orderBy('a.name', 'ASC');
+										},
+										
+										'label'=>"Агентство"
+										
+
+															])		
+				->add('submit', SubmitType::class,array('label' => 'Фильтровать'))
+				->getForm()
+			;
+			
+		$form->handleRequest($request);		
+		
+		$search = [];
+		if ($form->isSubmitted() && $form->isValid()) 
+		{
+			$search = $form->getData();
+		}	
+
+		//dump($search);
+		//dump($request);
+		
+		
 		if($request->query->get('all') === null)
 		{
-			$agencies = $em->getRepository('CruiseBundle:Agency')->findBy(['active'=>true]);	
+			if(isset($search))
+			{
+				$agencies = $em->getRepository('CruiseBundle:Agency')->findById($search['agency']);
+			}
+			else
+			{
+				$agencies = $em->getRepository('CruiseBundle:Agency')->findBy(['active'=>true]);
+			}
 		}
 		else
 		{
@@ -41,6 +83,7 @@ class AgencyController extends Controller
 
         return [
             'agencies' => $agencies,
+			'form'=>$form->createView()
         ];
     }
 

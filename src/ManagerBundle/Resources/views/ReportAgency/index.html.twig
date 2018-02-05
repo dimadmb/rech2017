@@ -2,6 +2,7 @@
 
 {% block body %}
 
+<script src="{{asset('/admin/js/develplatform.editable.select.js')}}"></script>
 
 {{ form_start(form) }}
 
@@ -43,5 +44,10 @@
 		url = "{{path('manager_agency_act')}}" + "?agency_id=" + agency_id + "&date_year=" + date_year + "&date_month=" + date_month;
 		window.open(url,'_blank');	
 	});
+	
+	
+	$(function () {
+            $("#form_agency").editableSelect();
+        });
 	
 {% endblock %}	

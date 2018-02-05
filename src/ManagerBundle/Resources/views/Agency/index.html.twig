@@ -10,6 +10,13 @@
 
 </style>
 
+<script src="{{asset('/admin/js/develplatform.editable.select.js')}}"></script>
+
+
+{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}
+
 
     <table class="agency">
         <thead>
@@ -48,4 +55,13 @@
             <a href="{{ path('manager_agency_new') }}">Create a new agency</a>
         </li>
     </ul>
+{% endblock %}
+
+
+{% block javascriptsready %}
+
+	$(function () {
+            $("#form_agency").editableSelect();
+        });
+	
 {% endblock %}

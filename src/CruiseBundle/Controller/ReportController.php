@@ -155,8 +155,18 @@ class ReportController extends Controller
 		$dayFirst = $em->getRepository("CruiseBundle:ProgramItem")->findOneBy(["cruise"=>$order->getCruise()],['dateStart'=>'ASC']);
 		$dayLast = $em->getRepository("CruiseBundle:ProgramItem")->findOneBy(["cruise"=>$order->getCruise()],['dateStart'=>'DESC']);
 		
-	
-		$phpTemplateObject = $this->get('phpword')->createTemplateObject( __DIR__ .'/../Resources/report/contract.docx');
+
+		if(($order->getRegion() !== null) && ($order->getRegion()->getId() == 2))
+		{
+			$phpTemplateObject = $this->get('phpword')->createTemplateObject( __DIR__ .'/../Resources/report/contract_spb.docx');
+		}
+		else
+		{
+			$phpTemplateObject = $this->get('phpword')->createTemplateObject( __DIR__ .'/../Resources/report/contract.docx');
+		}
+
+		
+		
 		
 		$passDate  = ($order->getBuyer()->getPassDate() !== null) ? $order->getBuyer()->getPassDate()->format("d.m.Y") .'г.' : "";
 		
@@ -226,7 +236,7 @@ class ReportController extends Controller
 		$phpTemplateObject->setValue('NDS_PROPIS', $this->get('num2str')->num2str($items['itogo']['nds']) );
 		
 		header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-		header('Content-Disposition: attachment;filename="Договор.docx"');
+		header('Content-Disposition: attachment;filename="Договор'.$id.'.docx"');
 		$phpTemplateObject->saveAs('php://output');
 		die();
 		/*
