@@ -48,7 +48,7 @@ class LoadInfoflot  extends Controller
 			$c = curl_init();
 			curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($c, CURLOPT_URL, $URL);
-			curl_setopt($c, CURLOPT_TIMEOUT_MS, 2000);
+			curl_setopt($c, CURLOPT_TIMEOUT_MS, 5000);
 			$contents = curl_exec($c);
 			curl_close($c);
 
