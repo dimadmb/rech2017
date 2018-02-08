@@ -4,7 +4,7 @@ html {
 }
 body {
 	/* Отступ снизу, по высоте футера */
-	margin-bottom: 120px !important;
+	margin-bottom: 150px !important;
 	/*min-width:900px;*/
 	background-color: #f6f6f6 !important;
 }
@@ -34,7 +34,7 @@ hr {
 	bottom: 0;
 	width: 100%;
 	/* Фиксированная высота футера */
-	height: 120px;
+	height: 150px;
 }
 .footer .container .row {
 	/*background:#483381;*/
