@@ -237,10 +237,12 @@ class ReportAgent
 				
 				$totalFee += $orderPrice['itogo']['fee_summ'];
 				$totalPriceDiscount += $orderPrice['itogo']['priceDiscount'];
-				$totalPriceDiscountWithoutFee += $totalPriceDiscount - $totalFee;
+				
 			}
 			
 		}
+		$totalPriceDiscountWithoutFee += ($totalPriceDiscount - $totalFee);
+		
 		if(count($orderPrices) == 0)
 		{
 			return new Response("Оплаченных счетов не найдено");
