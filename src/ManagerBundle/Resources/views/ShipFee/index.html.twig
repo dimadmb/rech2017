@@ -1,0 +1,28 @@
+{% extends 'basemanager.html.twig' %}
+
+{% block body %}
+
+
+{{ form_start(form) }}
+
+<h1>{{form.vars.data.name}}</h1>
+
+
+
+
+{% for formShip in form.ships %}
+
+<div class="row">
+	<div class="col-sm-2">{{ formShip.vars.data.name }}</div>
+	<div class="col-sm-1">Комиссия</div>
+	<div class="col-sm-1">{{ form_widget(formShip.fee) }}</div>
+	<div class="col-sm-2">%</div>
+</div>
+
+{% endfor %}
+
+
+{{ form_end(form) }}
+	
+
+{% endblock %}

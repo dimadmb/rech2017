@@ -39,6 +39,111 @@ class ReportAgent
     }	
 	
 	
+	public function reportSales( $year = null, $month = null )
+	{
+		if(($year === null) || ($month === null)) 
+		return ['error'];
+	
+	
+		$orders = $this->em->createQueryBuilder()
+					->select('o,pay,cruise,ship,turOperator,service')
+					->from("CruiseBundle:Ordering","o")
+					->leftJoin("o.pays","pay")
+					->leftJoin("o.service","service")
+					->leftJoin('o.cruise','cruise')
+					->leftJoin('cruise.ship','ship')
+					->leftJoin('ship.turOperator','turOperator')
+									
+					->where("pay.date LIKE '".$year.'-'.str_pad($month, 2, '0', STR_PAD_LEFT)."%' OR (pay.date IS NULL AND pay.created LIKE '".$year.'-'.str_pad($month, 2, '0', STR_PAD_LEFT)."%')")
+					
+					//->andWhere("o.agency = ".$agency->getId())
+					
+					->andWhere("pay.isDelete = 0")
+					->andWhere("o.active = 1")
+					
+					->orderBy('o.id','ASC')
+					
+					->getQuery()
+					->getResult()
+				;		
+		$orderPrices = [];
+		$items = [];
+		$itogo = [
+			'priceDiscount' => 0,
+			'feeSumm' => 0,
+			'feeRech' => 0,
+			'profit' => 0,
+		];
+		
+		
+		//dump($orders);
+		
+		foreach($orders as $order)
+		{
+			$orderPrice = $this->cruise->getOrderPrice($order);
+			if( round(($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ']),2) <=  $orderPrice['itogo']['pay'] )
+			{
+				$orderPrices[] = $orderPrice;
+				
+				$feeRechPercent = $this->getFeeRech($order);
+				
+				$items[] = [
+					'orderId' => $order->getId(),
+					'priceDiscount' => $orderPrice['itogo']['priceDiscount'],
+					'feeSumm' => $orderPrice['itogo']['fee_summ'],
+					'feeRechPercent' =>  $feeRechPercent,
+					'feeRech' =>  ($feeRechPercent /100) * $orderPrice['itogo']['priceDiscount'],
+					'profit' => ($feeRechPercent /100) * $orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ']
+				];
+				
+				$itogo['priceDiscount'] += $orderPrice['itogo']['priceDiscount'];
+				$itogo['feeSumm'] += $orderPrice['itogo']['fee_summ'];
+				$itogo['feeRech'] += ($feeRechPercent /100) * $orderPrice['itogo']['priceDiscount'];
+				$itogo['profit'] += ($feeRechPercent /100) * $orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'];
+				
+			}
+			
+		}	
+
+
+		
+		return ['items'=>$items, 'itogo'=>$itogo];
+		
+		//return $this->render("ManagerBundle:ReportAgency:reportSales.html.twig", ['items'=>$items]);
+	
+		return new Response("OK");
+
+	}
+	
+	private function getFeeRech($order)
+	{
+		$turOperatorCode = $order->getCruise()->getShip()->getTurOperator()->getCode();
+		
+		if($turOperatorCode == 'vodohod')
+		{
+			 $fee = 20;
+		}
+		elseif($turOperatorCode == 'mosturflot')
+		{
+			$fee = $order->getSesonDiscount() > 0 ? 10 : 13 ;
+		}
+		elseif($turOperatorCode == 'infoflot')
+		{
+			$fee = $order->getCruise()->getShip()->getFee();
+		}
+		elseif($turOperatorCode == 'gama')
+		{
+			$fee = 10;
+		}
+		else
+		{
+			return null;
+		}
+		
+		return $fee;
+		
+	}
+	
 
 	public function report($agency = null, $year = null, $month = null )
 	{

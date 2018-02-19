@@ -1,0 +1,45 @@
+{% extends 'basemanager.html.twig' %}
+
+{% block body %}
+
+
+<table class="table">
+	<tr>
+		<th>Номер заказа</th>
+		<th>Сумма со скидкой</th>
+		<th>Комиссия</th>
+		<th>процент Речному Агентству</th>
+		<th>Комиссия Речному Агентству</th>
+		<th>Прибыль</th>
+	</tr>
+{% for item in items %}	
+	<tr>
+		<td>{{item.orderId}}</td>
+		<td>{{item.priceDiscount | number_format(2, ',', ' ')}}</td>
+		<td>{{item.feeSumm | number_format(2, ',', ' ')}}</td>
+		<td>{{item.feeRechPercent}}</td>
+		<td>{{item.feeRech | number_format(2, ',', ' ')}}</td>
+		<td>{{item.profit | number_format(2, ',', ' ')}}</td>
+	</tr>
+	
+{% endfor %}
+
+	<tr>
+		<th></th>
+		<th>{{itogo.priceDiscount | number_format(2, ',', ' ')}}</th>
+		<th>{{itogo.feeSumm | number_format(2, ',', ' ')}}</th>
+		<th></th>
+		<th>{{itogo.feeRech | number_format(2, ',', ' ')}}</th>
+		<th>{{itogo.profit | number_format(2, ',', ' ')}}</th>
+	</tr>
+	<tr>
+		<th>Номер заказа</th>
+		<th>Сумма со скидкой</th>
+		<th>Комиссия</th>
+		<th>процент Речному Агентству</th>
+		<th>Комиссия Речному Агентству</th>
+		<th>Прибыль</th>
+	</tr>	
+</table>
+	
+{% endblock %}

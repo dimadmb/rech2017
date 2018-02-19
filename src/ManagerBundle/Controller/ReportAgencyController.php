@@ -79,6 +79,19 @@ class ReportAgencyController extends Controller
 	}
 	
 	/**
+	 * @Template()
+	 * @Route("/agency_report_sales", name="manager_agency_report_sales")
+	 */
+	public function reportSales(Request $request)
+	{
+		
+		$date_year = $request->query->get('date_year');
+		$date_month = $request->query->get('date_month');
+		$res = $this->get('report_agent')->reportSales($date_year,$date_month);
+		return $res;
+	}
+	
+	/**
 	 * @Route("/agency_report", name="manager_agency_report")
 	 */
 	public function report(Request $request)
@@ -90,9 +103,7 @@ class ReportAgencyController extends Controller
 
 
 		$response = $this->get('report_agent')->report($agency_id,$date_year,$date_month);
-		
 
-		
 		return $response;
 	}
 	

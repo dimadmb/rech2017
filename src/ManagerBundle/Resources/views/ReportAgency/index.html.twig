@@ -23,12 +23,23 @@
 
 <button class="btn btn-success" id="act">Акт агента</button>
 
+
+<button class="btn btn-success" id="reportSales">Отчёт по продажам за месяц</button>
+
 	
 {% endblock %}
 
 
 {% block javascriptsready %}
 
+	$('#reportSales').click(function(){
+		
+		date_month = $('#form_date_month option:selected').val();
+		date_year = $('#form_date_year option:selected').val();
+		url = "{{path('manager_agency_report_sales')}}" + "?date_year=" + date_year + "&date_month=" + date_month;
+		window.open(url,'_blank');	
+	});
+	
 	$('#report').click(function(){
 		agency_id = $('#form_agency option:selected').val();
 		date_month = $('#form_date_month option:selected').val();

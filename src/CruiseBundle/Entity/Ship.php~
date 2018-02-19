@@ -72,6 +72,14 @@ class Ship
 	private $cabin;
 	
 	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="fee", type="decimal", precision=10, scale=2, nullable=true)
+     */
+    private $fee;
+	
+	
 
 	
 	public function __toString()

@@ -72,6 +72,14 @@ class Ship
 	private $cabin;
 	
 	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="fee", type="decimal", precision=10, scale=2, nullable=true)
+     */
+    private $fee;
+	
+	
 
 	
 	public function __toString()
@@ -326,5 +334,29 @@ class Ship
         $this->id = $id;
 
         return $this;
+    }
+
+    /**
+     * Set fee
+     *
+     * @param string $fee
+     *
+     * @return Ship
+     */
+    public function setFee($fee)
+    {
+        $this->fee = $fee;
+
+        return $this;
+    }
+
+    /**
+     * Get fee
+     *
+     * @return string
+     */
+    public function getFee()
+    {
+        return $this->fee;
     }
 }
