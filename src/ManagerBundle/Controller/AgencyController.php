@@ -13,6 +13,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
@@ -46,12 +48,15 @@ class AgencyController extends Controller
 										'label'=>"Агентство"
 										
 
-															])		
+															])	
+				->add('agencyEditable',HiddenType::class)		
 				->add('submit', SubmitType::class,array('label' => 'Фильтровать'))
 				->getForm()
 			;
 			
 		$form->handleRequest($request);		
+		
+		dump($request);
 		
 		$search = [];
 		if ($form->isSubmitted() && $form->isValid()) 
@@ -65,7 +70,7 @@ class AgencyController extends Controller
 		
 		if($request->query->get('all') === null)
 		{
-			if(isset($search))
+			if(isset($search['agency']))
 			{
 				$agencies = $em->getRepository('CruiseBundle:Agency')->findById($search['agency']);
 			}

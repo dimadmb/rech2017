@@ -39,7 +39,13 @@ class OrderItemPlaceType extends AbstractType
 				$order = $data->getOrderItem()->getOrdering();
 				$cabin = $data->getOrderItem()->getRoom()->getCabin();
 				
-				$prices = $cabin->getPrices();
+				$prices = [];
+				
+				foreach($cabin->getPrices() as $price)
+				{
+					if($price->getPlace()->getId() == $data->getOrderItem()->getPlace()->getId())
+					$prices[] = $price;
+				}
 
 				if($data->getTypePlace()->getPrice())
 				{

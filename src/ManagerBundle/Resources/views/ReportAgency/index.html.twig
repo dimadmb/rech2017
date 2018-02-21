@@ -25,6 +25,9 @@
 
 
 <button class="btn btn-success" id="reportSales">Отчёт по продажам за месяц</button>
+<button class="btn btn-success" id="reportSalesAgency">Отчёт по продажам за месяц агентства</button>
+<button class="btn btn-success" id="reportSalesAgencyMonth">Отчёт по продажам за месяц выбранного агентства</button>
+<button class="btn btn-success" id="reportSalesFiz">Отчёт по продажам за месяц физики</button>
 
 	
 {% endblock %}
@@ -32,11 +35,35 @@
 
 {% block javascriptsready %}
 
+	$('#reportSalesAgencyMonth').click(function(){
+		agency_id = $('#form_agency option:selected').val();
+		date_month = $('#form_date_month option:selected').val();
+		date_year = $('#form_date_year option:selected').val();
+		url = "{{path('manager_agency_report_sales')}}" + "?agency_id=" + agency_id + "&date_year=" + date_year + "&date_month=" + date_month + '&buyer=agency';
+		window.open(url,'_blank');	
+	});
+
+	$('#reportSalesAgency').click(function(){
+		
+		date_month = $('#form_date_month option:selected').val();
+		date_year = $('#form_date_year option:selected').val();
+		url = "{{path('manager_agency_report_sales')}}" + "?date_year=" + date_year + "&date_month=" + date_month + '&buyer=agency';
+		window.open(url,'_blank');	
+	});
+
+	$('#reportSalesFiz').click(function(){
+		
+		date_month = $('#form_date_month option:selected').val();
+		date_year = $('#form_date_year option:selected').val();
+		url = "{{path('manager_agency_report_sales')}}" + "?date_year=" + date_year + "&date_month=" + date_month + '&buyer=fiz';
+		window.open(url,'_blank');	
+	});
+
 	$('#reportSales').click(function(){
 		
 		date_month = $('#form_date_month option:selected').val();
 		date_year = $('#form_date_year option:selected').val();
-		url = "{{path('manager_agency_report_sales')}}" + "?date_year=" + date_year + "&date_month=" + date_month;
+		url = "{{path('manager_agency_report_sales')}}" + "?date_year=" + date_year + "&date_month=" + date_month + '&buyer=all';
 		window.open(url,'_blank');	
 	});
 	

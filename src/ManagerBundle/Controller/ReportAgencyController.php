@@ -74,6 +74,8 @@ class ReportAgencyController extends Controller
 		
 		$form->handleRequest($request);		
 		
+		
+		
 		return ['form'=>$form->createView()];
 		return new Response("OK");
 	}
@@ -87,7 +89,9 @@ class ReportAgencyController extends Controller
 		
 		$date_year = $request->query->get('date_year');
 		$date_month = $request->query->get('date_month');
-		$res = $this->get('report_agent')->reportSales($date_year,$date_month);
+		$buyer = $request->query->get('buyer');
+		$agency_id = $request->query->get('agency_id');
+		$res = $this->get('report_agent')->reportSales($date_year,$date_month,$buyer,$agency_id);
 		return $res;
 	}
 	

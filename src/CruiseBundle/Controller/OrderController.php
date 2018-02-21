@@ -512,6 +512,7 @@ class OrderController extends Controller
 					$rooms_in_cabin[] = $room;
 				}				
 			}
+			$cabinsItem->getPrices()->setInitialized(false);
 			foreach($cabinsItem->getPrices() as $prices)
 			{
 				$price[$prices->getPlace()->getRpName()] = $prices->getPlace()->getRpId();
@@ -618,7 +619,7 @@ class OrderController extends Controller
 				
 				if(!in_array($room,$available_rooms))
 				{
-					return new Response("Каюта уже занята");
+					return new Response("Каюта ".$room->getNumber()." уже занята");
 				}
 				
 				if($room->getCountPassMax() !==  null)

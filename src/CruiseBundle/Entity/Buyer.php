@@ -119,6 +119,11 @@ class Buyer
     private $address;	
 	
 
+	
+	public function __toString()
+	{
+		return $this->lastName.' '. $this->name.' '. $this->fatherName;
+	}
 
     /**
      * Get id

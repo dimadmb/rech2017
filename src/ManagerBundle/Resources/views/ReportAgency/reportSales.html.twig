@@ -2,9 +2,15 @@
 
 {% block body %}
 
+<style>
+.table th , .table td  {
+	text-align:right;
+}
+</style>
 
 <table class="table">
 	<tr>
+		<th>Покупатель</th>
 		<th>Номер заказа</th>
 		<th>Сумма со скидкой</th>
 		<th>Комиссия</th>
@@ -13,7 +19,10 @@
 		<th>Прибыль</th>
 	</tr>
 {% for item in items %}	
+	
+	{% set buyer = item.order.agency != null ? item.order.agency.name : item.order.buyer %}
 	<tr>
+		<td>{{buyer}}</td>
 		<td>{{item.orderId}}</td>
 		<td>{{item.priceDiscount | number_format(2, ',', ' ')}}</td>
 		<td>{{item.feeSumm | number_format(2, ',', ' ')}}</td>
@@ -26,6 +35,7 @@
 
 	<tr>
 		<th></th>
+		<th></th>
 		<th>{{itogo.priceDiscount | number_format(2, ',', ' ')}}</th>
 		<th>{{itogo.feeSumm | number_format(2, ',', ' ')}}</th>
 		<th></th>
@@ -33,6 +43,7 @@
 		<th>{{itogo.profit | number_format(2, ',', ' ')}}</th>
 	</tr>
 	<tr>
+		<th></th>
 		<th>Номер заказа</th>
 		<th>Сумма со скидкой</th>
 		<th>Комиссия</th>

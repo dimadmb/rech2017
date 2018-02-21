@@ -39,13 +39,13 @@ class ReportAgent
     }	
 	
 	
-	public function reportSales( $year = null, $month = null )
+	public function reportSales( $year = null, $month = null, $buyer = 'all' , $agency_id)
 	{
 		if(($year === null) || ($month === null)) 
 		return ['error'];
 	
 	
-		$orders = $this->em->createQueryBuilder()
+		$qb = $this->em->createQueryBuilder()
 					->select('o,pay,cruise,ship,turOperator,service')
 					->from("CruiseBundle:Ordering","o")
 					->leftJoin("o.pays","pay")
@@ -62,10 +62,27 @@ class ReportAgent
 					->andWhere("o.active = 1")
 					
 					->orderBy('o.id','ASC')
-					
-					->getQuery()
-					->getResult()
-				;		
+				;
+		
+		if($agency_id !== null)
+		{
+			$qb->andWhere("o.agency = ".$agency_id);
+		}
+		
+		if($buyer == 'fiz')
+		{
+			$qb->andWhere("o.agency is null");
+		}			
+		
+		if($buyer == 'agency')
+		{
+			$qb->andWhere("o.agency is not null");
+		}
+				
+		$orders = $qb
+				->getQuery()
+				->getResult()
+			;		
 		$orderPrices = [];
 		$items = [];
 		$itogo = [
@@ -93,7 +110,8 @@ class ReportAgent
 					'feeSumm' => $orderPrice['itogo']['fee_summ'],
 					'feeRechPercent' =>  $feeRechPercent,
 					'feeRech' =>  ($feeRechPercent /100) * $orderPrice['itogo']['priceDiscount'],
-					'profit' => ($feeRechPercent /100) * $orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ']
+					'profit' => ($feeRechPercent /100) * $orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'],
+					'order' => $order,
 				];
 				
 				$itogo['priceDiscount'] += $orderPrice['itogo']['priceDiscount'];
