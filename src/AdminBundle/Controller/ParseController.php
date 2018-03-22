@@ -125,12 +125,18 @@ class ParseController extends Controller
 		$statement->execute();		
 		$res = $statement->fetchColumn();	
 		
-		dump($res);
+		//dump($res);
 		
 		
 		$cruise = $em->getRepository("CruiseBundle:Cruise")->findOneById($res);
 		
-		dump($cruise); 
+		if(null === $cruise)
+		{
+			return null;
+						
+		}
+		
+		//dump($cruise); 
 		
 		$sql = "
 			select * 
@@ -141,7 +147,7 @@ class ParseController extends Controller
 		$statement->execute();
 		$results = $statement->fetchAll();	
 
-		dump($results);
+		//dump($results);
 		
 		//$order = new Ordering();
 		$arr = [];
@@ -167,10 +173,88 @@ class ParseController extends Controller
 			
 			$arr[$room->getId()] =  $result['places'];
 		}
-		dump(http_build_query(['rooms'=>$arr,'cruise'=>$cruise->getId()]));
+		//dump(http_build_query(['rooms'=>$arr,'cruise'=>$cruise->getId()]));
+		
+		return ['invoice_id'=> $invoice_id , 'rooms'=>$arr,'cruise'=>$cruise->getId() ];
 		
 		return new Response("OK");		
 	}
+	
+	
+	/**
+	 * @Route("/invoice_compare", name="invoice_compare" )
+     */			
+	public function compareInvoice()
+	{
+		$em = $this->getDoctrine()->getManager();
+		$em_booking = $this->getDoctrine()->getManager('booking');	
+
+		$connection_booking = $em_booking->getConnection();
+
+		$sql = "
+			select id
+			from aa_schet
+			where status = 1
+			and id < 1738
+			order by id asc
+			limit 1000
+		";	
+
+		$statement = $connection_booking->prepare($sql);
+		$statement->execute();		
+		$res = $statement->fetchAll();	
+		
+		$return = [];
+		$cruisesOld = [];
+		//dump($res);
+		
+		foreach($res as $r)
+		{
+			$rr = $this->invoiceParse($r['id']);
+			if(null !== $rr)
+			{
+				$return[] =  $rr;
+				foreach($rr['rooms'] as $room_id => $place)
+				{
+					$cruisesOld[$rr['cruise']][] = $room_id;
+				}
+				
+			}
+
+		}
+		
+		ksort($cruisesOld);
+		
+		//dump($cruisesOld);
+		
+		//dump($return);
+		
+		$bug = [];
+		
+		foreach($cruisesOld as $cruise_id => $rooms)
+		{
+			$orders = $em->createQueryBuilder()
+					->select('o')
+					->from('CruiseBundle\Entity\Ordering', 'o')
+					->leftJoin('o.orderItems','oi')
+					->where("o.cruise = $cruise_id")
+					->andWhere('oi.room IN ('.implode(',',$rooms).')')
+					->getQuery()
+					->getResult()
+				;
+				
+			if(count($orders) !== 0)
+			{
+				$bug[] = $orders;
+			}
+		}
+		
+		dump($bug);
+		
+		return new Response();
+		
+	}
+	
 	
 	/**
 	 * @Route("/del_sold", name="del_sold" )

@@ -375,7 +375,7 @@ class ReportController extends Controller
 
 		$row++;
 
-		$st = "Всего наименований $col , на сумму ". $itogo ." RUB";
+		$st = "Всего наименований $col , на сумму ". number_format($itogo,2,'.' ,' ') ." RUB ";
 
 		$aSheet->setCellValue("B$row", $st);
 
@@ -516,7 +516,7 @@ class ReportController extends Controller
 
 		$row++;
 
-		$st = "Всего наименований $col , на сумму ". $itogo ." RUB";
+		$st = "Всего наименований $col , на сумму ". round($itogo,3) ." RUB";
 
 		$aSheet->setCellValue("B$row", $st);
 

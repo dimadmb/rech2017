@@ -56,7 +56,7 @@ class AgencyController extends Controller
 			
 		$form->handleRequest($request);		
 		
-		dump($request);
+		//dump($request);
 		
 		$search = [];
 		if ($form->isSubmitted() && $form->isValid()) 

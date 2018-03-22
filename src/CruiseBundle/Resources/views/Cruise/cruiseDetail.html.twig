@@ -358,6 +358,7 @@ label.checked {
 				
 				</div> <!-- end row -->
 				
+
 				<div style="display:table-row;">
 				<div class="cabin-places" style="display:table-cell; padding-right:50px; ">
 					<p>
@@ -388,6 +389,8 @@ label.checked {
 				{% endfor %}
 				
 				</div> <!-- end row -->
+				
+
 				<div style="display:table-row;">
 					{% for image in type.cabin.images %}
 						<a class="photo" title="{{ image.title }}" href="{{ (upload_path~image.filename) | imagine_filter('show') }}" rel="group{{type.cabin.id}}" >

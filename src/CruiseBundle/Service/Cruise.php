@@ -56,6 +56,8 @@ class Cruise
 			$roomsArr[$room->getNumber()] = $room->getId();
 		}
 		
+		//dump($roomsArr);
+		
 		return $roomsArr;
 	}
 	
@@ -143,6 +145,9 @@ class Cruise
 				}				
 			}
 		}
+		
+		//dump($rooms);
+		
 		
 		return $rooms;
 	}
@@ -365,6 +370,9 @@ class Cruise
 				
 			}
 		}// для Гама	
+		
+		
+		//dump($available_rooms);
 		
 		return $available_rooms;
 	}
@@ -592,6 +600,10 @@ class Cruise
 				}
 			}			
 		}
+		
+		
+		// dump($items);
+		// dump($itogo);
 
 
 		return ['order'=>$order, 'items'=>$items, 'itogo'=>$itogo];

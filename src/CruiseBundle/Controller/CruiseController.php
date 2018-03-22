@@ -161,26 +161,18 @@ class CruiseController extends Controller
 				foreach($cabinsItem->getRooms() as $room)
 				{
 					
-					if(in_array($room->getId(),$active_rooms))
-					{
-						//$room->discount = true;
-						$discountInCabin = true;
-					}
-					else
-					{
-						//$room->discount = false;
-					}
+
+
 					
 					if(in_array($room->getId(),$available_rooms) /*|| true*/)
 					{
 						$rooms_in_cabin[] = $room;
+						if(in_array($room->getId(),$active_rooms))
+						{
+							$discountInCabin = true;
+						}
 					}
-					/*
-					elseif(in_array($room->getId(),$active_rooms))
-					{
-						$rooms_in_cabin[] = $room;
-					}
-					*/
+
 					
 				}
 
@@ -219,7 +211,7 @@ class CruiseController extends Controller
 					'cabins' => $cabins,
 					'tariff_arr'=>$tariff_arr ,
 					'discount'=>$discount,
-					'request' => Request::createFromGlobals(),
+					//'request' => Request::createFromGlobals(),
 					'rooms' => $available_rooms,
 					];
 	}
