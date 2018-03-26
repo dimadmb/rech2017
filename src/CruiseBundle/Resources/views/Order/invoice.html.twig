@@ -138,8 +138,12 @@
 	</div>
 	<div class="col-sm-3">
 	{% if form.permanentRequest is defined %}
+	{#
 	{{ form_row(form.permanentRequest, {'label':'Запрос на скидку постоянного клиента'}) }}
 	<p style="color:red;"><i>Оплата онлайн будет возможна после подтверждения скидки менеджером.</i></p>
+	
+	#}
+	
 	{% else %}
 	{% if form.vars.data.permanentRequest %} <p style="color:red;"><b>Есть запрос на скидку постоянного клиента</b></p> {% endif %}
 	{% endif %}

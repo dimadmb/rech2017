@@ -695,6 +695,11 @@ class LoadInfoflot  extends Controller
 			;
 			$ship->addCruise($cruise);
 			
+			$em->persist($cruise);
+			
+			$em->flush();
+			
+			
 			foreach($cruise_i['prices'] as $priceItem)
 			{
 				

@@ -8,6 +8,9 @@
 
 {% if app.user.agency != null %}
 
+
+
+
 <div class="row" style="background:#fff; margin-bottom:10px;"> 
 {{ form_start(formOrder) }}	
 <div class="col-sm-2">
@@ -27,6 +30,27 @@
 </div>
 {{ form_end(formOrder) }}
 </div>
+
+
+
+<div class="row" style="background:#fff; padding-top:10px; padding-bottom:10px; margin-bottom: 10px;">
+
+{{ form_start(formReport) }}	
+<div class="col-sm-4">
+{{ form_widget(formReport.date_year) }}	
+</div>	
+
+<div class="col-sm-4">
+{{ form_widget(formReport.date_month) }}	
+</div>	
+<div class="col-sm-4" style="display: flex; justify-content: space-around;">
+<a class="btn btn-success" id="report">Отчёт агента</a>	
+<a class="btn btn-success" id="act">Акт агента</a>
+</div>	
+
+{{ form_end(formReport) }}
+</div>
+
 
 {% endif %}
 
@@ -95,4 +119,22 @@
 		if (!confirm("Удалить?")) return false;
 		return true;
 	});
+	
+		$('#report').click(function(){
+		date_month = $('#report_date_month option:selected').val();
+		date_year = $('#report_date_year option:selected').val();
+		url = "{{path('agency_report')}}" + "?date_year=" + date_year + "&date_month=" + date_month;
+		window.open(url,'_blank');	
+	});
+
+
+	
+ 	$('#act').click(function(){
+		date_month = $('#report_date_month option:selected').val();
+		date_year = $('#report_date_year option:selected').val();
+		url = "{{path('agency_act')}}" + "?date_year=" + date_year + "&date_month=" + date_month;
+		window.open(url,'_blank');	
+	}); 
+	
+	
 {% endblock %}	

@@ -203,6 +203,7 @@ class ReportAgent
 		$totalFee = 0;
 		$totalPriceDiscount = 0;
 		$totalPriceDiscountWithoutFee = 0;
+		$totalNDS = 0;
 		
 		//dump($orders);
 		
@@ -215,6 +216,8 @@ class ReportAgent
 				
 				$totalFee += $orderPrice['itogo']['fee_summ'];
 				$totalPriceDiscount += $orderPrice['itogo']['priceDiscount'];
+				
+				$totalNDS += $orderPrice['itogo']['nds'];
 				
 			}
 			
@@ -279,7 +282,7 @@ class ReportAgent
 			$aSheet->setCellValue("F$row", $orderPrice['itogo']['priceDiscount'] );
 			$aSheet->setCellValue("G$row", $orderPrice['itogo']['nds'] );
 			$aSheet->setCellValue("H$row", $orderPrice['itogo']['fee_summ'] );
-			$aSheet->setCellValue("I$row", round($orderPrice['itogo']['fee_summ']* $orderPrice['itogo']['nds'] / $orderPrice['itogo']['priceDiscount'] ,2));
+			/* $aSheet->setCellValue("I$row", round($orderPrice['itogo']['fee_summ']* $orderPrice['itogo']['nds'] / $orderPrice['itogo']['priceDiscount'] ,2)); */
 			$aSheet->setCellValue("J$row", $orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] );
 
 		$row++;	
@@ -288,6 +291,7 @@ class ReportAgent
 
 
 		$aSheet->setCellValue("F$row", $totalPriceDiscount);
+		$aSheet->setCellValue("G$row", $totalNDS);
 		$aSheet->setCellValue("H$row", $totalFee);
 		$aSheet->setCellValue("J$row", $totalPriceDiscountWithoutFee);
 
@@ -296,7 +300,10 @@ class ReportAgent
 		$row += 2;
 
 		$st = "Вознаграждение агента за ".$this->monthAssoc[$month]." " . $year ." составило $totalFee (". $this->num2str->num2str($totalFee).")";
-		$aSheet->setCellValue("A$row", $st);		
+		$aSheet->setCellValue("A$row", $st);
+		
+		$st = "в т.ч. НДС $totalNDS (". $this->num2str->num2str($totalNDS).")";
+		$aSheet->setCellValue("A".($row+1), $st);		
 
 		$summ_vozvrata = 0;
 		$row += 2+9;

@@ -88,7 +88,7 @@ class OrderingType extends AbstractType
 		}
 		
 		
-		if( !$options['is_manager'] and ($builder->getData()->getAgency() === null))
+		if( /* !$options['is_manager'] and */ ($builder->getData()->getAgency() === null))
 		{
 			$builder
 					->add('permanentRequest')		;	

@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ApiController extends Controller
 {
-    
+  const PATH_IMG = "files/ship/";  
 	/**
 	 * @Template()
 	 * @Route("/api/json", name="api_json" )
@@ -58,6 +58,10 @@ class ApiController extends Controller
 			$cruises_json[$cruise->getId()]['days'] = $cruise->getDaycount();
 			$cruises_json[$cruise->getId()]['ship'] = $cruise->getShip()->getName();
 			$cruises_json[$cruise->getId()]['ship_id'] = $cruise->getShip()->getId();
+			$cruises_json[$cruise->getId()]['ship_photo_main'] = $this->renderView("CruiseBundle:ApiV1:img.html.twig",[
+					'img_url' =>  
+					self::PATH_IMG.$cruise->getShip()->getCode().'/'.$cruise->getShip()->getCode().'-main.jpg',
+			]);
 			$cruises_json[$cruise->getId()]['route'] = $cruise->getName();
 			
 		}

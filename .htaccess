@@ -2,6 +2,7 @@ RewriteEngine On
 
 
 # редиректы 
+
 # категории маршрутов (переехали на статичные страницы с вызовом контроллера)
 RewriteRule ^(.*)cruise/categoryroutes/(.*)\.html$ $1/cruise/$2 [R=301,L]
 # детальное описание круиза (упростили путь и отказались от теплохода в маршруте)
@@ -25,6 +26,35 @@ Redirect 301 /cruise/month/1533070800.html  /cruise/month/2018-08
 Redirect 301 /cruise/month/1535749200.html  /cruise/month/2018-09
 Redirect 301 /cruise/month/1538341200.html  /cruise/month/2018-10
 Redirect 301 /cruise/month/1541019600.html  /cruise/month/2018-11
+Redirect 301 /cruise/month/1469998800.html  https://www.rech-agent.ru/
+Redirect 301 /cruise/month/1475269200.html  https://www.rech-agent.ru/
+Redirect 301 /cruise/month/1490994000.html  https://www.rech-agent.ru/
+Redirect 301 /cruise/month/1501534800.html  https://www.rech-agent.ru/
+Redirect 301 /cruise/month/1504213200.html  https://www.rech-agent.ru/
+Redirect 301 /cruise/month/1506805200.html  https://www.rech-agent.ru/
+Redirect 301 /cruise/month/1509483600.html  https://www.rech-agent.ru/
+
+Redirect 301 /cruise/river/kama.html        /cruise/kruizy-po-kame
+Redirect 301 /cruise/river/kovzha.html      /cruise/
+Redirect 301 /cruise/shipclass/4            https://www.rech-agent.ru/
+Redirect 301 /cruise/sol                    https://www.rech-agent.ru/
+Redirect 301 /cruise/vol                    https://www.rech-agent.ru/
+Redirect 301 /derevna_mandrogi.html         /info/ports_and_pirs/mandrogi
+Redirect 301 /sheksninskij_ples.html        /info/ports_and_pirs/ples
+Redirect 301 /ships/aleksandr-radishchev    /ships/radishchev
+Redirect 301 /ships/nizhniy-novgorod        /ships/nnovgorod      
+Redirect 301 /ships/g_v_-plehanov           https://www.rech-agent.ru/
+Redirect 301 /ships/mihail-sholohov         https://www.rech-agent.ru/
+Redirect 301 /ships/mihail-tanich           https://www.rech-agent.ru/
+Redirect 301 /ships/shashkov                https://www.rech-agent.ru/
+Redirect 301 /cruise/4                      https://www.rech-agent.ru/
+Redirect 301 /cruise/4968                   https://www.rech-agent.ru/
+Redirect 301 /cruise/4979                   https://www.rech-agent.ru/
+Redirect 301 /cruise/9                      https://www.rech-agent.ru/
+Redirect 301 /cruise/kam                    /cruise/kruizy-po-kame
+Redirect 301 /cruise/settlement/moskva.html  /info/ports_and_pirs/moskva
+Redirect 301 /cruise/settlement/murom.html   /info/ports_and_pirs/murom
+
 
 Redirect 301 /cruise/alphabetlist  /ships
 

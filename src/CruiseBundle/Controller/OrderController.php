@@ -699,6 +699,44 @@ class OrderController extends Controller
 		
 		return ["request"=>$request,'order'=>$order];
     }	
+
+	/**
+	 * @Route("/agency_report", name="agency_report")
+	 */
+	public function report(Request $request)
+	{
+		// https://www.rech-agent.ru/web/app_dev.php/agency_report?agency_id=66&date_year=2018&date_month=02
+		//return new Response("OK");
+		
+		$agency_id = $this->getUser()->getAgency()->getId();
+		
+		//$agency_id = $request->query->get('agency_id');
+		$date_year = $request->query->get('date_year');
+		$date_month = $request->query->get('date_month');
+
+
+		$response = $this->get('report_agent')->report($agency_id,$date_year,$date_month);
+
+		return $response;
+	}
+	
+	/**
+	 * @Route("/agency_act", name="agency_act")
+	 */
+	public function act(Request $request)
+	{
+		$agency_id = $this->getUser()->getAgency()->getId();
+		$date_year = $request->query->get('date_year');
+		$date_month = $request->query->get('date_month');
+
+
+		$response = $this->get('report_agent')->act($agency_id,$date_year,$date_month);
+		
+
+		
+		return $response;
+	}
+	
 	
     /**
 	 * @Template()	
@@ -732,21 +770,7 @@ class OrderController extends Controller
 									),
 									'label'=>"Оплата"
 								])								
-				/*
-				->add('del', CheckboxType::class,[
-								'required'=> false,
-								'label'  => "Показать удалённые",
-								])
-								
-				->add('region',EntityType::class,[
-								'required'=> false,
-								'class' => Region::class,
-								'label'=>"Регион"								
-								])
-								
-				->add('buyer',TextType::class,['required'=> false,'label'=>"Покупатель"])
-				->add('agency',TextType::class,['required'=> false,'label'=>"Агентство"])
-				*/
+
 				->add('submit', SubmitType::class,array('label' => 'Фильтровать'))
 				->getForm()
 			;	
@@ -859,8 +883,44 @@ class OrderController extends Controller
 				
 		}		
 		
+
+
+		$years = [];
+		foreach(range(date("Y"), 2017) as $year)
+		{
+			$years[$year] = $year;
+		}
 		
-		return ['orders'=>$orders,'formOrder'=>$form->createView()];
+		$months = [
+					'январь' => 1,
+					'февраль' => 2,
+					'март' => 3,
+					'апрель' => 4,
+					'май' => 5,
+					'июнь' => 6,
+					'июль' => 7,
+					'август' => 8,
+					'сентябрь' => 9,
+					'октябрь' => 10,
+					'ноябрь' => 11,
+					'декабрь' => 12,
+					];
+					
+		$formReport = 
+		//$this->createFormBuilder()
+		$this->get('form.factory')->createNamed('report')
+				->add('date_month',ChoiceType::class,['choices'=> $months, 'label'=>'Месяц'])
+				->add('date_year',ChoiceType::class, ['choices'=> $years,'label'=>'Год'])
+				
+				
+				//->getForm()
+			;
+		
+		$formReport->handleRequest($request);		
+		
+
+		
+		return ['orders'=>$orders,'formOrder'=>$form->createView(),'formReport'=>$formReport->createView()];
 	}
 	
     /**
