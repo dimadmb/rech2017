@@ -396,6 +396,8 @@ class LoadVodohod  extends Controller
 				}
 
 				
+				//dump($room_types);
+				
 				foreach($p_t['prices'] as $key => $prices)
 				{
 					
@@ -543,14 +545,14 @@ class LoadVodohod  extends Controller
 		$room_types_url = $base_url."room_types.php";
 		$room_types_json = $this->curl_get_file_contents($room_types_url);
 		$room_types_v = json_decode($room_types_json,true);
-			
+		//dump($room_types_v);	
 		foreach($room_types_v as $room_type_v)
 		{
 			$room_type = $cabinTypeRepos->findOneByRtId($room_type_v['rt_id']);
-			if ($room_type != null) {
-				continue;
+			if ($room_type === null) {
+				$room_type = new ShipCabinType();
 			}
-			$room_type = new ShipCabinType();
+			
 			$room_type
 				->setRtId($room_type_v['rt_id'])
 				->setName($room_type_v['rt_name'])

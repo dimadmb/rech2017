@@ -192,6 +192,7 @@ class ApiController extends Controller
 						
 						'deck' => $price->getCabin()->getDeck()->getName(),
 						'room_type' => $price->getCabin()->getType()->getName(),
+						'room_group_id' => $price->getCabin()->getId(),
 						'number' => $room->getNumber(),
 						'count_place' => $price->getPlace()->getRpId(),
 						'name_place' => $price->getPlace()->getRpName(),

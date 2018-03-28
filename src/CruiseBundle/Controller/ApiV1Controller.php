@@ -23,6 +23,58 @@ class ApiV1Controller extends Controller
 {
     
 const PATH_IMG = "files/ship/";
+
+
+
+ 
+
+	
+	/**
+	 * @Template("CruiseBundle:ApiV1:json.html.twig")
+	 * @Route("/room_group_img/{id}/{pre}", name="room_group_img" )
+     */			
+	public function roomGroupImgAction($id, $pre = false)
+	{
+
+		if(!preg_match("|^[\d]+$|",$id))
+		{
+			return new Response("Группа кают с таким ID (".$id.") не найдена.",404);
+		}
+		
+		$roomGroupImg = $this->getDoctrine()->getManager()->createQueryBuilder()
+				->select("sc,i")
+				->from("CruiseBundle:ShipCabin","sc")
+				->leftJoin("sc.images","i")
+				
+				->where("sc.id = ".$id)
+				
+				->getQuery()
+				->getONeOrNullResult()
+			;
+		
+		if(null === $roomGroupImg)
+		{
+			return new Response("Группа кают с таким ID (".$id.") не найдена.",404);
+		}
+		
+		$json = [];
+		
+		//dump($roomGroupImg);
+		
+		foreach($roomGroupImg->getImages() as $image)
+		{
+			$json[] = [
+					'url' =>  $this->renderView("CruiseBundle:ApiV1:img.html.twig",[
+								'img_url' =>  	'files/'.$image->getFilename(),
+						]),
+					'title' => $image->getTitle(),
+				];
+		}
+		
+		if($pre) return array('json'=> '<pre>'.print_r($json,1).'</pre>');
+		return array('json'=> json_encode($json));
+	}
+
 	
 	/**
 	 * @Template()
@@ -190,6 +242,7 @@ const PATH_IMG = "files/ship/";
 						
 						'deck' => $price->getCabin()->getDeck()->getName(),
 						'room_type' => $price->getCabin()->getType()->getName(),
+						'room_group_id' => $price->getCabin()->getId(),
 						'number' => $room->getNumber(),
 						'count_place' => $price->getPlace()->getRpId(),
 						'name_place' => $price->getPlace()->getRpName(),

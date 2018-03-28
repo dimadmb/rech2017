@@ -710,7 +710,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 				enabled: true,
 				formatter: function formatter(val) {
 					if (Array.isArray(val)) {
-						return val[0] + " : " + val[1];
+						return val[0] + " - " + val[1];
 					} else {
 						return val;
 					}
