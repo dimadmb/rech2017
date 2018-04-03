@@ -24,6 +24,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
@@ -1001,6 +1002,7 @@ class OrderController extends Controller
 		$form = $this->get('form.factory')->createNamed('send_mail')
 			->add('name',TextType::class,['label'=>'Имя'])
 			->add('phone',TextType::class,['label'=>'Телефон'])
+			->add('email',EmailType::class,['label'=>'Email'])
 			->add('submit',SubmitType::class,['label'=>'Отправить'])
 		;
 		
@@ -1011,9 +1013,10 @@ class OrderController extends Controller
 			
 			$name = $form->getData()['name'];
 			$phone = $form->getData()['phone'];
+			$email = $form->getData()['email'];
 			
 			$message = \Swift_Message::newInstance()
-				->setSubject('Заказ')
+				->setSubject('Заказ '.date("Y-d-m H:i:s"))
 				->setFrom(array('test-rech-agent@yandex.ru'=>'rech-agent.ru'))
 				//->setTo('info@rech-agent.ru')
 				->setTo('info@rech-agent.ru')
@@ -1021,7 +1024,7 @@ class OrderController extends Controller
 				->setBody(
 					$this->renderView(
 						'CruiseBundle:Order:emailNotSale.html.twig',
-						['cruise'=>$cruise,'rooms'=>$rooms,'name'=>$name,'phone'=>$phone]
+						['cruise'=>$cruise,'rooms'=>$rooms,'name'=>$name,'phone'=>$phone,'email'=>$email]
 					),
 					'text/html'
 				)
