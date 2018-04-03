@@ -47,14 +47,14 @@ class OrderItemService
      *
      * @ORM\Column(name="is_permanent_discount", type="boolean")
      */
-    private $isPermanentDiscount = true;
+    private $isPermanentDiscount = false;
 
     /**
      * @var bool
      *
      * @ORM\Column(name="is_seson_discount", type="boolean")
      */
-    private $isSesonDiscount = true;
+    private $isSesonDiscount = false;
 
     /**
      * @var bool
@@ -201,5 +201,52 @@ class OrderItemService
     {
         return $this->isSesonDiscount;
     }
-}
 
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     *
+     * @return OrderItemService
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * Set order
+     *
+     * @param \CruiseBundle\Entity\Ordering $order
+     *
+     * @return OrderItemService
+     */
+    public function setOrder(\CruiseBundle\Entity\Ordering $order = null)
+    {
+        $this->order = $order;
+
+        return $this;
+    }
+
+    /**
+     * Get order
+     *
+     * @return \CruiseBundle\Entity\Ordering
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+}

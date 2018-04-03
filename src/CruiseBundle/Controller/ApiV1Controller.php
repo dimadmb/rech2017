@@ -393,7 +393,9 @@ const PATH_IMG = "files/ship/";
 		if(!isset($arr['cruise_id']))
 		{
 			return ['json'=>json_encode(['error'=>["Нет круиза в звпросе"]])];
-		}	
+		}
+
+		$commentUser = isset($arr['comment']) ? $arr['comment'] : "";
 		
 		$cruise_id = $arr['cruise_id'];
 		$rooms = $arr['rooms'];
@@ -451,6 +453,7 @@ const PATH_IMG = "files/ship/";
 					->setAgency($agency)
 					->setSesonDiscount(null)
 					->setUser($agency->getUsers()[0])
+					->setCommentUser($commentUser)
 				;
 			
 			foreach($rooms as $number=>$room)

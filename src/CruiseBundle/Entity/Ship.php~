@@ -81,6 +81,14 @@ class Ship
 	
 	
 
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="in_sale", type="boolean")
+     */
+    private $inSale = true;	
+	
+
 	
 	public function __toString()
 	{
@@ -334,5 +342,29 @@ class Ship
         $this->id = $id;
 
         return $this;
+    }
+
+    /**
+     * Set fee
+     *
+     * @param string $fee
+     *
+     * @return Ship
+     */
+    public function setFee($fee)
+    {
+        $this->fee = $fee;
+
+        return $this;
+    }
+
+    /**
+     * Get fee
+     *
+     * @return string
+     */
+    public function getFee()
+    {
+        return $this->fee;
     }
 }

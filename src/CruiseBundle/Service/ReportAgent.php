@@ -184,7 +184,7 @@ class ReportAgent
 		
 	
 		$orders = $this->em->createQueryBuilder()
-					->select('o,pay')
+					->select('o')
 					->from("CruiseBundle:Ordering","o")
 					->leftJoin("o.pays","pay")
 					
@@ -199,6 +199,9 @@ class ReportAgent
 					->getResult()
 				;
 		
+
+		
+		
 		$orderPrices = [];
 		$totalFee = 0;
 		$totalPriceDiscount = 0;
@@ -209,6 +212,9 @@ class ReportAgent
 		
 		foreach($orders as $order)
 		{
+			
+			//$order->getPays()->setInitialized(false);
+
 			$orderPrice = $this->cruise->getOrderPrice($order);
 			if( round(($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ']),2) <=  $orderPrice['itogo']['pay'] )
 			{
@@ -222,6 +228,9 @@ class ReportAgent
 			}
 			
 		}
+
+			
+		
 		$totalPriceDiscountWithoutFee += ($totalPriceDiscount - $totalFee);
 		
 		if(count($orderPrices) == 0)

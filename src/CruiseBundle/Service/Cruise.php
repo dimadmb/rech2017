@@ -64,6 +64,8 @@ class Cruise
 	public function getRooms($cruise_id)
 	{
 		
+		//dump("вызов ");
+		
 		$em = $this->doctrine->getManager();
 		
 		// все каюты
@@ -123,11 +125,12 @@ class Cruise
 		}		
 
 		$rooms = [];
-		
+		//	dump($occupied_rooms);
 		foreach($cruise->getShip()->getCabin() as $cabin)
 		{
 			foreach($cabin->getRooms() as $room)
 			{
+				//dump($room);
 				if(in_array($room,$occupied_rooms))
 				{
 					continue;
@@ -434,6 +437,7 @@ class Cruise
 		$em = $this->doctrine->getManager();
 		
 		$order_id = $order->getId();
+		//dump(get_class_methods($order->getPays()));
 		
 		$order = $em->createQueryBuilder()
 			->select('o,oi,oip,price,room,cabin,cabin_type,cabin_deck,typeDiscount,pay')
@@ -447,7 +451,7 @@ class Cruise
 			->leftJoin('cabin.type','cabin_type')
 			->leftJoin('cabin.deck','cabin_deck')
 			->leftJoin('oi.typeDiscount','typeDiscount')
-			->where('o.id = '.$order->getId())
+			->where('o.id = '.$order_id)
 			->andWhere('price.place = oi.place')
 			->andWhere('price.cruise = o.cruise')
 			->getQuery()

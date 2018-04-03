@@ -1,0 +1,15 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+
+
+<h2>Отправка заявки на бронирование каюты</h2>
+<h3>Теплоход «{{cruise.ship.name}}»  с {{cruise.startDate | date("d.m.Y")}} по {{cruise.endDate | date("d.m.Y")}}  <br><a href="{{path('cruisedetail',{'id':cruise.id})}}">«{{cruise.name}}»</a></h3>
+
+
+
+{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}
+
+{% endblock %}

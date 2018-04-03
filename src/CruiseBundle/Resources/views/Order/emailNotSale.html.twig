@@ -1,0 +1,9 @@
+<p>Имя: {{name}}</p>
+<p>Телефон: {{phone}}</p>
+
+
+<p>Теплоход «{{cruise.ship.name}}»  с {{cruise.startDate | date("d.m.Y")}} по {{cruise.endDate | date("d.m.Y")}}  <br><a href="{{absolute_url(path('cruisedetail',{'id':cruise.id}))}}">«{{cruise.name}}»</a></p>
+
+{% for room in rooms %}
+	<p>Каюта {{room.number}}</p>
+{% endfor %}

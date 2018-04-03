@@ -574,7 +574,7 @@ class OrderController extends Controller
 		if(null !== $basket_session)
 		{
 			$user = $this->getUser();
-			$cruise = $em->getRepository('CruiseBundle:Cruise')->findOneById($basket_session['cruise']);
+			$cruise = $em->getRepository('CruiseBundle:Cruise')->findOneById($basket_session['cruise']);			
 			$order = new Ordering();
 			$order->setCruise($cruise);
 			$order->setUser($user);
@@ -667,6 +667,39 @@ class OrderController extends Controller
 					$orderItem->addOrderItemPlace($orderItemPlace);
 				}
 			}
+			
+/* 			
+			// если теплоход не в свободной продаже отправим заявку и вернём пользователя на страницу
+			if(false && !$cruise->getShip()->getInSale())
+			{
+				$message = \Swift_Message::newInstance()
+					->setSubject('Заказ')
+					->setFrom(array('test-rech-agent@yandex.ru'=>'rech-agent.ru'))
+					//->setTo('info@rech-agent.ru')
+					->setTo('dkochetkov@vodohod.ru')
+					->setBcc('dkochetkov@vodohod.ru')
+					->setBody(
+						$this->renderView(
+							'CruiseBundle:Order:emailNotSale.html.twig',
+							['order'=>$order]
+						),
+						'text/html'
+					)
+
+				;
+				$this->get('mailer')->send($message);
+				
+			$session->getFlashBag()->add(
+				'flash',
+				'Ваша заявка принята'
+			);				
+				
+
+				return $this->redirectToRoute('cruisedetail',['id'=>$cruise->getId()]);
+				
+			}			
+			 */
+			
 			$em->flush();
 			
 			$session->remove('basket');
@@ -935,10 +968,77 @@ class OrderController extends Controller
 		
 		$session->set('basket',$request->request->all());
 	
+		$ship = $this->getDoctrine()->getRepository("CruiseBundle:Cruise")->findOneById($session->get('basket')['cruise'])->getShip();
 		
+		if(!$ship->getInSale())
+		{
+			
+			return $this->redirectToRoute('send_email_order');
+		}
 		
 		return $this->redirectToRoute('order');
 		 
 		return ["request"=>$request,"session"=>$session]; 
+    }		
+    /**
+	 * @Template()	
+     * @Route("/send_email_order", name="send_email_order")
+     */
+    public function orderSendMailAction(Request $request)
+    {
+		$session = new Session();
+		
+		$em = $this->getDoctrine()->getManager();
+		
+		$basket_session = $session->get('basket');
+		$cruise = $em->getRepository('CruiseBundle:Cruise')->findOneById($basket_session['cruise']);	
+		$rooms = [];
+		foreach($basket_session['rooms'] as $room_id => $place_id)
+		{
+			$rooms[] = $em->getRepository("CruiseBundle:ShipRoom")->findOneById($room_id);
+		}
+
+		$form = $this->get('form.factory')->createNamed('send_mail')
+			->add('name',TextType::class,['label'=>'Имя'])
+			->add('phone',TextType::class,['label'=>'Телефон'])
+			->add('submit',SubmitType::class,['label'=>'Отправить'])
+		;
+		
+		$form->handleRequest($request);
+
+		if ($form->isSubmitted() && $form->isValid())
+		{
+			
+			$name = $form->getData()['name'];
+			$phone = $form->getData()['phone'];
+			
+			$message = \Swift_Message::newInstance()
+				->setSubject('Заказ')
+				->setFrom(array('test-rech-agent@yandex.ru'=>'rech-agent.ru'))
+				//->setTo('info@rech-agent.ru')
+				->setTo('info@rech-agent.ru')
+				->setBcc('dkochetkov@vodohod.ru')
+				->setBody(
+					$this->renderView(
+						'CruiseBundle:Order:emailNotSale.html.twig',
+						['cruise'=>$cruise,'rooms'=>$rooms,'name'=>$name,'phone'=>$phone]
+					),
+					'text/html'
+				)
+
+			;
+			$this->get('mailer')->send($message);
+				
+			$session->getFlashBag()->add(
+				'flash',
+				'Ваша заявка принята'
+			);
+			
+			return $this->redirectToRoute('homepage');
+			
+		}
+
+		
+		return ['cruise'=>$cruise,'rooms'=>$rooms,'form'=>$form->createView()]; 
     }	
 }
