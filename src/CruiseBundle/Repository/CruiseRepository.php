@@ -77,6 +77,7 @@ class CruiseRepository extends \Doctrine\ORM\EntityRepository
 		$str = "SELECT c, s
 			FROM CruiseBundle\Entity\Cruise c 
 			JOIN c.ship s
+			WHERE c.startDate >= CURRENT_DATE()
 			ORDER BY c.startDate
 			";
    		$q = $this->_em->createQuery($str);

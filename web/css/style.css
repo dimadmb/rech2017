@@ -199,6 +199,9 @@ ul,ol {
   left: 100%;
   margin-top: -6px;
 
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content; 
 }
 
 .dropdown-submenu:hover>.dropdown-menu {

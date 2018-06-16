@@ -55,6 +55,32 @@ Redirect 301 /cruise/kam                    /cruise/kruizy-po-kame
 Redirect 301 /cruise/settlement/moskva.html  /info/ports_and_pirs/moskva
 Redirect 301 /cruise/settlement/murom.html   /info/ports_and_pirs/murom
 
+Redirect 301 /cruise/kruizy-vyhodnyh-dney      /cruise/cruises-on-destinations/kruizy-vyhodnyh-dney
+Redirect 301 /cruise/kareliya      /cruise/cruises-on-destinations/kareliya
+Redirect 301 /cruise/kruizy-po-volge      /cruise/rivers/kruizy-po-volge
+Redirect 301 /cruise/kruizy-po-kame      /cruise/rivers/kruizy-po-kame
+Redirect 301 /cruise/kruizy-po-donu      /cruise/rivers/kruizy-po-donu
+Redirect 301 /cruise/kruizy-v-moskvu      /cruise/to/moscow
+Redirect 301 /cruise/kruizy-v-astrakhan      /cruise/cruises-on-destinations/kruizy-v-astrakhan
+Redirect 301 /cruise/kruizy-v_iz-sankt-peterburga      /cruise/cruises-on-destinations/kruizy-v_iz-sankt-peterburga
+Redirect 301 /cruise/sankt-peterburg-—-valaam      /cruise/cruises-on-destinations/sankt-peterburg-—-valaam
+Redirect 301 /cruise/sankt-peterburg-—-valaam-i_ili-kizhi      /cruise/cruises-on-destinations/sankt-peterburg-—-valaam-i_ili-kizhi
+Redirect 301 /cruise/sankt-peterburg-—-kizhi      /cruise/cruises-on-destinations/sankt-peterburg-—-kizhi
+Redirect 301 /cruise-from/astrahan      /cruise/from/astrahan
+Redirect 301 /cruise-from/volgograd      /cruise/from/volgograd
+Redirect 301 /cruise-from/kazan      /cruise/from/kazan
+Redirect 301 /cruise-from/moscow      /cruise/from/moscow
+Redirect 301 /cruise-from/nnovgorod      /cruise/from/nnovgorod
+Redirect 301 /cruise-from/samara      /cruise/from/samara
+Redirect 301 /cruise-from/spb      /cruise/from/sankt-peterburg
+Redirect 301 /cruise-from/saratov      /cruise/from/saratov
+
+Redirect 301 /cruise/cruises-on-destinations/kruizy-v-astrakhan       /cruise/to/astrakhan
+Redirect 301 /cruise/cruises-on-destinations/kruizy-v_iz-sankt-peterburga       /cruise/from/sankt-peterburg
+
+
+Redirect 301 /cruise-from     /cruise/from
+
 
 Redirect 301 /cruise/alphabetlist  /ships
 

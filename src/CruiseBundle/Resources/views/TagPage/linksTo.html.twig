@@ -1,0 +1,44 @@
+<style>
+.half-hidden.on {
+	height:400px;
+	overflow:hidden;
+}
+
+</style>
+
+<div class="row half-hidden on" >
+	<div class="col-sm-6">
+		<ul>
+			{% for placeCode , place in placesAssoc %}
+				<li><a href="{{path('cruise_from_to',{'place_from':placeCode,'place_to':to})}}">Круизы из {{place.gen}} в {{placesAssoc[to].acc}}</a></li>
+			{% endfor %}
+		</ul> 
+		<ul>
+			{% for riverCode , river in riverAssoc %}
+				<li><a href="{{path('cruise_to_river',{'place_to':to,'river':riverCode})}}">Круизы в {{placesAssoc[to].acc}} по {{river}}</a></li>
+			{% endfor %}
+		</ul> 	
+		<ul>
+			{% for monthCode, month in monthAssoc %}
+				<li><a href="{{path('cruise_to_month',{'place_to':to,'month':monthCode})}}">Круизы в {{placesAssoc[to].acc}} в {{month}}</a></li>
+			{% endfor %}
+		</ul> 
+	</div>
+	<div class="col-sm-6">
+		<ul>
+			{% for ship in ships %}
+				<li><a href="{{path('cruise_to_on_ship',{'place_to':to,'shipCode':ship.code})}}">Круизы в {{placesAssoc[to].acc}} на теплоходе {{ship.name}}</a></li>
+			{% endfor %}
+		</ul>
+	</div>
+	
+	
+</div>
+
+<button class="btn btn-default half-toggle">Развернуть/скрыть</button>
+
+<JS>
+	$('.half-toggle').click(function(){
+		$('.half-hidden').toggleClass('on');
+	})
+</JS>

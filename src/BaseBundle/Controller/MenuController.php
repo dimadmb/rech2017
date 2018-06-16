@@ -15,7 +15,7 @@ class MenuController extends Controller
 	public function getMenuAction()
 	{
         $repository = $this->getDoctrine()->getRepository("BaseBundle:Page");
-		$pages = $repository->findBy(array("isMenu"=>true),array('sort' => 'ASC'));
+		$pages = $repository->findBy(array("isMenu"=>true, "active"=>true),array('sort' => 'ASC'));
 		
 		foreach($pages as $page)
 		{

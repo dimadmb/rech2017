@@ -83,7 +83,7 @@ class OrderController extends Controller
 		//return ['dump'=>$this->get('cruise')->getOrderPrice($order), $this->get('cruise')->getSesonDiscount($order) ];
 		
 		
-	$href = "https://b2c.appex.ru/payment/choice?orderSourceCode=$id&billingCode=Rechnoeagentstvo003";
+	$href = "https://b2c.appex.ru/payment/choice?orderSourceCode=0$id&billingCode=Rechnoeagentstvo003";
 
 	return $this->redirect($href);
 		
@@ -407,6 +407,12 @@ class OrderController extends Controller
 		
 			
 			$this->getDoctrine()->getManager()->flush();
+			
+			if( /* $allow_order &&  */ ($order->getCruise()->getShip()->getTurOperator()->getCode() === 'infoflot') && $order->getActive())
+			{
+				$this->get('cruise')->createOrderInfoflot($order);
+			}			
+			
         }
 		
 		
@@ -418,7 +424,7 @@ class OrderController extends Controller
 			foreach($orderItem->getOrderItemPlaces() as $orderItemPlace)
 			{
 				if(
-					$orderItemPlace->getPrice() === null
+					$orderItemPlace->getPriceValue() === null
 				or 	$orderItemPlace->getName() === null
 				or 	$orderItemPlace->getLastName() === null
 				or 	$orderItemPlace->getFatherName() === null
@@ -477,7 +483,7 @@ class OrderController extends Controller
 			$allow_pay = false;
 			//$allow_order = false;
 		}
-		
+		//dump($allow_pay);
 		if($order->getPermanentRequest())
 		{
 			if(($order->getPermanentDiscount() == null) /*or ($order->getPermanentDiscount() == 0)*/ ) // возможно убрать второй аргумент
@@ -486,11 +492,14 @@ class OrderController extends Controller
 				$allow_order = false;
 			}
 		}
+		//dump($allow_pay);
 		
+		/// заказ на сайте туроператора 
 		if( $allow_order && ($order->getCruise()->getShip()->getTurOperator()->getCode() === 'mosturflot') && $order->getActive())
 		{
 			$this->get('cruise')->createOrderMosturflot($order, $allow_pay);
 		}
+
 		
 		
 		
@@ -971,7 +980,7 @@ class OrderController extends Controller
 	
 		$ship = $this->getDoctrine()->getRepository("CruiseBundle:Cruise")->findOneById($session->get('basket')['cruise'])->getShip();
 		
-		if(!$ship->getInSale())
+		if(!$ship->getInSale() && !$this->get('security.authorization_checker')->isGranted('ROLE_MANAGER'))
 		{
 			
 			return $this->redirectToRoute('send_email_order');

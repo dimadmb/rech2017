@@ -155,14 +155,18 @@ const PATH_IMG = "files/ship/";
 		{
 			return array('array' => json_encode(array('error' => "Продажи путевок на выбранный тур завершены")));
 		}
-		
+
 		foreach($cruise->getPrograms() as $programmItem)
 		{
+			
+			$place = (null !== $programmItem->getPlace()) ? 
+				$programmItem->getPlace()->getName() : 
+				$programmItem->getPlaceTitle();
 			$cruise_programm[] = array(
 					
 					'date_start' => $programmItem->getDateStart()->format('U'),
 					'date_stop' => $programmItem->getDateStop()->format('U'),
-					'place' => $programmItem->getPlace()->getName(),
+					'place' => $place,
 					'description' => $programmItem->getDescription(),
 					
 					);

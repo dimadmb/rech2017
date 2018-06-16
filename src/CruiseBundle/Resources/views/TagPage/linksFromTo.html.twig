@@ -1,0 +1,7 @@
+<div class="col-sm-12">
+	<ul>
+		{% for placeCode , place in placesAssoc %}
+			<li><a href="{{path('cruise_from_to',{'place_from':from,'place_to':placeCode})}}">Круизы из {{placesAssoc[from].gen}} в {{place.acc}}</a></li>
+		{% endfor %}
+	</ul> 
+</div>

@@ -14,6 +14,8 @@ class Cruise
 {
 
     private $doctrine;
+	
+	const BASE_URL_KEY_INF = "https://api.infoflot.com/JSON/68a3d0c23cf277febd26dc1fa459787522f32006";
 
 
     public function __construct($doctrine, $mailer)
@@ -21,6 +23,21 @@ class Cruise
         $this->doctrine = $doctrine;
         $this->mailer = $mailer;
     }
+
+	public function curl_get_file_contents_post($URL,$post)
+	{
+		$c = curl_init();
+		curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($c, CURLOPT_URL, $URL);
+		curl_setopt($c, CURLOPT_TIMEOUT_MS, 5000);
+		
+		curl_setopt($c, CURLOPT_POSTFIELDS, $post);
+		
+		$contents = curl_exec($c);
+		curl_close($c);
+		if ($contents) return $contents;
+			else return FALSE;
+	}
 
 	public function curl_get_file_contents($URL)
 	{
@@ -153,6 +170,93 @@ class Cruise
 		
 		
 		return $rooms;
+	}
+	
+	
+	public function createOrderInfoflot($order, $fullOrder = false)
+	{
+		$em = $this->doctrine->getManager();
+		
+		// проверить создал ли счёт у инфофлота
+		if(null !== $order->getOuterId())
+		{
+			//dump("есть outer id ");
+			return null;
+		}		
+		$ship_id = $order->getCruise()->getShip()->getId() - 2000;
+		$cruise_id = $order->getCruise()->getId() - 2000000;
+
+		$url = self::BASE_URL_KEY_INF."/CabinsStatus/$ship_id/$cruise_id";
+		$ans = $this->curl_get_file_contents($url);
+		$ans = json_decode($ans, true);
+		
+		//dump($ans);
+		
+		$query_string = [];
+		
+		foreach($order->getOrderItems() as $orderItem)
+		{
+			$room_num = $orderItem->getRoom()->getNumber();
+			//dump($room_num);
+			foreach($ans as $id_room_inf => $item)
+			{
+				
+				if($item['name'] == $room_num)
+				{
+					$query_string['cabins'][$id_room_inf] = '';
+					$keys_place = array_keys($item['places']);
+					$i = 0;
+					foreach($orderItem->getOrderItemPlaces() as $orderItemPlace)
+					{
+						
+						
+						$place_id = $keys_place[$i];
+						$query_string['places'][$place_id]['name'] = $orderItemPlace->getLastName() . ' ' . $orderItemPlace->getName() . ' ' . $orderItemPlace->getFatherName();
+						
+						if($orderItemPlace->getBirthday() !== null)
+						{
+							$query_string['places'][$place_id]['birthday'] = $orderItemPlace->getBirthday()->format('d.m.Y');							
+						}
+						else
+						{
+							$query_string['places'][$place_id]['birthday'] = "01.01.1970";
+						}
+
+						$query_string['places'][$place_id]['type'] = 0;
+						
+						$i++;
+					}
+				}
+				else
+				{
+					// писать в лог 
+					//dump("Каюта не найдена");
+					//return 'Каюта не найдена';
+				}
+			}
+		}
+		$query_string['customer'] = "rech-agent.ru";
+		//$query_string['email'] = "dk@made.ru.com";
+		$query_string['email'] = "info@rech-agent.ru";
+		$query_string['phone'] = "+7(495)649-83-71";
+		$query_string['submit'] = 1;
+		//dump($query_string);
+		$post = /*urldecode*/(http_build_query($query_string));
+		//dump($post);
+		
+		//$outer_id = $this->curl_get_file_contents_post(self::BASE_URL_KEY_INF."/Requests/".$cruise_id , $post);
+		
+		$url = self::BASE_URL_KEY_INF."/Requests/".$cruise_id.'?'.$post;
+		//dump($url);
+		$outer_id = $this->curl_get_file_contents($url);
+		//dump($outer_id);
+		$order->setOuterId($outer_id);
+		$order->setCommentManager("Инф. ".$outer_id. $order->getCommentManager());
+		
+		$em->flush();
+		
+		return null;
+		
 	}
 	
 	
@@ -289,6 +393,24 @@ class Cruise
 		return null;
 	}
 	
+	public function deleteOrderInfoflot($order)
+	{
+		
+		if($order->getOuterId() !== null)
+		{
+			$url = self::BASE_URL_KEY_INF."/RequestCancel/".$order->getOuterId();
+			$ans = $this->curl_get_file_contents($url);
+
+			
+			$order->setOuterId(null);
+			$this->doctrine->getManager()->flush();
+			
+			
+		}
+		
+		return null;
+	}
+	
 	public function deleteOrderMosturflot($order)
 	{
 		
@@ -421,6 +543,11 @@ class Cruise
 		if($order->getCruise()->getTuroperator()->getCode() == 'mosturflot')
 		{
 			$this->deleteorderMosturflot($order);
+		}
+		
+		if($order->getCruise()->getTuroperator()->getCode() == 'infoflot')
+		{
+			$this->deleteorderInfoflot($order);
 		}
 		
 		$message = \Swift_Message::newInstance()

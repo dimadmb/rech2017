@@ -94,11 +94,20 @@ class ReportController extends Controller
 		$aSheet->setCellValue(   'G18', $fio  );
 
 		if(/*(null !== $orderItemPlace->getPassSeria()) && */ (null !== $orderItemPlace->getPassNum()) &&  (null !== $orderItemPlace->getPassDate()) &&  (null !== $orderItemPlace->getPassWho())   )
-		$aSheet->setCellValue(   'G19',
+
+		    $data = $orderItemPlace->getPassSeria()
+                .', номер '.$orderItemPlace->getPassNum().', выдан '.$orderItemPlace->getPassDate()->format("d.m.Y").' г, кем выдан: '.$orderItemPlace->getPassWho();
+            $data2 = $orderItemPlace->getPassSeria().', номер '.$orderItemPlace->getPassNum();
+        $aSheet->setCellValue(   'G19', $data ? $data: $data2 );
+
+
+        /*
+		 $aSheet->setCellValue(   'G19',
 			$orderItemPlace->getTypeDoc()->getName().', серия '.
 			$orderItemPlace->getPassSeria()
 			.', номер '.$orderItemPlace->getPassNum().', выдан '.$orderItemPlace->getPassDate()->format("d.m.Y").' г, кем выдан: '.$orderItemPlace->getPassWho()
-		);		
+		);
+		*/
 		
 		
 		if(($order->getAgency() === null) && ($order->getBuyer() !== null) )

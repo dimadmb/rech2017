@@ -216,7 +216,23 @@ class ReportAgent
 			//$order->getPays()->setInitialized(false);
 
 			$orderPrice = $this->cruise->getOrderPrice($order);
-			if( round(($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ']),2) <=  $orderPrice['itogo']['pay'] )
+			
+			$pays = $orderPrice['itogo']['pays'];
+			$date_last_pay = null;
+			foreach($orderPrice['itogo']['pays'] as $pay)
+			{
+				$date_pay = $pay->getDate() !== null ? $pay->getDate() : $pay->getCreated();
+				$date_last_pay = $date_pay > $date_last_pay ? $date_pay : $date_last_pay;
+			}
+			
+			// dump($date_last_pay->format("Y-m"));
+			// dump($month);
+			// return new Response("OK");
+			
+			
+			
+			
+			if((round(($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ']),2) <=  $orderPrice['itogo']['pay']) && ($date_last_pay->format("Y-m") == $year.'-'.str_pad($month, 2, '0', STR_PAD_LEFT)) )
 			{
 				$orderPrices[] = $orderPrice;
 				
@@ -349,7 +365,7 @@ class ReportAgent
 		}
 
 		$orders = $this->em->createQueryBuilder()
-					->select('o,pay')
+					->select('o')
 					->from("CruiseBundle:Ordering","o")
 					->leftJoin("o.pays","pay")
 					->where("pay.date LIKE '".$year.'-'.str_pad($month, 2, '0', STR_PAD_LEFT)."%' OR (pay.date IS NULL AND pay.created LIKE '".$year.'-'.str_pad($month, 2, '0', STR_PAD_LEFT)."%')")
@@ -448,7 +464,7 @@ class ReportAgent
 		$writer = $this->phpExcel->createWriter($phpExcelObject, 'Excel5');
 		$response = $this->phpExcel->createStreamedResponse($writer);
 		$response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-		$response->headers->set('Content-Disposition', 'attachment;filename=Отчёт агента за ' .$year ."-". str_pad($month, 2, '0', STR_PAD_LEFT). '.xls');
+		$response->headers->set('Content-Disposition', 'attachment;filename=Акт агента за ' .$year ."-". str_pad($month, 2, '0', STR_PAD_LEFT). '.xls');
 		$response->headers->set('Pragma', 'public');
 		$response->headers->set('Cache-Control', 'maxage=1');		
 

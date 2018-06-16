@@ -1,10 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Расписание и цены речных круизов по месяцам на 2018 год{% endblock %}
+{% block title %}{% if title is not defined %}Расписание и цены речных круизов по месяцам на 2018 год{% else %}{{title}}{% endif %}{% endblock %}
+
+
+
+{% block description %}{% if description is defined %}{{description}}{%else%} {{ parent() }}{% endif %}{% endblock %}
 
 {% block body %}
 
-{#{dump()}#}
+{% if h1 is defined %}<h1>{{h1}}</h1>{% endif %}
 
 {% include 'CruiseBundle:Cruise:cruises.html.twig'   %}
 

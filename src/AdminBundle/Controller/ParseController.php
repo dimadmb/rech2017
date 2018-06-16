@@ -33,6 +33,45 @@ class ParseController extends Controller
 	
 	
 	/**
+	 * @Route("/infoflot_test_order/{order_id}", name="infoflot_test_order" )
+	 */
+	public function getInfoflotTestOrder($order_id)
+	{
+		$em = $this->getDoctrine()->getManager();
+		$order = $em->getRepository("CruiseBundle:Ordering")->findOneById($order_id);
+		$this->get('cruise')->createOrderInfoflot($order);
+		return new Response("OK");
+	}
+	
+	/**
+	 * @Route("/infoflot_ship_cabin_status/{ship_id}/{cruise_id}", name="infoflot_cabins_status" )
+	 */
+	public function getCabinsStatusInfoflot($ship_id,$cruise_id)
+	{
+		$url = self::BASE_URL_KEY."/CabinsStatus/$ship_id/$cruise_id";
+		$ans = $this->curl_get_file_contents($url);
+		
+		$ans = json_decode($ans, true);
+		
+		//$kauta_id = null;
+		
+		// foreach($ans as $id => $kauta)
+		// {
+			// if($kauta['name'] == '202')
+			// {
+				// $kauta_id = $id;
+			// }
+		// }
+		
+		
+		//dump($kauta_id);
+		dump($ans);
+		return new Response("OK");
+	}
+				
+	
+	
+	/**
 	 * @Route("/infoflot_ship/{ship_id}", name="infoflot_ship" )
 	 */
 	public function getCruisesInfoflot($ship_id)

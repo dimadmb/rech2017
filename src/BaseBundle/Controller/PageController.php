@@ -56,9 +56,19 @@ class PageController extends Controller
 		$template =  $this->container->get('twig')->createTemplate($html);
 		$html = $template->render([]);
 		
+		/// переносим JS из дополнительно отрендерренных контроллеров
+		$re = '/<JS>(.*)<\/JS>/Us';
+		preg_match_all($re, $html, $matches, PREG_SET_ORDER, 0);
+		$js = '';
+		foreach($matches as $match)
+		{
+			$js .= $match[1];
+		}
+		$html = preg_replace($re,"",$html);
+	
 		$page->html = $html;
 		
-		return ['page' => $page ];
+		return ['page' => $page, 'js' => $js  ];
     }
 	
 	 /**

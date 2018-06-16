@@ -91,7 +91,7 @@ class LoadVodohod  extends Controller
 		$placesAll = $placeRepos->findAll();
 		foreach($placesAll as $placesAllItem)
 		{
-			$places[$placesAllItem->getName()] = $placesAllItem;
+			$places[mb_strtolower($placesAllItem->getName())] = $placesAllItem;
 		}
 		
 		$tariffs = array();
@@ -358,7 +358,7 @@ class LoadVodohod  extends Controller
 				$cruise_program_item
 							
 							->setCruise($cruise)
-							->setPlace($places[$program_item_v['port']])
+							->setPlace($places[mb_strtolower($program_item_v['port'])])
 							->setDateStart($date_item_start)
 							->setDateStop($date_item_stop)
 							->setDescription(nl2br($program_item_v['excursion']))

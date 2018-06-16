@@ -11,7 +11,7 @@ var rns={
 {% for  deckName, deck in cabins %}
 	{% for type in deck %}
 			{% for room in type.rooms %}
-			{{room.number | nospace}}:{
+			'{{room.number | nospace}}':{
 			desc: '{{type.cabinName}}',
 			offers:[{% for rpName , place in type.rpPrices %}'{{type.cabin.id}}-{{rpName}}',{% endfor %}],
 			},

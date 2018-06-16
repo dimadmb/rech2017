@@ -102,6 +102,11 @@ class CruiseSearch
 			$where .= "
 			AND s.shipId = ".$parameters['ship'];
 		}
+		if(isset($parameters['shipCode']) )
+		{
+			$where .= "
+			AND s.code = '".$parameters['shipCode']."'";
+		}
 		
 		
 		if(isset($parameters['offers']))
@@ -131,10 +136,22 @@ class CruiseSearch
 			AND c.daycount <=".$maxdays;			
 		}	
 
+		if(isset($parameters['likeName']))
+		{
+			$where .= "
+			AND c.name LIKE '%".$parameters['likeName']."%'";
+		}	
+
 		if(isset($parameters['placeStart']) && ($parameters['placeStart'] != "all" ) )
 		{
 			$where .= "
 			AND c.name LIKE '".$parameters['placeStart']."%'";
+		}
+		
+		if(isset($parameters['placeStop']) && ($parameters['placeStop'] != "all" ) )
+		{
+			$where .= "
+			AND c.name LIKE '%".$parameters['placeStop']."'";
 		}
 		
 		if(isset($parameters['month'])  )

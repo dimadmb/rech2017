@@ -69,8 +69,8 @@ class LoadGama  extends Controller
 		//file_put_contents ("log.txt","Начало\n".date("Y-m-d H:i:s")."\n\n", FILE_APPEND | LOCK_EX);
 		$em = $this->em;
 		
-		ini_set("memory_limit","2G");
-		ini_set("max_execution_time","1200");
+		ini_set("memory_limit","4G");
+		ini_set("max_execution_time","1800");
 		
 		
 
@@ -384,6 +384,7 @@ class LoadGama  extends Controller
 									$em->persist($price);
 									
 								}
+								$price->setPrice($priceValue);
 								$em->flush();
 								//dump($price);
 							}
@@ -414,6 +415,7 @@ class LoadGama  extends Controller
 										;
 									$em->persist($price);
 								}
+								$price->setPrice($priceValue);
 								$em->flush();
 								//dump($price);
 							}
@@ -444,6 +446,7 @@ class LoadGama  extends Controller
 										;
 									$em->persist($price);
 								}
+								$price->setPrice($priceValue);
 								$em->flush();
 								//dump($price);
 							}
@@ -476,6 +479,7 @@ class LoadGama  extends Controller
 										;
 									$em->persist($price);
 								}
+								$price->setPrice($priceValue);
 								$em->flush();
 								//dump($price);
 							}
@@ -506,6 +510,7 @@ class LoadGama  extends Controller
 										;
 									$em->persist($price);
 								}
+								$price->setPrice($priceValue);
 								$em->flush();
 								//dump($price);
 							}
@@ -536,6 +541,7 @@ class LoadGama  extends Controller
 										;
 									$em->persist($price);
 								}
+								$price->setPrice($priceValue);
 								$em->flush();
 								//dump($price);
 							}

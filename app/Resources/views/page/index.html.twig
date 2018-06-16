@@ -13,6 +13,7 @@
 				   <a class="btn btn-success" href="{{ path('page_new', { 'parent': page.id }) }}">Создать ребёнка</a> 
 				   <a class="btn btn-success" href="{{ path('page_delete', { 'id': page.id }) }}">Удалить</a> 
 				   <a class="btn btn-success" href="{{ path('page', { 'url': page.fullUrl }) }}" target="_blank">Перейти на страницу</a> 
+				   <span>{{page.sort}}</span>
 
                 {% if page.children|length %}
                     <button class="show-hidden" data-id={{page.id}} >развернуть/скрыть</button>
