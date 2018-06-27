@@ -191,6 +191,7 @@ class CruiseSearch
 			) p ON c.id = p.cruise_id
 
 		WHERE c.active = 1
+		AND c.endDate >= CURRENT_DATE()
 		"
 		.$where.
 		"
