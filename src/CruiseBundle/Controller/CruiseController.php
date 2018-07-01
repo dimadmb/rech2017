@@ -28,15 +28,15 @@ class CruiseController extends Controller
 	}
 
 
-    /**
-	 * @Template()	
-     * @Route("/cruise", name="cruise")
-     */
-    public function indexAction(Request $request)
-    {
-		$cruises = $this->searchCruise();
-		return ["months"=>$this->month($cruises)];
-    }
+#    /**
+#	 * @Template()	
+#     * @Route("/cruise", name="cruise")
+#     */
+#    public function indexAction(Request $request)
+#    {
+#		$cruises = $this->searchCruise();
+#		return ["months"=>$this->month($cruises)];
+#    }
 
     /**
 	 * @Template("CruiseBundle:Cruise:index.html.twig")	

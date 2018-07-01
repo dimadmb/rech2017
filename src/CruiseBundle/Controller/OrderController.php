@@ -812,6 +812,14 @@ class OrderController extends Controller
 										'Переплата' => 4,
 									),
 									'label'=>"Оплата"
+								])									
+				->add('year', ChoiceType::class,[
+								'required'=> false,
+									'choices'  => array(
+										'2018' => 2018,
+										'2019' => 2019,
+									),
+									'label'=>"Год круиза"
 								])								
 
 				->add('submit', SubmitType::class,array('label' => 'Фильтровать'))
@@ -857,6 +865,13 @@ class OrderController extends Controller
 			->setParameter('id','%'.$search['order'].'%')
 			;
 		}		
+			
+		if(isset($search['year']) && $search['year'] !== null)
+		{
+			$qb
+			->andWhere("cruise.startDate LIKE '" . $search['year'] . "%' ")
+			;
+		}	
 		
 		if($this->getUser()->getAgency() !== null)
 		{

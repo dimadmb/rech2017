@@ -110,6 +110,25 @@ class ManagerController extends Controller
 										'Переплата' => 4,
 									),
 									'label'=>"Оплата"
+								])	
+								
+				->add('year', ChoiceType::class,[
+								'required'=> false,
+									'choices'  => array(
+										'2018' => 2018,
+										'2019' => 2019,
+									),
+									'label'=>"Год круиза"
+								])										
+				->add('count', ChoiceType::class,[
+								'required'=> true,
+									'choices'  => array(
+										'50' => null,
+										'200' => 200,
+										'1000' => 1000,
+										'все' => 10000,
+									),
+									'label'=>"Выводить по"
 								])								
 				->add('del', CheckboxType::class,[
 								'required'=> false,
@@ -197,6 +216,23 @@ class ManagerController extends Controller
 		{
 			$qb->andWhere('o.active = 1');
 		}
+		
+		if(isset($search['count']) && $search['count'] !== null)
+		{
+			$qb->setMaxResults($search['count']);
+		} 
+		else
+		{
+			$qb->setMaxResults(50);
+		}
+		
+		
+		if(isset($search['year']) && $search['year'] !== null)
+		{
+			$qb->leftJoin('o.cruise','c')
+			->andWhere("c.startDate LIKE '" . $search['year'] . "%' ")
+			;
+		}		
 
 		
 		$orders = $qb
