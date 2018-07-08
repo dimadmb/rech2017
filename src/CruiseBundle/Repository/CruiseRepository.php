@@ -49,7 +49,7 @@ class CruiseRepository extends \Doctrine\ORM\EntityRepository
 	public function findMinStartDate()
 	{
         return $this->getEntityManager()
-            ->createQuery('SELECT c FROM CruiseBundle:Cruise c WHERE c.endDate >= CURRENT_DATE() ORDER BY c.startDate ASC ')->setMaxResults(1)
+            ->createQuery('SELECT c FROM CruiseBundle:Cruise c WHERE c.startDate >= CURRENT_DATE() ORDER BY c.startDate ASC ')->setMaxResults(1)
             ->getOneOrNullResult();		
 	}		
 	public function findMaxStartDate()

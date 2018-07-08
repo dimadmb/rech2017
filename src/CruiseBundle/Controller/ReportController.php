@@ -57,12 +57,12 @@ class ReportController extends Controller
 
 		// дата и время регистрации 
 			
-		$aSheet->setCellValue(   'J12', $dayFirst->getDateStop()->format("d.m.y H:i") );
+		$aSheet->setCellValue(   'J12', $dayFirst ? $dayFirst->getDateStop()->format("d.m.y H:i") : "");
 		
-		$aSheet->setCellValue(   'D14', $dayFirst->getDateStop()->format("H:i") );
-		$aSheet->setCellValue(   'D15', $dayFirst->getPlaceTitle() );
+		$aSheet->setCellValue(   'D14', $dayFirst ? $dayFirst->getDateStop()->format("H:i") : "");
+		$aSheet->setCellValue(   'D15', $dayFirst ? $dayFirst->getPlaceTitle() : "");
 		
-		$aSheet->setCellValue(   'J14', $dayLast->getPlaceTitle() );
+		$aSheet->setCellValue(   'J14', $dayLast ? $dayLast->getPlaceTitle() : "");
 		
 		$aSheet->setCellValue(   'D16', $orderItemPlace->getOrderItem()->getRoom()->getCabin()->getDeck()->getName() );
 		$aSheet->setCellValue(   'D17', $orderItemPlace->getOrderItem()->getRoom()->getCabin()->getType()->getName() );
@@ -72,11 +72,11 @@ class ReportController extends Controller
 		$aSheet->setCellValue(   'D10', $cruise->getShip()->getName() );
 		
 		$aSheet->setCellValue(   'D11', $cruise->getName() );
-		$aSheet->setCellValue(   'D13', $dayFirst->getDateStop()->format("d.m.y") );
-		$aSheet->setCellValue(   'J13', $dayLast->getDateStart()->format("d.m.y H:i") );
+		$aSheet->setCellValue(   'D13', $dayFirst ? $dayFirst->getDateStop()->format("d.m.y") : "");
+		$aSheet->setCellValue(   'J13', $dayLast ? $dayLast->getDateStart()->format("d.m.y H:i") : "");
 
 
-		$aSheet->setCellValue(   'D12', $dayFirst->getDateStop()->modify('-2 hour')->format("d.m.y H:i") );	
+		$aSheet->setCellValue(   'D12', $dayFirst ? $dayFirst->getDateStop()->modify('-2 hour')->format("d.m.y H:i") : "");	
 
 		$aSheet->setCellValue(   'J15', $orderItemPlace->getOrderItem()->getRoom()->getNumber() );
 		
@@ -101,13 +101,13 @@ class ReportController extends Controller
         $aSheet->setCellValue(   'G19', $data ?? $data2 );
 
 
-        /*
-		 $aSheet->setCellValue(   'G19',
+
+		/* $aSheet->setCellValue(   'G19',
 			$orderItemPlace->getTypeDoc()->getName().', серия '.
 			$orderItemPlace->getPassSeria()
 			.', номер '.$orderItemPlace->getPassNum().', выдан '.$orderItemPlace->getPassDate()->format("d.m.Y").' г, кем выдан: '.$orderItemPlace->getPassWho()
-		);
-		*/
+		);*/
+
 		
 		
 		if(($order->getAgency() === null) && ($order->getBuyer() !== null) )
@@ -190,13 +190,13 @@ class ReportController extends Controller
 		$phpTemplateObject->setValue('PHONE', $order->getBuyer()->getPhone());
 		$phpTemplateObject->setValue('WAY', $order->getCruise()->getName());
 		$phpTemplateObject->setValue('TEPLOHOD', $order->getCruise()->getShip()->getName());
-		$phpTemplateObject->setValue('PORT1', $dayFirst->getPlaceTitle());
-		$phpTemplateObject->setValue('PORT2', $dayLast->getPlaceTitle());
-		$phpTemplateObject->setValue('TIME1', $dayFirst->getDateStop()->format("H:i"));
-		$phpTemplateObject->setValue('TIME2', $dayLast->getDateStart()->format("H:i"));
+		$phpTemplateObject->setValue('PORT1', $dayFirst ? $dayFirst->getPlaceTitle() : "");
+		$phpTemplateObject->setValue('PORT2', $dayLast ? $dayLast->getPlaceTitle() : "");
+		$phpTemplateObject->setValue('TIME1', $dayFirst ? $dayFirst->getDateStop()->format("H:i") : "");
+		$phpTemplateObject->setValue('TIME2', $dayLast ? $dayLast->getDateStart()->format("H:i") : "");
 		$phpTemplateObject->setValue('DATE1', $order->getCruise()->getStartDate()->format("d.m.Y"));
 		$phpTemplateObject->setValue('DATE2', $order->getCruise()->getEndDate()->format("d.m.Y"));
-		$phpTemplateObject->setValue('TIME_REG', $dayFirst->getDateStop()->modify('-2 hour')->format("H:i"));
+		$phpTemplateObject->setValue('TIME_REG', $dayFirst ? $dayFirst->getDateStop()->modify('-2 hour')->format("H:i") : "");
 		$phpTemplateObject->setValue('DAYS', $order->getCruise()->getDayCount());
 		$phpTemplateObject->setValue('DAYS_1', $order->getCruise()->getDayCount() - 1 );
 

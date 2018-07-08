@@ -157,8 +157,9 @@ class ManagerController extends Controller
 		//$orders = $em->getRepository("CruiseBundle:Ordering")->findAll();
 		
 		$qb = $em->createQueryBuilder()
-						->select('o')
+						->select('o,c')
 						->from('CruiseBundle:Ordering','o')
+                        ->leftJoin('o.cruise','c')
 						;
 		if(isset($search['order']))
 		{
@@ -177,7 +178,7 @@ class ManagerController extends Controller
 		if(isset($search['ship']))
 		{
 			$qb
-			->leftJoin('o.cruise','c')
+			
 			->leftJoin('c.ship','s')
 			->andWhere('s = :ship')
 			->setParameter('ship',$search['ship'])
@@ -229,7 +230,7 @@ class ManagerController extends Controller
 		
 		if(isset($search['year']) && $search['year'] !== null)
 		{
-			$qb->leftJoin('o.cruise','c')
+			$qb
 			->andWhere("c.startDate LIKE '" . $search['year'] . "%' ")
 			;
 		}		
