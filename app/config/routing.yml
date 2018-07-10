@@ -44,11 +44,10 @@ remove_trailing_slash:
     defaults: { _controller: BaseBundle:Redirecting:removeTrailingSlash }
     requirements:
         url: .*/$
-    methods: [GET]
+
 
 page:
     path: /{url}
     defaults: { _controller: BaseBundle:Page:page }
     requirements:
         url: .*$
-    methods: [GET]

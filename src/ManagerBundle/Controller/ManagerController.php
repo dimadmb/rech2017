@@ -26,12 +26,10 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
  * Manager controller.
  *
  * @Route("/manager")
- 
  */
 
 class ManagerController extends Controller
 {
-
     /**
 	 * @Template()	
      * @Route("/cruises", name="manager_cruises")
@@ -42,18 +40,14 @@ class ManagerController extends Controller
 		return ['cruises'=>$cruises];
 	}	
 
-
     /**
      * @Route("/invoice_del/{order}", name="manager_invoice_del")
      */
     public function invoiceDeleteAction(Ordering $order)
     {
-		
 		$this->get('cruise')->deleteOrder($order);
-		
-		
-		return $this->redirectToRoute('manager_invoices');		
 
+		return $this->redirectToRoute('manager_invoices');		
     }
 
     /**
@@ -67,13 +61,9 @@ class ManagerController extends Controller
 			$order->setActive(true);
 			$em->flush();
 		}
-		
-						
-		
-		
+
 		return $this->redirectToRoute('manager_invoices');
     }
-	
 	
     /**
 	 * @Template()	
@@ -82,10 +72,7 @@ class ManagerController extends Controller
     public function invoicesAction(Request $request)
     {
 		$em = $this->getDoctrine()->getManager();
-		
-		
-		
-		
+
 		$form = $this->createFormBuilder()
 				->add('ship',EntityType::class,[
 								'required'=> false,
@@ -94,10 +81,7 @@ class ManagerController extends Controller
 									return $er->createQueryBuilder('s')
 										->orderBy('s.name', 'ASC');
 										},
-										
 										'label'=>"Теплоход"
-										
-
 															])
 				->add('order',TextType::class,['required'=> false,'label'=>"Заявка"]) 
 								
@@ -147,8 +131,7 @@ class ManagerController extends Controller
 		$form->handleRequest($request);		
 		
 		$search = [];
-		if ($form->isSubmitted() && $form->isValid()) 
-		{
+		if ($form->isSubmitted() && $form->isValid()) {
 			$search = $form->getData();
 		}		
 		
@@ -161,31 +144,26 @@ class ManagerController extends Controller
 						->from('CruiseBundle:Ordering','o')
                         ->leftJoin('o.cruise','c')
 						;
-		if(isset($search['order']))
-		{
+		if (isset($search['order'])) {
 			$qb
 			->andWhere($qb->expr()->like('o.id', ':id'))
 			->setParameter('id','%'.$search['order'].'%')
 			;
 		}
-		if(isset($search['region']))
-		{
+		if (isset($search['region'])) {
 			$qb
 			->andWhere('o.region = :region')
 			->setParameter('region',$search['region'])
 			;
 		}
-		if(isset($search['ship']))
-		{
+		if (isset($search['ship'])) {
 			$qb
-			
 			->leftJoin('c.ship','s')
 			->andWhere('s = :ship')
 			->setParameter('ship',$search['ship'])
 			;
 		}
-		if(isset($search['buyer']))
-		{
+		if (isset($search['buyer']))	{
 			$qb->leftJoin('o.buyer','b');			
 			$qb->andWhere($qb->expr()->orX(
 							$qb->expr()->like('b.name', ':buyer') , 
@@ -197,8 +175,7 @@ class ManagerController extends Controller
 			$qb->setParameter('buyer', '%'.$search['buyer'].'%');				
 			
 		}
-		if(isset($search['agency']))
-		{
+		if (isset($search['agency'])) {
 			$qb->leftJoin('o.agency','a');			
 			$qb->andWhere($qb->expr()->orX(
 							$qb->expr()->like('a.name', ':agency') , 
@@ -227,7 +204,6 @@ class ManagerController extends Controller
 			$qb->setMaxResults(50);
 		}
 		
-		
 		if(isset($search['year']) && $search['year'] !== null)
 		{
 			$qb
@@ -235,13 +211,11 @@ class ManagerController extends Controller
 			;
 		}		
 
-		
 		$orders = $qb
 				->orderBy('o.id','DESC')
 				->getQuery()
 				->getResult()
 			;
-		
 		
 		foreach($orders as $key => &$order)
 		{
@@ -256,26 +230,22 @@ class ManagerController extends Controller
 				$orderPrice = $order->orderPrice;
 				
 				// не оплачен
-				if ( ($search['oplata'] == 1 ) && ($orderPrice['itogo']['pay'] > 0) ) 
-				{
+				if ( ($search['oplata'] == 1 ) && ($orderPrice['itogo']['pay'] > 0) ) {
 					unset($orders[$key]);
 				}
 				
 				//частично оплачен
-				if (($search['oplata'] == 2 ) && ( ($orderPrice['itogo']['pay'] == 0) ||  $orderPrice['itogo']['pay'] >= ($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] ))  )
-				{
+				if (($search['oplata'] == 2 ) && ( ($orderPrice['itogo']['pay'] == 0) ||  $orderPrice['itogo']['pay'] >= ($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] ))  ) {
 					unset($orders[$key]);
 				}
 				
 				// оплачен
-				if (($search['oplata'] == 3 ) && ( $orderPrice['itogo']['pay'] < ($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] ))  )
-				{
+				if (($search['oplata'] == 3 ) && ( $orderPrice['itogo']['pay'] < ($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] ))  ) {
 					unset($orders[$key]);
 				}
 				
 				// переплата
-				if (($search['oplata'] == 4 ) && ( $orderPrice['itogo']['pay'] <= ($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] ))  )
-				{
+				if (($search['oplata'] == 4 ) && ( $orderPrice['itogo']['pay'] <= ($orderPrice['itogo']['priceDiscount'] - $orderPrice['itogo']['fee_summ'] ))  ) {
 					unset($orders[$key]);
 				}
 				

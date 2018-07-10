@@ -54,7 +54,7 @@ class PageController extends Controller
 
 		$html = htmlspecialchars_decode($html,ENT_QUOTES );
 		$html = html_entity_decode($html);
-		
+        
 		$template =  $this->container->get('twig')->createTemplate($html);
 		$html = $template->render([]);
 		

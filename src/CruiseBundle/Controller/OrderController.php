@@ -378,7 +378,9 @@ class OrderController extends Controller
 			// если агентство - ставим комиссию
 			if(($order->getAgency() !== null) && ($order->getFee() === null))
 			{
-				$order->setFee($order->getAgency()->getFee());
+				$fee = $order->getCruise()->getStartDate()->format("Y") == "2019" ? $order->getAgency()->getFee() - 5 : $order->getAgency()->getFee();
+                            
+                $order->setFee($fee);
 				//dump($order->getAgency()->getFee());
 				$this->getDoctrine()->getManager()->flush();
 			}

@@ -16,21 +16,18 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 use CruiseBundle\Entity\Agency;
 
-
 /**
  * @Route("/manager")
  */
 
 class ReportAgencyController extends Controller
 {
-	
 	/**
 	 * @Route("/agency_report_index", name="manager_agency_report_index")
 	 * @Template()		 
 	 */
 	public function index(Request $request)
 	{
-		
 		$years = [];
 		foreach(range(date("Y"), 2017) as $year)
 		{
@@ -66,18 +63,12 @@ class ReportAgencyController extends Controller
 				])
 				->add('date_month',ChoiceType::class,['choices'=> $months, 'label'=>'Месяц'])
 				->add('date_year',ChoiceType::class, ['choices'=> $years,'label'=>'Год'])											
-															
-													
-															
 				->getForm()
 			;
 		
 		$form->handleRequest($request);		
-		
-		
-		
+
 		return ['form'=>$form->createView()];
-		return new Response("OK");
 	}
 	
 	/**
@@ -100,12 +91,10 @@ class ReportAgencyController extends Controller
 	 */
 	public function report(Request $request)
 	{
-		
 		$agency_id = $request->query->get('agency_id');
 		$date_year = $request->query->get('date_year');
 		$date_month = $request->query->get('date_month');
-
-
+        
 		$response = $this->get('report_agent')->report($agency_id,$date_year,$date_month);
 
 		return $response;
@@ -116,16 +105,22 @@ class ReportAgencyController extends Controller
 	 */
 	public function act(Request $request)
 	{
-		
 		$agency_id = $request->query->get('agency_id');
 		$date_year = $request->query->get('date_year');
 		$date_month = $request->query->get('date_month');
-
-
+        
 		$response = $this->get('report_agent')->act($agency_id,$date_year,$date_month);
-		
 
-		
+		return $response;
+	}	
+    
+	/**
+	 * @Route("/report_excel", name="manager_excel")
+	 */
+	public function excel(Request $request)
+	{
+		$response = $this->get('report_agent')->excel();
+
 		return $response;
 	}
 	

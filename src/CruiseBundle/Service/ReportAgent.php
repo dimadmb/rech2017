@@ -3,6 +3,7 @@ namespace CruiseBundle\Service;
 
 
 use Symfony\Component\HttpFoundation\Response;
+use CruiseBundle\Entity\Ordering;
 
 class ReportAgent
 {
@@ -38,8 +39,60 @@ class ReportAgent
         $this->em = $doctrine->getManager();
     }	
 	
+	public function excel()
+    {
+		$phpExcelObject = $this->phpExcel->createPHPExcelObject();
+        $phpExcelObject->setActiveSheetIndex(0);
+		$aSheet = $phpExcelObject->getActiveSheet();
+        
+        
+        $orders = $this->doctrine->getRepository(Ordering::class)->findById(2560);
+        //$orders = $this->doctrine->getRepository(Ordering::class)->findAll();
+        
+        $aSheet->setCellValue("A1", "Номер заявки");
+        $aSheet->setCellValue("B1", "Теплоход");
+        $aSheet->setCellValue("C1", "Дата рейса");
+        $aSheet->setCellValue("D1", "Номера кают");
+        $aSheet->setCellValue("E1", "Регион");
+        $aSheet->setCellValue("F1", "ФИО покупателя");
+        $aSheet->setCellValue("G1", "ID Агентства");
+        $aSheet->setCellValue("H1", "Агентство");
+        $aSheet->setCellValue("I1", "Полная сумма заказа");
+        $aSheet->setCellValue("J1", "Скидка");
+        $aSheet->setCellValue("K1", "Сумма со скидкой");
+        $aSheet->setCellValue("L1", "Агентское вознаграждение");
+        $aSheet->setCellValue("M1", "За вычетом агентского вознаграждения");
+        $aSheet->setCellValue("N1", "Процент РА");
+        $aSheet->setCellValue("O1", "Комиссия РА");
+        $aSheet->setCellValue("P1", "Прибыль РА");
+        $aSheet->setCellValue("Q1", "Оплачено");
+        $aSheet->setCellValue("R1", "Дата оплаты");
+        
+        $row = 2;
+        foreach($orders as $order) {
+            
+            $orderPrice = $this->cruise->getOrderPrice($order);
+            
+          //  dump($orderPrice);
+            
+            $aSheet->setCellValue("A$row", $order->getId());
+            $aSheet->setCellValue("B$row", $order->getCruise()->getShip()->getName());
+            $row++;
+        }
+        
+        //dump($aSheet); return new Response();
+        
+        $writer = $this->phpExcel->createWriter($phpExcelObject, 'Excel5');
+		$response = $this->phpExcel->createStreamedResponse($writer);
+		$response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
+		$response->headers->set('Content-Disposition', 'attachment;filename=Отчёт.xls');
+		$response->headers->set('Pragma', 'public');
+		$response->headers->set('Cache-Control', 'maxage=1');		
+
+		return $response;
+    }
 	
-	public function reportSales( $year = null, $month = null, $buyer = 'all' , $agency_id)
+    public function reportSales( $year = null, $month = null, $buyer = 'all' , $agency_id)
 	{
 		if(($year === null) || ($month === null)) 
 		return ['error'];

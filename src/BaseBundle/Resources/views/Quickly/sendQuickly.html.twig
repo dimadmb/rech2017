@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<br>
+<p>Если Вы не смогли найти на нашем сайте  подходящий круиз, или у Вас нет времени   самостоятельно искать тур, напишите нам и мы подберем Вам лучший вариант</p>
+<br>
+{{ form_start(form) }}
+<div class="row">
+    <div class="col-sm-3">{{ form_row(form.name) }}</div>
+    <div class="col-sm-3">{{ form_row(form.phone) }}</div>
+    <div class="col-sm-3">{{ form_row(form.email) }}</div>
+    <div class="col-sm-3">{{ form_row(form.city) }}</div>
+    <div class="col-sm-12">{{ form_row(form.body) }}</div>
+</div>
+
+{{ form_end(form) }}
+
+{% endblock %}
